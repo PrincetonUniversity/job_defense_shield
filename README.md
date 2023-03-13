@@ -1,6 +1,6 @@
 # Job Defense Shield
 
-The general version is coming. Please see the version that is specific to [our institution](https://github.com/jdh4/job_defense_shield).
+The general version is coming. Please see the version that is specific to [our institution](https://github.com/jdh4/job_defense_shield) in the meantime.
 
 Job Defense Shield is simple Python code for sending automated email alerts to users and for creating reports for system administrators. It is part of the [Jobstats platform](https://github.com/PrincetonUniversity/jobstats).
 
@@ -159,6 +159,61 @@ Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help.
 ```
 
+### Low CPU Utilization
+
+```
+Hi Alan,
+
+Over the last 8 days you have used the 11th most CPU-hours on TigerCPU but
+your mean CPU efficiency is only 47%:
+
+     NetID    Partition(s)   Jobs  CPU-hours CPU-rank Efficiency
+     aturing cpu,ext,serial   11    52876     11/63      47%    
+
+Please investigate the reason(s) for the low efficiency. Common reasons for low
+CPU efficiency include:
+
+  1. Running a serial code using multiple CPU-cores. Make sure that your code is
+     written to run in parallel before using multiple CPU-cores. Learn more:
+     https://researchcomputing.princeton.edu/support/knowledge-base/parallel-code
+
+  2. Using too many CPU-cores for parallel jobs. You can find the optimal number
+     of CPU-cores by performing a scaling analysis:
+     https://researchcomputing.princeton.edu/support/knowledge-base/scaling-analysis
+
+  3. Writing job output to the /tigress or /projects storage systems. Actively
+     running jobs should be writing output files to /scratch/gpfs/hm2524 which is
+     a much faster filesystem. For more information:
+     https://researchcomputing.princeton.edu/support/knowledge-base/data-storage
+
+  4. Using the MPICH library instead of an MPI library that was built for our
+     clusters. Some software installed using 'conda' is built against an MPI
+     library that is not optimized for our systems. Run 'conda list' after
+     activating the environment and look for 'mpich' to see if you are using this
+     library.
+
+  5. Using 'mpirun' instead of 'srun' for parallel codes. Please use 'srun'.
+
+Consult the documentation or write to the mailing list of the software that you
+are using for additional reasons for low CPU efficiency and for potential
+solutions. You may also consider attending a Research Computing help session:
+
+     https://researchcomputing.princeton.edu/support/help-sessions
+
+Add the following lines to your Slurm scripts to receive an email report with CPU
+efficiency information after each job finishes:
+
+     #SBATCH --mail-type=end
+     #SBATCH --mail-user=aturing@princeton.edu
+
+You can check the efficiency of completed and actively running jobs by using the
+"jobstats" command:
+
+     https://researchcomputing.princeton.edu/support/knowledge-base/job-stats
+
+Replying to this email will open a support ticket with CSES. Let us know if we
+can be of help.
+```
 
 ### Recommending MIG GPUs
 

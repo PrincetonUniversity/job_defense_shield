@@ -2,7 +2,7 @@
 
 The general version is coming. Please see the version that is specific to [our institution](https://github.com/jdh4/job_defense_shield).
 
-Job Defense Shield is a Python script for sending automated email alerts to users and for creating reports for system administrators. It is part of the [Jobstats platform](https://github.com/PrincetonUniversity/jobstats).
+Job Defense Shield is simple Python code for sending automated email alerts to users and for creating reports for system administrators. It is part of the [Jobstats platform](https://github.com/PrincetonUniversity/jobstats).
 
 ## About
 

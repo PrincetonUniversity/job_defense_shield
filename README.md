@@ -6,11 +6,11 @@ Job Defense Shield is simple Python code for sending automated email alerts to u
 
 ## About
 
-The software in this repo creates a report of problem users and problem jobs on the large Research Computing clusters. The software identifies the following:
+The software in this repo creates a report of problem users and problem jobs. The software identifies the following:
 
 + actively running jobs where a GPU has zero utilization  
 + the heaviest users with low CPU or GPU utilization  
-+ jobs that use the datascience nodes but do not need them  
++ jobs that use the large-memory nodes but do not need them  
 + jobs that could have been run on MIG GPUs instead of full A100 GPUs  
 + multinode CPU jobs where one or more nodes have zero utilization  
 + users that have been over-allocating CPU or GPU time  
@@ -21,7 +21,6 @@ The software in this repo creates a report of problem users and problem jobs on 
 
 The script does not identify:
 + abuses of file storage or I/O  
-+ problems with jobs or users on Adroit
 
 ## How to Use
 
@@ -47,7 +46,7 @@ The Job Defense Shield is written in Python. The requirements are:
 
 - Python 3.7+
 - Pandas
-- jobstats (if looking to send emails about actively running jobs)  
+- [jobstats](https://github.com/PrincetonUniversity/jobstats) (if looking to send emails about actively running jobs)  
 
 ## Sample Emails
 

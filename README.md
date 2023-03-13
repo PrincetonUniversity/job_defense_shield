@@ -4,7 +4,7 @@ The general version is coming. Please see the version that is specific to [our i
 
 ## Sample Emails
 
-#### Running GPUs with Zero GPU Utilization
+### Running GPUs with Zero GPU Utilization
 
 ```
 Hi Alan,
@@ -54,10 +54,10 @@ can be of help in resolving this matter.
 ```
 
 
-#### Low GPU Utilization
+### Low GPU Utilization
 
 ```
-Hi Ahmet,
+Hi Alan,
 
 Over the last 8 days you have used the 10th most GPU-hours on Della (GPU) but
 your mean GPU efficiency is only 12%:
@@ -114,7 +114,7 @@ can be of help.
 ```
 
 
-#### Recommending MIG GPUs for certain jobs
+### Recommending MIG GPUs for certain jobs
 
 ```
 Hi Alan,

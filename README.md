@@ -1,6 +1,53 @@
-# job_defense_shield
+# Job Defense Shield
 
 The general version is coming. Please see the version that is specific to [our institution](https://github.com/jdh4/job_defense_shield).
+
+Job Defense Shield is a Python script for sending automated email alerts to users and for creating reports for system administrators. It is part of the [Jobstats platform](https://github.com/PrincetonUniversity/jobstats).
+
+## About
+
+The software in this repo creates a report of problem users and problem jobs on the large Research Computing clusters. The software identifies the following:
+
++ actively running jobs where a GPU has zero utilization  
++ the heaviest users with low CPU or GPU utilization  
++ jobs that use the datascience nodes but do not need them  
++ jobs that could have been run on MIG GPUs instead of full A100 GPUs  
++ multinode CPU jobs where one or more nodes have zero utilization  
++ users that have been over-allocating CPU or GPU time  
++ jobs with CPU or GPU fragmentation (e.g., 1 GPU per node over 4 nodes)  
++ jobs with the most CPU-cores and jobs with the most GPUs  
++ pending jobs with the longest queue times  
++ jobs that request more than the default memory but do not use it  
+
+The script does not identify:
++ abuses of file storage or I/O  
++ problems with jobs or users on Adroit
+
+## How to Use
+
+The following two examples show how to check for zero GPU utilization, low efficiencies and jobs that fragment GPU nodes:
+
+```
+$ ./job_defense_shield.py --email \
+                          --days=3 \
+                          --zero-gpu-utilization \
+                          --files /tigress/jdh4/utilities/job_defense_shield/violations
+                          
+$ ./job_defense_shield.py --email \
+                          --watch \
+                          --zero-gpu-utilization \
+                          --low-xpu-efficiencies \ 
+                          --datascience \
+                          --gpu-fragmentation                          
+```
+
+## Installation
+
+The Job Defense Shield is written in Python. The requirements are:
+
+- Python 3.7+
+- Pandas
+- jobstats (if looking to send emails about actively running jobs)  
 
 ## Sample Emails
 
@@ -114,7 +161,7 @@ can be of help.
 ```
 
 
-### Recommending MIG GPUs for certain jobs
+### Recommending MIG GPUs
 
 ```
 Hi Alan,
@@ -124,14 +171,8 @@ Below are jobs that ran on an A100 GPU on Della in the past 10 days:
    JobID   NetID  GPU-Util GPU-Mem-Used CPU-Mem-Used  Hours
   45933239 aturing  10%        3 GB         3 GB       50  
   45933241 aturing   9%        3 GB         3 GB       50  
-  45942078 aturing  10%        3 GB         3 GB       55  
-  45942079 aturing  11%        3 GB         3 GB       70  
-  45942080 aturing  11%        3 GB         3 GB       70  
-  45942081 aturing  12%        3 GB         3 GB       70  
   45948433 aturing  10%        2 GB         2 GB       55  
-  45948435 aturing   8%        2 GB         2 GB       82  
-  45948439 aturing  11%        2 GB         2 GB       85  
-  45948440 aturing  11%        2 GB         2 GB       83  
+  45948435 aturing   8%        2 GB         2 GB       82
 
 The jobs above have a low GPU utilization and they use less than 10 GB of GPU
 memory and less than 32 GB of CPU memory. Such jobs could be run on the MIG

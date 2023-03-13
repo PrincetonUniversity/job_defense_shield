@@ -270,3 +270,7 @@ the software you are using.
 Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help.
 ```
+
+## How to Create a New Alert
+
+A new alert is made by creating a new Python class that derives from the `Alert` base class. One then has to write the `_filter_and_add_new_fields` method and the `send_email` method. There are numerous examples of this procedure.

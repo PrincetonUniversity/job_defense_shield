@@ -50,7 +50,7 @@ The Job Defense Shield is written in Python. The requirements are:
 
 ## Sample Emails
 
-### Running GPUs with Zero GPU Utilization
+### Actively Running Jobs with Zero GPU Utilization
 
 ```
 Hi Alan,
@@ -59,8 +59,8 @@ You have GPU jobs that have been running for more than 1 hour but they appear to
 not be using the GPU(s):
 
       JobID    NetID  Cluster  GPUs-Allocated  GPUs-Unused GPU-Unused-Util  Hours
-     46177950 aturing  della         2             2              0%        3.9  
-     46177951 aturing  della         2             2              0%        3.9  
+     46177950 aturing  della         2             2              0%        3.0  
+     46177951 aturing  della         1             1              0%        1.5  
 
 We measure the utilization of each allocated GPU every 30 seconds. All
 measurements for at least one of the GPUs used in each job above have been
@@ -98,7 +98,6 @@ GPU utilization information after each job finishes:
 Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help in resolving this matter.
 ```
-
 
 ### Low GPU Utilization
 

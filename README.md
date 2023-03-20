@@ -273,6 +273,12 @@ As an alternative to MIG, you may consider trying to improve the GPU
 utilization of your code. A good place to start is the mailing list of
 the software you are using.
 
+Add the following lines to your Slurm scripts to receive an email report with
+memory usage information after each job finishes:
+
+   #SBATCH --mail-type=end
+   #SBATCH --mail-user=aturing@princeton.edu
+
 Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help.
 ```

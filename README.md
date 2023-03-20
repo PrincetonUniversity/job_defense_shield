@@ -270,6 +270,48 @@ Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help.
 ```
 
+### Underutilization of the Large-Memory Nodes
+
+```
+Hi Alan,
+
+Below are jobs that ran on the large-memory (datascience) nodes on Della in the 
+past 7 days:
+
+    JobID     NetID  Memory-Used Memory-Allocated Large-Memory-Needed?  Hours
+   46171956  aturing    105 GB        300 GB               No             8   
+   46236937  aturing    104 GB        300 GB               No             3   
+   46247483  aturing     72 GB        300 GB               No             2   
+
+The large-memory nodes should only be used for jobs that require 190 GB or more.
+It appears that none of the jobs above needed one of these nodes. For future jobs,
+please lower the value of the --mem-per-cpu or --mem Slurm directive so that the
+overall memory requirement of each job is less than 190 GB. You should use the
+smallest value possible but include an extra 20% for safety.
+
+For more information on the large-memory nodes and allocating CPU memory:
+
+   https://researchcomputing.princeton.edu/systems/della#large_memory
+   https://researchcomputing.princeton.edu/support/knowledge-base/memory
+
+Users that continually run jobs on the large-memory nodes without justification
+risk losing access to these nodes since it prevents others from getting their
+work done.
+
+Add the following lines to your Slurm scripts to receive an email report with
+memory usage information after each job finishes:
+
+   #SBATCH --mail-type=end
+   #SBATCH --mail-user=aturing@princeton.edu
+
+One can also see memory usage information by using the following command:
+
+   $ jobstats 46171956
+
+Replying to this email will open a support ticket with CSES. Let us know if we
+can be of help.
+```
+
 ## How to Create a New Alert
 
 A new alert is made by creating a new Python class that derives from the `Alert` base class. One then has to write the `_filter_and_add_new_fields` method and the `send_email` method. There are numerous examples of this procedure.

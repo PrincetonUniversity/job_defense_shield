@@ -24,20 +24,27 @@ The script does not identify:
 
 ## How to Use
 
-The following two examples show how to check for zero GPU utilization, low efficiencies and jobs that fragment GPU nodes:
+The following example show how to check for zero GPU utilization of actively running jobs:
 
 ```
 $ ./job_defense_shield.py --email \
-                          --days=3 \
+                          --days=1 \
                           --zero-gpu-utilization \
-                          --files /tigress/jdh4/utilities/job_defense_shield/violations
-                          
+                          --files /nfs/.shield/violations
+```
+
+The example below runs several alerts at once:
+
+```
 $ ./job_defense_shield.py --email \
-                          --watch \
-                          --zero-gpu-utilization \
-                          --low-xpu-efficiencies \ 
+                          --days=7 \
+                          --zero-util-gpu-hours \
+                          --gpu-fragmentation \
+                          --mig \
+                          --low-xpu-efficiency \
+                          --low-time-efficiency \
                           --datascience \
-                          --gpu-fragmentation                          
+                          --longest-queued   
 ```
 
 ## Installation

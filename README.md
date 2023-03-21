@@ -327,4 +327,4 @@ can be of help.
 
 ## How to Create a New Alert
 
-A new alert is made by creating a new Python class that derives from the `Alert` base class. One then has to write the `_filter_and_add_new_fields` method and the `send_email` method. There are numerous examples of this procedure.
+A new alert is made by creating a new Python class that derives from the `Alert` base class. One then has to write the `_filter_and_add_new_fields` method and the `send_emails_to_users` method. There are several examples of this procedure in the `alert` directory.

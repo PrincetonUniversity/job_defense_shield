@@ -312,7 +312,7 @@ risk losing access to these nodes since it prevents others from getting their
 work done.
 
 Add the following lines to your Slurm scripts to receive an email report with
-memory usage information after each job finishes:
+GPU utilization information after each job finishes:
 
    #SBATCH --mail-type=end
    #SBATCH --mail-user=aturing@princeton.edu

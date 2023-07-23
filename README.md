@@ -340,6 +340,56 @@ Replying to this automated email will open a support ticket with Research
 Computing. Let us know if we can be of help.
 ```
 
+### Excessive Run Time Limits
+
+```
+Hi Alan,
+
+Below are 10 of your 174 jobs that ran on Della (CPU) in the past 7 days:
+
+       JobID      NetID  Time-Used Time-Allocated Percent-Used  CPU-Cores
+    49152228_1   aturing  01:01:33    16:00:00         6%          32    
+    49152228_2   aturing  01:01:31    16:00:00         6%          32    
+    49152228_3   aturing  01:00:16    16:00:00         6%          32    
+    49152228_4   aturing  01:01:19    16:00:00         6%          32    
+    49152228_5   aturing  01:02:12    16:00:00         6%          32    
+    49152228_6   aturing  00:59:56    16:00:00         6%          32    
+    49152228_7   aturing  01:01:00    16:00:00         6%          32    
+    49152228_8   aturing  01:01:36    16:00:00         6%          32    
+    49152228_9   aturing  01:02:29    16:00:00         7%          32    
+    49152228_10  aturing  01:02:25    16:00:00         7%          32    
+
+It appears that you are requesting too much time for your jobs since you are
+only using on average 7% of the allocated time (for the 174 jobs). This has
+resulted in 72507 CPU-hours that you scheduled but did not use (it was made
+available to other users, however).
+
+Please request less time by modifying the --time Slurm directive. This will
+lower your queue times and allow the Slurm job scheduler to work more
+effectively for all users. For instance, if your job requires 8 hours then use:
+
+    #SBATCH --time=10:00:00
+
+The value above includes an extra 20% for safety. This is important because jobs
+that exceed the run time limit are killed. A good target for Percent-Used is 80%.
+
+Time-Used is the time (wallclock) that the job needed. The total time allocated
+for the job is Time-Allocated. The format is DD-HH:MM:SS where DD is days,
+HH is hours, MM is minutes and SS is seconds. Percent-Used is Time-Used
+divided by Time-Allocated.
+
+For more information on allocating time via Slurm:
+
+    https://researchcomputing.princeton.edu/support/knowledge-base/slurm
+
+Consider attending an in-person Research Computing help session for assistance:
+
+    https://researchcomputing.princeton.edu/support/help-sessions
+
+Replying to this automated email will open a support ticket with Research
+Computing. Let us know if we can be of help.
+```
+
 ### Underutilization of the Large-Memory Nodes
 
 ```

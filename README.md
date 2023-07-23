@@ -340,6 +340,61 @@ Replying to this automated email will open a support ticket with Research
 Computing. Let us know if we can be of help.
 ```
 
+### Serial Code Using Multiple CPU-Cores
+
+```
+Hi Alan,
+
+Below are jobs that ran on Della in the past 7 days:
+
+     JobID     NetID   Partition  CPU-cores CPU-Util 100%/CPU-cores  Hours
+    49229759  aturing    cpu          8       11.5%       12.5%        12  
+    49229772  aturing    cpu          8       12.5%       12.5%        75  
+    49234330  aturing    cpu          8       11.2%       12.5%        15  
+
+The CPU utilization (CPU-Util) of each job above is approximately equal to
+100% divided by the number of allocated CPU-cores (100%/CPU-cores). This
+suggests that you may be running a code that can only use 1 CPU-core. If this is
+true then allocating more than 1 CPU-core is wasteful. A good target value for
+CPU utilization is 90% and above.
+
+Please consult the documentation of the software to see if it is parallelized.
+For a general overview of parallel computing:
+
+    https://researchcomputing.princeton.edu/support/knowledge-base/parallel-code
+
+If the code cannot run in parallel then please use the following Slurm
+directives:
+
+    #SBATCH --nodes=1
+    #SBATCH --ntasks=1
+    #SBATCH --cpus-per-task=1
+
+You will experience shorter queue times by allocating only 1 CPU-core per job.
+In some cases this will also allow you run more jobs simultaneously.
+
+If you believe that the code is capable of using more than 1 CPU-core then
+consider attending an in-person Research Computing help session for assistance
+with running parallel jobs:
+
+    https://researchcomputing.princeton.edu/support/help-sessions
+
+You can check the CPU utilization of completed and actively running jobs by using
+the "jobstats" command. For example:
+
+    $ jobstats 49229759
+
+Add the following lines to your Slurm scripts to receive an email report with
+CPU utilization information after each job finishes:
+
+    #SBATCH --mail-type=end
+    #SBATCH --mail-user=aturing@princeton.edu
+
+Replying to this automated email will open a support ticket with Research
+Computing. Let us know if we can be of help.
+```
+
+
 ### Excessive Run Time Limits
 
 ```

@@ -13,7 +13,7 @@ The software in this repo creates a report of problem users and problem jobs. Th
 + jobs that use the large-memory nodes but do not need them  
 + jobs that could have been run on MIG GPUs instead of full A100 GPUs  
 + multinode CPU jobs where one or more nodes have zero utilization  
-+ users that have been over-allocating CPU or GPU time  
++ jobs with excessive run time limits  
 + jobs with CPU or GPU fragmentation (e.g., 1 GPU per node over 4 nodes)  
 + jobs with the most CPU-cores and jobs with the most GPUs  
 + pending jobs with the longest queue times  

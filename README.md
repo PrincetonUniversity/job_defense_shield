@@ -283,6 +283,63 @@ Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help.
 ```
 
+### Excess CPU Memory Allocations
+
+```
+Hi Alan,
+
+Below are 10 of your 1671 jobs that ran on Della (CPU) in the past 7 days:
+
+        JobID     Memory-Used Memory-Allocated Percent-Used  Cores  Hours
+    49271341_1448     1 GB         32 GB            3%        1      24  
+     49271341_147     1 GB         32 GB            3%        1      24  
+    49271341_1497     1 GB         32 GB            3%        1      24  
+    49271341_1540     1 GB         32 GB            3%        1      24  
+    49271341_1541     1 GB         32 GB            3%        1      24  
+    49271341_1544     1 GB         32 GB            3%        1      24  
+     49271341_293     1 GB         32 GB            3%        1      24  
+     49271341_294     1 GB         32 GB            3%        1      24  
+     49271341_298     1 GB         32 GB            3%        1      24  
+     49271341_397     1 GB         32 GB            3%        1      24  
+
+It appears that you are requesting too much CPU memory for your jobs since you
+are only using on average 3% of the allocated memory (for the 1671 jobs). This
+has resulted in 507 TB-hours of unused memory. A TB-hour is the allocation
+of 1 terabyte of memory for 1 hour.
+
+Please request less memory by modifying the --mem-per-cpu or --mem Slurm
+directive. This will lower your queue times and make the resources available
+to other users. For instance, if your job requires 8 GB per node then use:
+
+    #SBATCH --mem=10G
+
+The value above includes an extra 20% for safety. A good target value for
+Percent-Used is 80%. For more on allocating CPU memory with Slurm:
+
+    https://researchcomputing.princeton.edu/support/knowledge-base/memory
+
+You can check the CPU memory utilization of completed and actively running jobs
+by using the "jobstats" command. For example:
+
+    $ jobstats 49271341_1448
+
+The command above can also be used to see suggested values for the --mem-per-cpu
+and --mem Slurm directives.
+
+Add the following lines to your Slurm scripts to receive an email report with
+CPU memory utilization information after each job finishes:
+
+    #SBATCH --mail-type=end
+    #SBATCH --mail-user=aturing@princeton.edu
+
+Consider attending an in-person Research Computing help session for assistance:
+
+    https://researchcomputing.princeton.edu/support/help-sessions
+
+Replying to this automated email will open a support ticket with Research
+Computing. Let us know if we can be of help.
+```
+
 ### Underutilization of the Large-Memory Nodes
 
 ```

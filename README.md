@@ -291,16 +291,16 @@ Hi Alan,
 Below are 10 of your 1671 jobs that ran on Della (CPU) in the past 7 days:
 
         JobID     Memory-Used Memory-Allocated Percent-Used  Cores  Hours
-    49271341_1448     1 GB         32 GB            3%        1      24  
-     49271341_147     1 GB         32 GB            3%        1      24  
-    49271341_1497     1 GB         32 GB            3%        1      24  
-    49271341_1540     1 GB         32 GB            3%        1      24  
-    49271341_1541     1 GB         32 GB            3%        1      24  
-    49271341_1544     1 GB         32 GB            3%        1      24  
-     49271341_293     1 GB         32 GB            3%        1      24  
-     49271341_294     1 GB         32 GB            3%        1      24  
-     49271341_298     1 GB         32 GB            3%        1      24  
-     49271341_397     1 GB         32 GB            3%        1      24  
+    49271341_287      1 GB         32 GB            3%         1      24  
+    49271341_288      1 GB         32 GB            3%         1      24  
+    49271341_289      1 GB         32 GB            3%         1      24  
+    49271341_290      1 GB         32 GB            3%         1      24  
+    49271341_291      1 GB         32 GB            3%         1      24  
+    49271341_292      1 GB         32 GB            3%         1      24  
+    49271341_293      1 GB         32 GB            3%         1      24  
+    49271341_294      1 GB         32 GB            3%         1      24  
+    49271341_295      1 GB         32 GB            3%         1      24  
+    49271341_296      1 GB         32 GB            3%         1      24  
 
 It appears that you are requesting too much CPU memory for your jobs since you
 are only using on average 3% of the allocated memory (for the 1671 jobs). This

@@ -393,7 +393,70 @@ CPU utilization information after each job finishes:
 Replying to this automated email will open a support ticket with Research
 Computing. Let us know if we can be of help.
 ```
+### Using Too Many CPU Nodes
 
+```
+Hi Alan,
+
+Below are your recent jobs which appear to be using more nodes than necessary:
+
+   JobID   Cluster  Nodes Memory-per-Node-Used Cores-per-Node  Min-Nodes-Needed
+  49362222  della    4            3 GB               16               2        
+  49362290  della    4            3 GB               16               2        
+  49362294  della    4            3 GB               16               2        
+
+The "Nodes" column shows the number of nodes used to run the job. The
+"Min-Nodes-Needed" column shows the minimum number of nodes needed to run the
+job (these values are based on the number of requested CPU-cores while taking
+into account the CPU memory usage of the job).
+
+When possible please try to minimize the number of nodes per job by using all
+of the CPU-cores of each node. This will help to maximize the overall job
+throughput of the cluster.
+
+Della is composed of nodes with 32 CPU-cores and 190 GB of CPU memory. If your
+job requires 64 CPU-cores then use, for example:
+
+  #SBATCH --nodes=2
+  #SBATCH --ntasks-per-node=32
+
+For more information about the nodes on Della:
+
+  https://researchcomputing.princeton.edu/systems/della
+
+If you are unsure about the meanings of --nodes, --ntasks, --ntasks-per-node and
+--cpus-per-task, see our Slurm webpage:
+
+  https://researchcomputing.princeton.edu/support/knowledge-base/slurm
+
+Additionally, see this general overview on parallel computing:
+
+  https://researchcomputing.princeton.edu/support/knowledge-base/parallel-code
+
+It is very important to conduct a scaling analysis to find the optimal number
+of nodes and CPU-cores to use for a given parallel job. The calculation of
+"Min-Nodes-Needed" above is based on your choice of the total CPU-cores which
+may not be optimal. For information on conducting a scaling analysis:
+
+  https://researchcomputing.princeton.edu/support/knowledge-base/scaling-analysis
+
+See detailed information about each job by running the "jobstats" command:
+
+  $ jobstats 49362222
+
+Add the following lines to your Slurm scripts to receive an email report with
+efficiency information after each job finishes:
+
+  #SBATCH --mail-type=end
+  #SBATCH --mail-user=aturing@princeton.edu
+
+Consider attending an in-person Research Computing help session for assistance:
+
+  https://researchcomputing.princeton.edu/support/help-sessions
+
+Replying to this automated email will open a support ticket with Research
+Computing. Let us know if we can be of help.
+```
 
 ### Excessive Run Time Limits
 

@@ -62,39 +62,41 @@ The Job Defense Shield is written in Python. The requirements are:
 ```
 Hi Alan,
 
-You have GPU jobs that have been running for more than 1 hour but they appear to
-not be using the GPU(s):
+You have a GPU job that has been running for more than 1 hour but it appears to
+not be using the GPU:
 
-      JobID    NetID  Cluster  GPUs-Allocated  GPUs-Unused GPU-Unused-Util  Hours
-     46177950 aturing  della         2             2              0%        3.0  
-     46177951 aturing  della         1             1              0%        1.5  
+      JobID     NetID  Cluster  GPUs-Allocated  GPUs-Unused GPU-Util  Hours
+     49412914  aturing  della         1             1          0%     2.8  
 
-We measure the utilization of each allocated GPU every 30 seconds. All
-measurements for at least one of the GPUs used in each job above have been
-reported as 0%. You can see this by running the "jobstats" command, for example:
+Please consider canceling the job listed above by using the "scancel" command,
+for example:
 
-     $ jobstats 46177950
+     $ scancel 49412914
+
+The utilization of each allocated GPU is measured every 30 seconds. All
+measurements for the job above have been reported as 0%. You can see this by
+running the "jobstats" command, for example:
+
+     $ jobstats 49412914
 
 Follow the link at the bottom of the "jobstats" output for more detailed
 information.
 
-If the GPU(s) are not being used then you need to take action now to resolve
-this issue. Wasting resources prevents other users from getting their work done
-and it causes your subsequent jobs to have a lower priority. Users that
-continually underutilize the GPUs risk having their accounts suspended.
+If the GPU is not being used then you need to take action now to resolve this
+issue. Wasting resources prevents other users from getting their work done and
+it causes your subsequent jobs to have a lower priority. Users that continually
+underutilize the GPUs risk having their accounts suspended.
 
-Toward resolving this issue please consult the documentation for the code that
+Toward resolving this issue, please consult the documentation for the code that
 you are running. Is it GPU-enabled?
 
-For general information about GPU computing and Slurm job statistics:
+For general information about GPU computing at Princeton:
 
      https://researchcomputing.princeton.edu/support/knowledge-base/gpu-computing
+
+Please monitor your jobs using the "jobstats" command and the web interface:
+
      https://researchcomputing.princeton.edu/support/knowledge-base/job-stats
-
-Please consider canceling the jobs listed above by using the "scancel" command,
-for example:
-
-     $ scancel 46177950
 
 Add the following lines to your Slurm scripts to receive an email report with
 GPU utilization information after each job finishes:
@@ -102,8 +104,12 @@ GPU utilization information after each job finishes:
      #SBATCH --mail-type=end
      #SBATCH --mail-user=aturing@princeton.edu
 
-Replying to this email will open a support ticket with CSES. Let us know if we
-can be of help in resolving this matter.
+Consider attending an in-person Research Computing help session for assistance:
+
+     https://researchcomputing.princeton.edu/support/help-sessions
+
+Replying to this automated email will open a support ticket with Research
+Computing. Let us know if we can be of help.
 ```
 
 ### Low GPU Utilization

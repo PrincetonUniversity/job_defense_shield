@@ -227,7 +227,7 @@ Replying to this email will open a support ticket with CSES. Let us know if we
 can be of help.
 ```
 
-### Recommending MIG GPUs
+### Consider Using the MIG GPUs on Della
 
 ```
 Hi Alan,
@@ -346,7 +346,7 @@ Replying to this automated email will open a support ticket with Research
 Computing. Let us know if we can be of help.
 ```
 
-### Serial Code Using Multiple CPU-Cores
+### Serial Jobs Using Multiple CPU-cores
 
 ```
 Hi Alan,
@@ -399,7 +399,7 @@ CPU utilization information after each job finishes:
 Replying to this automated email will open a support ticket with Research
 Computing. Let us know if we can be of help.
 ```
-### Using Too Many CPU Nodes
+### Jobs Using Too Many Nodes
 
 ```
 Hi Alan,
@@ -464,7 +464,43 @@ Replying to this automated email will open a support ticket with Research
 Computing. Let us know if we can be of help.
 ```
 
-### Excessive Run Time Limits
+### Fragmented GPU Jobs on Della
+
+```
+Hi Kaixuan,
+
+Below are jobs that ran on Della in the past 5 days that used 1 GPU per node
+over multiple nodes:
+
+     JobID   NetID   GPUs  Nodes  GPUs-per-Node  Hours State GPU-eff
+    48550174 kw5996   4     4          1          1     COM    86%  
+    48550175 kw5996   4     4          1          1     COM    86%  
+    48625465 kw5996   4     4          1          1     COM    96%  
+
+The GPU nodes on Della have either 2 GPUs per node or 4 GPUs per node. For future
+jobs, please try to use as few nodes as possible by allocating more GPUs per node.
+This is done by modifying the --gres Slurm directive as explained here:
+
+    https://researchcomputing.princeton.edu/support/knowledge-base/slurm#gpus
+
+For more information about the Della GPU nodes:
+
+    https://researchcomputing.princeton.edu/systems/della#gpus
+
+When using more than 1 GPU per job, be sure to conduct a scaling analysis to find
+the optimal number of GPUs:
+
+    https://researchcomputing.princeton.edu/support/knowledge-base/scaling-analysis
+
+Consider attending an in-person Research Computing help session for assistance:
+
+    https://researchcomputing.princeton.edu/support/help-sessions
+
+Replying to this automated email will open a support ticket with Research
+Computing. Let us know if we can be of help.
+```
+
+### Requesting Too Much Time for Jobs
 
 ```
 Hi Alan,

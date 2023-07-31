@@ -467,15 +467,15 @@ Computing. Let us know if we can be of help.
 ### Fragmented GPU Jobs on Della
 
 ```
-Hi Kaixuan,
+Hi Alan,
 
 Below are jobs that ran on Della in the past 5 days that used 1 GPU per node
 over multiple nodes:
 
-     JobID   NetID   GPUs  Nodes  GPUs-per-Node  Hours State GPU-eff
-    48550174 kw5996   4     4          1          1     COM    86%  
-    48550175 kw5996   4     4          1          1     COM    86%  
-    48625465 kw5996   4     4          1          1     COM    96%  
+     JobID    NetID   GPUs  Nodes  GPUs-per-Node  Hours State GPU-eff
+    48550174 aturing   4     4          1          1     COM    86%  
+    48550175 aturing   4     4          1          1     COM    86%  
+    48625465 aturing   4     4          1          1     COM    96%  
 
 The GPU nodes on Della have either 2 GPUs per node or 4 GPUs per node. For future
 jobs, please try to use as few nodes as possible by allocating more GPUs per node.

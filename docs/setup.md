@@ -85,46 +85,48 @@ Here is an example output:
 ```
 $ python job_defense_shield.py --utilization-overview
 
+           Utilization Overview          
+-----------------------------------------
+cluster   users   cpu-hours    gpu-hours 
+-----------------------------------------
+   della  464   1285938 (16%) 91714 (65%)
+ stellar  149   6745324 (82%)  1926  (1%)
+traverse    1    189987  (2%) 47497 (34%)
+-----------------------------------------
 
-           Utilization Overview           
-------------------------------------------
-cluster   users   cpu-hours    gpu-hours  
-------------------------------------------
-   della  491   1664010 (16%) 107435 (76%)
- stellar  148   6290093 (61%)    3193 (2%)
-   tiger   43   2276967 (22%)       0 (0%)
-traverse    1     126183 (1%)  31546 (22%)
 
 
-            Utilization Overview by Partition            
----------------------------------------------------------
-cluster    partition    users   cpu-hours    gpu-hours  
----------------------------------------------------------
-   della           cpu  296    963959 (58%)       0 (0%)
-   della         pli-c   27    217984 (13%)  31254 (29%)
-   della    gpu-shared  116     158050 (9%)  42930 (40%)
-   della       datasci   45      95059 (6%)       0 (0%)
-   della       physics   16      66573 (4%)       0 (0%)
-   della           gpu   35      63406 (4%)  11736 (11%)
-   della        cryoem   20      24510 (1%)    4524 (4%)
-   della         donia    6      19055 (1%)       0 (0%)
-   della        gpu-ee    3      18779 (1%)     255 (0%)
-   della           pli   23      16976 (1%)    7806 (7%)
-   della       gputest  115      11698 (1%)    1485 (1%)
-   della           mig   47       7445 (0%)    7445 (7%)
-   della         malik    1        515 (0%)       0 (0%)
-   della     gpu-wentz    1          3 (0%)       1 (0%)
- stellar            pu   48   2998473 (48%)       0 (0%)
- stellar          pppl   38   1747524 (28%)       0 (0%)
- stellar         cimes   23   1423071 (23%)       0 (0%)
- stellar        serial   44      60886 (1%)       0 (0%)
- stellar           all   55      45176 (1%)       0 (0%)
- stellar           gpu   22      14691 (0%)  3193 (100%)
- stellar        bigmem    3        270 (0%)       0 (0%)
-   tiger           cpu   31   1792892 (79%)            0
-   tiger           ext    5    476715 (21%)            0
-   tiger        serial   15       7360 (0%)            0
-traverse           all    1   126183 (100%) 31546 (100%)
+          Utilization Overview by Partition           
+------------------------------------------------------
+cluster  partition   users   cpu-hours     gpu-hours  
+------------------------------------------------------
+   della        cpu  311    874114  (68%)     0   (0%)
+   della      pli-c   28    115406   (9%) 25838  (28%)
+   della gpu-shared   98     83617   (7%) 30083  (33%)
+   della    datasci   31     80954   (6%)     0   (0%)
+   della        gpu   51     47475   (4%) 16503  (18%)
+   della        pli   20     35814   (3%)  6249   (7%)
+   della     cryoem   17     20897   (2%)  4110   (4%)
+   della    physics    5     12968   (1%)     0   (0%)
+   della        mig   41      7169   (1%)  7169   (8%)
+   della     pli-lc    5      3107   (0%)  1081   (1%)
+   della    gputest   99      1948   (0%)   647   (1%)
+   della        all    1      1280   (0%)     0   (0%)
+   della      donia    4      1003   (0%)     0   (0%)
+   della     gpu-ee    2       173   (0%)    23   (0%)
+   della      grace    1        11   (0%)    11   (0%)
+   della      malik    1         2   (0%)     0   (0%)
+ stellar      cimes   21   2941001  (44%)     0   (0%)
+ stellar         pu   56   2426873  (36%)     0   (0%)
+ stellar       pppl   33   1340776  (20%)     0   (0%)
+ stellar     serial   41     13187   (0%)     0   (0%)
+ stellar        all   48     12377   (0%)     0   (0%)
+ stellar        gpu   20     11044   (0%)  1926 (100%)
+ stellar     bigmem    1        66   (0%)     0   (0%)
+traverse        all    1    189987 (100%) 47497 (100%)
+------------------------------------------------------
+     Start: Fri Mar 07, 2025 at 11:27 AM
+       End: Fri Mar 14, 2025 at 11:27 AM
 ```
 
 You can go further back in time by using the `--days` option:

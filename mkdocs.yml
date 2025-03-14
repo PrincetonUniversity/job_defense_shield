@@ -1,7 +1,7 @@
 site_name: "Job Defense Shield"
-site_url: https://jdh4.github.io/job_defense_shield/
-repo_url: "https://github.com/jdh4/job_defense_shield"
-repo_name: jdh4/job_defense_shield
+site_url: https://PrincetonUniversity.github.io/job_defense_shield/
+repo_url: "https://github.com/PrincetonUniversity/job_defense_shield"
+repo_name: PrincetonUniversity/job_defense_shield
 nav:
   - Overview: index.md
   - Installation: setup.md
@@ -64,7 +64,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/jdh4/job_defense_shield
+      link: https://github.com/PrincetonUniversity/job_defense_shield
   generator: false
 
 copyright: "&copy;2025 Princeton University. All rights reserved."

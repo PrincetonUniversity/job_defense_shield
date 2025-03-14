@@ -8,7 +8,7 @@ This alert is important because it enables system administrators to identify use
 Here is an example of the report:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiencies
+$ python job_defense_shield.py --low-gpu-efficiency
 
                                        Low GPU Efficiencies                                      
 -------------------------------------------------------------------------------------------------

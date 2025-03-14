@@ -94,29 +94,38 @@ zero-util-gpu-hours:
   min_run_time: 30               # minutes
   gpu_hours_threshold_user: 24   # hours
   gpu_hours_threshold_admin: 12  # hours
+  email_file: "zero_util_gpu_hours.txt"
   max_num_jobid: 3               # count
+  admin_emails:
+    - admin@institution.edu
+  report_emails:
+    - admin@institution.edu
 ```
 
 For the configuration above, only jobs that ran for 30 minutes or more are considered. Users will receive
-an email (when `--email-users` is used) if they consumed 24 GPU-hours or more at 0% utilization. System
-administrators will see users in the report (using `--email-admins`) that consumed 12 GPU-hours or more.
-The JobID will be shown for up to three jobs per user. Notice that the optional settings
-(`excluded_users`, `user_emails_bcc`, `report_emails`) are omitted in the YAML entry.
-
+an email (when `--email` is used) if they consumed 24 GPU-hours or more at 0% utilization. System
+administrators will see users in the report (using `--report`) that consumed 12 GPU-hours or more.
+The JobID will be shown for up to three jobs per user.
 
 ## How to Write Your Email File
 
-You have these quanities available to you:
+Below is an example email message:
 
 ```
-Dear u20461:
+Hello Alan (u12345),
 
-Over the past 7 days you have ran 16 jobs on Della that have burnt
-97 GPU-hours at 0% utilization. Here are the jobid's:
+You have consumed 120 GPU-hours at 0% GPU utilization in the past 7 days
+on the pli-c partition(s) of della:
 
-    60458831,60460188,60478799,60479839+
+     JobID     GPUs  GPUs-Unused GPU-Unused-Util  Zero-Util-GPU-Hours
+    62399648    8          8           0%                 36         
+    62399649    8          8           0%                 36          
+    62400616    8          8           0%                 36          
+    62402931    6          3           0%                 12          
 
-Please investigate the reason for the GPUs not being used.
+Please address this issues before submitting new jobs. Replying to
+this automated email will open a support ticket with Research
+Computing.
 ```
 
 ### Tags
@@ -133,7 +142,7 @@ These tags can be used to generate custom emails:
 
 ## Usage
 
-Email users about GPU-hours at 0% utilization: 
+Email users about GPU-hours at 0% utilization:
 
 ```
 $ python job_defense_shield.py --zero-util-gpu-hours --email
@@ -142,13 +151,12 @@ $ python job_defense_shield.py --zero-util-gpu-hours --email
 Send a report to system administrators by email:
 
 ```
-$ job_defense_shield --zero-util-gpu-hours --days=7 --report
+$ python job_defense_shield.py --zero-util-gpu-hours --report
 ```
 
 ## Related Alerts
 
-If you are looking to automatically jobs running a 0% GPU utilization then
-see this section.
+To automatically cancel GPU jobs, see the alert [Cancel 0% GPU Jobs](cancel_gpu_jobs.md).
 
 If you are looking for finding users with low but non-zero GPU utilization then
-see the [low GPU utilization](low_gpu_util.md) alert.
+see the [low GPU efficiency](low_gpu_util.md) alert.

@@ -33,7 +33,7 @@ Here are some ways the requirements can be installed:
 Next, pull down the repository:
 
 ```
-$ git clone https://github.com/jdh4/job_defense_shield
+$ git clone https://github.com/PrincetonUniversity/job_defense_shield
 $ cd job_defense_shield
 ```
 

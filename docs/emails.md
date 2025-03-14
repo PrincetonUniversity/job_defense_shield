@@ -7,17 +7,17 @@ By default, users can only receive an email for a particular instance of underut
 The `Email` column in the table below shows the number of emails that each user has received about this particular instance of underutilization:
 
 ```
-                         GPU-Hours at 0% Utilization                          
-------------------------------------------------------------------------------
-    User   GPU-Hours-At-0%  Jobs                 JobID                  Emails
-------------------------------------------------------------------------------
-1  u12998        308         39   62266607,62285369,62303767,62317153+   1 (7)
-2  u9l487         84         14   62301196,62301737,62301738,62301742+   0     
-3  u39635         25          2                     62184669,62187323    2 (4)     
-4  u24074         24         13   62303161,62303182,62303183,62303184+   0      
-------------------------------------------------------------------------------
+                         GPU-Hours at 0% Utilization
+---------------------------------------------------------------------
+    User   GPU-Hours-At-0%  Jobs             JobID             Emails
+---------------------------------------------------------------------
+1  u12998        308         39   62285369,62303767,62317153+   1 (7)
+2  u9l487         84         14   62301737,62301738,62301742+   0
+3  u39635         25          2            62184669,62187323    2 (4)
+4  u24074         24         13   62303182,62303183,62303184+   0
+---------------------------------------------------------------------
    Cluster: della
-Partitions: gpu, pli-c, pli-p, pli, pli-lc
+Partitions: gpu, llm
      Start: Wed Feb 12, 2025 at 09:50 AM
        End: Wed Feb 19, 2025 at 09:50 AM
 ```
@@ -125,7 +125,7 @@ For testing, one can add a second flag that will only send the emails to `admin_
 $ python job_defense_shield.py --low-gpu-efficiency --email --no-emails-to-users
 ```
 
-The `--no-emails-to-users` will also prevent violation log files from being updated. This allows administrators to test and modify the email messages in safety.
+The `--no-emails-to-users` will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml` without involving the users.
 
 There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](alert/cancel_gpu_jobs.md). In this case, one should add the following to the alert definition:
 

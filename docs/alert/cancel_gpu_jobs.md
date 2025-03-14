@@ -10,7 +10,7 @@ Up to two warning emails can be sent before each job is cancelled.
 
 ## Configuration File
 
-Below is an example entry for the configuration file where many of the settings are applied:
+Below is an example entry for the configuration file:
 
 ```yaml
 cancel-zero-gpu-jobs-1:
@@ -61,11 +61,11 @@ per alert.
 
 - `jobid_cache_path`: (Optional) Path to a writable directory where a cache file containing the `jobid` of each job known to be using the GPUs is stored. This is a binary file with the name `.jobid_cache.pkl`. Including this setting will eliminate redundant calls to the Prometheus server.
 
-- `max_interactive_hours`: (Optional) An interactive job will only be cancelled if the run time limit is greater than `max_interactive_hours` and the number of allocated GPUs is less than or equal to `max_interactive_gpus`. Remove these lines if interactive jobs should not receive special attention. An interactive job is one with a `jobname` that starts with either `interactive` or `sys/dashboard`.
+- `max_interactive_hours`: (Optional) An interactive job will only be cancelled if the run time limit is greater than `max_interactive_hours` and the number of allocated GPUs is less than or equal to `max_interactive_gpus`. Remove these lines if interactive jobs should not receive special treatment. An interactive job is one with a `jobname` that starts with either `interactive` or `sys/dashboard`.
 
 - `max_interactive_gpus`: (Optional) See line above.
 
-- `gpu_frac_threshold`: For a given job, let `g` be the ratio of GPUs with non-zero utilization to the number of allocated GPUs. Jobs with `gpu_frac_threshold` greater than or equal to `g` will be excluded. For example, if `gpu_frac_threshold` is 0.8 and a job uses 7 of the 8 allocated GPUs then it will be excluded since 7/8 > 0.8. Default: 1.0
+- `gpu_frac_threshold`: For a given job, let `g` be the ratio of the number of GPUs with non-zero utilization to the number of allocated GPUs. Jobs with `g` greater than or equal to  `gpu_frac_threshold` will be excluded. For example, if a job uses 7 of the 8 allocated GPUs and `gpu_frac_threshold` is 0.8 then it will be excluded from cancellation since 7/8 > 0.8. Default: 1.0
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -216,8 +216,8 @@ Below is an example email (see `email/cancel_gpu_jobs_scancel_3.txt`):
 ```
 Hi Alan (aturing),
 
-The jobs below have been cancelled because they ran for more than 2 hours at 0% GPU
-utilization:
+The jobs below have been cancelled because they ran for more than 2 hours at
+0% GPU utilization:
 
      JobID   Cluster  Partition    State    GPUs-Allocated GPU-Util  Hours
    60131148   della      gpu     CANCELLED         4          0%      2.1

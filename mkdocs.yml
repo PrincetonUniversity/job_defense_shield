@@ -13,10 +13,14 @@ nav:
     - Zero GPU Utilization:        alert/zero_gpu_util.md
     - Low CPU Utilization:         alert/low_cpu_util.md
     - Low GPU Utilization:         alert/low_gpu_util.md
+    - Serial Allocating Multiple:  alert/serial_allocating_multiple.md
     - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
+    - CPU Mem per GPU:             alert/excess_cpu_mem_per_gpu.md
+    - Too Many Cores per GPU:      alert/excess_cores_per_gpu.md
     - Multinode CPU Fragmentation: alert/cpu_fragmentation.md
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
     - Excess CPU Memory:           alert/excess_cpu_memory.md
+    - Run Time Limits:             alert/time_limits.md
     - Custom:                      alert/custom.md
   - Reports:
     - Overview:             reports/overview.md

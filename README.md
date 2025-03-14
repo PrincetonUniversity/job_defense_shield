@@ -5,7 +5,7 @@
 
 # Job Defense Shield
 
-Job Defense Shield is a software tool for sending automated email alerts to users for the underutilization of HPC resources. It also creates reports for system administrators. The software was written to be used with the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
+Job Defense Shield is a software tool for sending automated email alerts to HPC users for the underutilization. It also creates reports for system administrators. The software is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
 
 Automated email alerts to users are available for these cases:
 
@@ -32,19 +32,18 @@ Below is an example report for 0% GPU utilization:
 
 ```
                          GPU-Hours at 0% Utilization
-------------------------------------------------------------------------------
-    User   GPU-Hours-At-0%  Jobs                 JobID                  Emails
-------------------------------------------------------------------------------
-1  u12998        308         39   62266607,62285369,62303767,62317153+   1 (7)
-2  u9l487         84         14   62301196,62301737,62301738,62301742+   0
-3  u39635         25          2                     62184669,62187323    2 (4)
-4  u24074         24         13   62303161,62303182,62303183,62303184+   0
-------------------------------------------------------------------------------
+---------------------------------------------------------------------
+    User   GPU-Hours-At-0%  Jobs             JobID             Emails
+---------------------------------------------------------------------
+1  u12998        308         39   62285369,62303767,62317153+   1 (7)
+2  u9l487         84         14   62301737,62301738,62301742+   0         
+3  u39635         25          2            62184669,62187323    2 (4)         
+4  u24074         24         13   62303182,62303183,62303184+   0         
+---------------------------------------------------------------------
    Cluster: della
-Partitions: gpu, pli-c, pli-p, pli, pli-lc
+Partitions: gpu, llm
      Start: Wed Feb 12, 2025 at 09:50 AM
        End: Wed Feb 19, 2025 at 09:50 AM
-
 ```
 
 Below is an example email to a user that is requesting too much CPU memory:

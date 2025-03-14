@@ -5,9 +5,7 @@
 
 # Job Defense Shield
 
-The software in this repository, which runs on top of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) platform, can be used to send automated email alerts to users that are underutilizing the cluster resources. It can also be used for generating reports for administrators. The software identifies the following:
-
-Job Defense Shield is a software tool for sending automated email alerts to users concerning the underutilization of HPC resources. It also creates reports for system administrators. The software was written to be used with the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
+Job Defense Shield is a software tool for sending automated email alerts to users for the underutilization of HPC resources. It also creates reports for system administrators. The software was written to be used with the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
 
 Automated email alerts to users are available for these cases:
 

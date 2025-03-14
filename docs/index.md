@@ -1,7 +1,6 @@
 # Defend the Hardware
 
-**Job Defense Shield** is a Python code for sending automated email alerts to users and for creating reports for system administrators. It was written to be used with the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
-
+**Job Defense Shield** is a software tool for sending automated email alerts to users and for creating reports for system administrators. It was written to be used with the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
 
 Automated email alerts to users are available for these cases:
 

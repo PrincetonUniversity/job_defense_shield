@@ -188,7 +188,7 @@ external-emails:
 By default the software will look for `config.yaml` in the same directory as `job_defense_shield.py`. One can override this behavior by using the `--config-file` option:
 
 ```
-$ job_defense_shield --config-file=/path/to/myconfig.yaml --low-gpu-efficiency
+$ python job_defense_shield.py --config-file=/path/to/myconfig.yaml --low-gpu-efficiency
 ```
 
 The ability to use different configuration files provides additional flexibility. For instance, for some institutions it may make sense to have a different configuration file for each cluster or for different alerts.

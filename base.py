@@ -32,6 +32,7 @@ class Alert:
         self.emails = []
         self.email_file = None
         self.admin_emails = []
+        self.min_run_time = 0
         self.include_running_jobs = False
         self.warnings_to_admin = True
         for key in props:

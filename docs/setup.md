@@ -7,11 +7,13 @@ We assume that the [Jobstats platform](https://github.com/PrincetonUniversity/jo
 
 The installation requirements for Job Defense Shield are `pandas` and `pyyaml`. The `requests` module is needed only if one wants to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
 
+Python 3.6+ and pandas 1.2+ are the minimum required versions. We recommend using newer versions such as Python 3.10+ and pandas 2.1+.
+
 Here are some ways the requirements can be installed:
 
 === "Ubuntu"
 
-    ```
+    ```bash
     $ apt-get install python3-pandas python3-yaml python3-requests
     ```
 
@@ -141,18 +143,25 @@ $ python job_defense_shield.py --utilization-overview --days=14
 One can only include data from specific clusters or partitions using the `-M` and `-r` options from `sacct`:
 
 ```
-$ python job_defense_shield.py --utilization-overview -M della
+$ python job_defense_shield.py --utilization-overview -M della -r cpu,gpu
+```
+Or equivalently:
+
+```
+$ python job_defense_shield.py --utilization-overview --clusters=della --partition=cpu,gpu
 ```
 
-The `-M` and `-r` options are very useful for alerts that only apply to a particular cluster or particular partitions.
+The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to `sacct`. See `man sacct` for more information.
 
 ## Email Test
 
-By having your email address in `report-emails`, the `--report` flag can be used to send the output to administrators by email:
+By having your email address in `report-emails` in `config.yaml`, the `--report` flag can be used to send the output to administrators by email:
 
 ```
 $ python job_defense_shield.py --utilization-overview --report
 ```
+
+This feature is useful when combined with `cron`. That is, one can receive a daily report showing all of the instances of underutilization across all of the systems. This is shown later.
 
 ## Troubleshooting the Installation
 

@@ -61,22 +61,21 @@ class ZeroUtilGPUHours(Alert):
                          "gpus":"GPUs"}
             self.df = self.df.rename(columns=renamings)
             def jobid_list(series):
-                ellipsis = "+" if len(series) > self.max_num_jobid_admin else ""
+                ellipsis = "+" if len(series) > self.max_num_jobid_admin else " "
                 return ",".join(series[:self.max_num_jobid_admin]) + ellipsis
-            # for each user sum the number of GPU-hours with zero GPU utilization
+            # for each user sum the number of gpu-hours with zero gpu utilization
             self.gp = self.df.groupby("User").agg({"GPU-Hours-At-0%":"sum",
                                                    "User":"size",
                                                    "JobID":jobid_list})
             self.gp = self.gp.rename(columns={"User":"Jobs"})
             self.gp.reset_index(drop=False, inplace=True)
             self.admin = self.gp[self.gp["GPU-Hours-At-0%"] >= self.gpu_hours_threshold_admin].copy()
-            # apply a threshold to focus on the heaviest offenders
+            # apply a threshold to identify on the top offenders
             self.gp = self.gp[self.gp["GPU-Hours-At-0%"] >= self.gpu_hours_threshold_user]
             self.df["GPU-Hours-At-0%"] = self.df["GPU-Hours-At-0%"].apply(lambda x:
                                                                           round(x, 1))
 
     def create_emails(self, method):
-        # self.gp is not needed here (could use df)
         g = GreetingFactory().create_greeting(method)
         for user in self.gp.User.unique():
             vfile = f"{self.vpath}/{self.violation}/{user}.csv"

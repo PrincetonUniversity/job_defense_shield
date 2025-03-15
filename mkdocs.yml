@@ -8,7 +8,7 @@ nav:
   - Configuration: configuration.md
   - Emails: emails.md
   - Alerts:
-    - Overview:                    alert/overview.md
+    - Your First Alert:            alert/your_first_alert.md
     - Cancel 0% GPU Jobs:          alert/cancel_gpu_jobs.md
     - Zero GPU Utilization:        alert/zero_gpu_util.md
     - Low CPU Utilization:         alert/low_cpu_util.md
@@ -21,7 +21,7 @@ nav:
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
     - Excess CPU Memory:           alert/excess_cpu_memory.md
     - Run Time Limits:             alert/time_limits.md
-    - Custom:                      alert/custom.md
+    - New Alert:                   alert/new_alert.md
   - Reports:
     - Overview:             reports/overview.md
     - Usage By Slurm Account: reports/account.md

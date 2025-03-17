@@ -1,1 +1,127 @@
 # Too Much Allocated CPU Memory per GPU
+
+The alert finds jobs that allocate excess GPU memory per GPU.
+
+## Configuration File
+
+Below is an example entry for `config.yaml`:
+
+```yaml
+too-much-cpu-mem-per-gpu-1:
+  cluster: della
+  partitions:
+    - gpu
+    - llm
+  cores_per_node: 96           # count
+  gpus_per_node: 8             # count
+  cpu_mem_per_node: 1000       # GB
+  cpu_mem_per_gpu_target: 115  # GB
+  cpu_mem_per_gpu_limit: 128   # GB
+  mem_eff_thres: 0.8           # [0, 1]
+  min_run_time: 61             # minutes
+  email_file: "too_much_cpu_mem_per_gpu.txt"
+  admin_emails:
+    - admin@institution.edu
+```
+
+The parameters are explained below:
+
+- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
+per alert.
+
+- `partitions`: Specify one or more Slurm partitions.
+
+- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
+
+- `cores_per_node`: (Required) Number of CPU-cores per node.
+
+- `gpus_per_node`: (Required) Number of GPUs per node.
+
+- `cpu_mem_per_node`: (Required) Total CPU memory per node in GB.
+
+- `cpu_mem_per_gpu_target`: This should a value slightly less than the total CPU memory divided by the number of GPUs per node in GB. For instance, nodes with 1000 GB of memory and 8 GPUs might use `cpu_mem_per_gpu_target: 120`. The idea is to save some memory for the operating system. This might be interpreted as a soft limit.
+
+- `cpu_mem_per_gpu_limit`: (Required) Include jobs with a CPU memory allocation per GPU greater than this value. 
+
+- `mem_eff_threshld`: Ignore jobs where the ratio of used to allocated CPU memory is greater than or equal to this value. Default: 0.8
+
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+
+- `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
+- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
+in reports for system administrators when `--report` is used.
+
+- `email_file`: The text file to be used for the email message.
+
+- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
+when the `--email` option is used.
+
+## Report
+
+```
+                                     Too Much CPU Memory Per GPU                                     
+-----------------------------------------------------------------------------------------------------
+    JobID     User  Hours Mem-Eff CPU-Mem Partition  GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit Emails
+-----------------------------------------------------------------------------------------------------
+   62794176  u29427   23     8%    500 GB    gpu      1        500 GB             240 GB         1 (4)
+   62794179  u29427   31     2%    500 GB    gpu      1        500 GB             240 GB         1 (4)
+   62707434  u15404   48     6%    512 GB    gpu      1        512 GB             240 GB         3 (2)
+   62930177  u15404  1.4     1%    512 GB    gpu      1        512 GB             240 GB         3 (2)
+   62918411  u81448  3.8     0%    512 GB    gpu      1        512 GB             240 GB         0     
+   62837444  u35452  1.8     0%    500 GB    gpu      1        500 GB             240 GB         1 (5)
+-----------------------------------------------------------------------------------------------------
+   Cluster: della
+Partitions: gpu
+     Start: Sun Mar 09, 2025 at 10:54 PM
+       End: Sun Mar 16, 2025 at 10:54 PM
+```
+
+## Email
+
+```
+Hello Alan (u12345),
+
+Your Della (PLI) jobs appear to be allocating more CPU memory than necessary:
+
+     JobID   Hours Mem-Eff CPU-Mem  GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit
+    62733079  1.3    37%    512 GB   2        256 GB             115 GB       
+    62735106  1.4    32%    512 GB   2        256 GB             115 GB       
+
+Each node on Della (PLI) has 1000 GB of CPU memory and 8 GPUs. If possible please
+only allocate up to the soft limit of 115 GB of CPU memory per GPU. This will
+prevent the situation where there are free GPUs on a node but not enough CPU
+memory to accept new jobs.
+
+"Mem-Eff" is the memory efficiency or the ratio of used to allocated CPU memory.
+A good target value for this quantity is 80% and above. Please use an accurate
+value for the --mem, --mem-per-cpu or --mem-per-gpu Slurm directive. For job
+62733079, one could have used:
+
+    #SBATCH --mem-per-gpu=114G
+
+Replying to this automated email will open a support ticket with Research
+Computing.
+```
+
+### Tags
+
+The following tags can be used in the email file:
+
+- `<GREETING>`: The greeting generated by `greeting-method`.
+- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
+- `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
+- `<CORES>`: Cores per node (i.e., `cores_per_node`).
+- `<TARGET>`: The soft limit for CPU memory per GPU in GB (i.e., `cpu_mem_per_gpu_target`).
+- `<GPU-HOURS>`: Total number of GPU-hours at 0% utilization.
+- `<NUM-JOBS>`: Total number of jobs with at least one idle GPU.
+- `<TABLE>`: Table of job data.
+- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+
+## Usage
+
+Email users about allocating too much CPU memory per GPU:
+
+```
+$ python job_defense_shield.py --too-much-cpu-mem-per-gpu --email
+```

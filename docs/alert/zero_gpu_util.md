@@ -78,9 +78,6 @@ in reports for system administrators when `--report` is used.
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
 
-- `report_emails`: (Optional) Reports will be sent to these administator emails. This applies
-when the `--report` option is used.
-
 !!! info "Multi-GPU Jobs"
     For jobs that allocate multiple GPUs, only the GPU-hours for the GPUs at 0% utilization are included.
 

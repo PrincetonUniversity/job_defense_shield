@@ -16,7 +16,7 @@ nav:
     - Serial Allocating Multiple:  alert/serial_allocating_multiple.md
     - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
     - CPU Mem per GPU:             alert/excess_cpu_mem_per_gpu.md
-    - Too Many Cores per GPU:      alert/excess_cores_per_gpu.md
+    - Too Many Cores per GPU:      alert/too_many_cores_per_gpu.md
     - Multinode CPU Fragmentation: alert/cpu_fragmentation.md
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
     - Excess CPU Memory:           alert/excess_cpu_memory.md

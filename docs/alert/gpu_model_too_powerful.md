@@ -6,6 +6,50 @@ used the less powerful L40S GPUs or [MIG](https://www.nvidia.com/en-us/technolog
 The GPU utilization, CPU/GPU memory usage, and number of allocated CPU-cores
 is taken into account when identifying jobs.
 
+## Configuration File
+
+Here is an example entry for `config.yaml`:
+
+```yaml
+gpu-model-too-powerful:
+  clusters:
+    - della
+  partitions:
+    - gpu
+  min_run_time: 61        # minutes
+  num_cores_threshold: 1  # count
+  num_gpus_threshold: 1   # count
+  gpu_util_threshold: 15  # percent
+  gpu_mem_threshold: 10   # GB
+  cpu_mem_threshold: 32   # GB
+  email_file: "gpu_model_too_powerful.txt"
+  admin_emails:
+    - admin@institution.edu
+```
+
+- `min_run_time`: The minimum run time of a job for it to be considered. Jobs that did not run longer
+than this limit will be ignored. Default: 0
+
+- `num_cores_threshold`: Only jobs that allocate a number of CPU-cores that is equal to or less than `num_cores_threshold` will be included.
+
+- `num_gpus_threshold`: The number of allocated GPUs to be considered by the alert.
+
+- `gpu_util_threshold`:  The GPU utilization as available from `nvidia-smi`. Jobs with a mean GPU utilization of less or equal to this value will be included. The default value is 15%.
+
+- `gpu_util_target`: The minimum acceptable mean GPU utilization for any job. This is available as a email tag (see below):
+
+- `email_file`: The text file to be used for the email message.
+
+- `email_subject`: Subject of the email message to users.
+
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+
+- `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
+- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
+in reports for system administrators when `--report` is used.
+
+- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies when the `--email` option is used.
 
 ## Report
 
@@ -14,12 +58,14 @@ $ python job_defense_shield.py --gpu-model-too-powerful
 
           GPU Model Too Powerful         
 -----------------------------------------
- User   GPU-Hours  Jobs  JobID    email90
+ User   GPU-Hours  Jobs   JobID    Emails
 -----------------------------------------
-yw6760    1.1       1   61122477    2
+u87203     1.1       1   61122477   2 (1)
 ```
 
 ## Email Message
+
+Below is an example email message (see `email/gpu_model_too_powerful.txt`):
 
 ```
 Hello Alan (u12345),
@@ -46,94 +92,31 @@ For interactive sessions use, for example:
 
   $ salloc --nodes=1 --ntasks=1 --time=1:00:00 --gres=gpu:1 --partition=mig
 
-If you are using Jupyter OnDemand then set the "Node type" to "mig" when
-creating the session.
-
-By running jobs on the MIG GPUs you will experience shorter queue times and
-you will help keep A100 GPUs free for jobs that need them. For more info:
-
-  https://researchcomputing.princeton.edu/systems/della#gpus
-
-As an alternative to MIG, you may consider trying to improve the GPU
-utilization of your code. A good target value is greater than 50%. Consider
-writing to the mailing list of the software that you are using or attend
-an in-person Research Computing help session:
-
-  https://researchcomputing.princeton.edu/support/help-sessions
-
-For general information about GPU computing at Princeton:
-
-  https://researchcomputing.princeton.edu/support/knowledge-base/gpu-computing
-
 Replying to this automated email will open a support ticket with Research
 Computing.
 ```
 
-The example alert provided in `alert/gpu_model_too_powerful.py` 
+### Tags
 
-## Configuration File
+The following tags can be used in the email file:
 
-Here is an example configuration file (`config.yaml`) entry for the MIG alert:
-
-```yaml
-gpu-model-too-powerful:
-  clusters:
-    - della
-  partitions:
-    - gpu
-  min_run_time: 60        # minutes
-  num_cores_threshold: 1  # count
-  num_gpus_threshold: 1   # count
-  gpu_util_threshold: 15  # percent
-  gpu_mem_threshold: 10   # GB
-  cpu_mem_threshold: 32   # GB
-  email_file: "alert/mig.py"
-  excluded_users:
-    - aturing
-    - einstein
-```
-
-`min_run_time` is the minimum run time of the job for it to be considered. Jobs that did not run longer
-than this limit will be ignored. The default is 60 minutes.
-
-`num_cores_threshold` is the number of CPU-cores. For instance, if a job requires a large number of
-of CPU-cores than it is exempt from MIG. The default value is 1 CPU-core.
-
-`num_gpus_threshold`: The number of allocated GPUs to be considered by the alert.
-
-`gpu_util_threshold` is the GPU utilization as available from `nvidia-smi`. Jobs with a GPU utilization
-of less or equal to this value will be included. The default value is 15%.
-
-Some institutions provide a range of MIG instances (e.g., not all H100 or A100 GPUs are converted to 7 MIG instances). In this case you will
-need to modify the example to find your case. Note that you can make multiple MIG alerts to handle your situation.
-
-## Main
-
-```python
-if args.mig:
-    alerts = [alert for alert in cfg.keys() if "should-be-using-mig" in alert]
-    for alert in alerts:
-        mig = MultiInstanceGPU(df,
-                               days_between_emails=args.days,
-                               violation="should_be_using_mig",
-                               vpath=args.files,
-                               subject="Consider Using the MIG GPUs on Della",
-                               **cfg[alert])
-        if args.email and is_today_a_work_day():
-            mig.send_emails_to_users()
-        s += mig.generate_report_for_admins("Could Have Been MIG Jobs")
-```
+- `<GREETING>`: The greeting generated by `greeting-method`.
+- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
+- `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
+- `<TARGET>`: The GPU utilization (i.e., `gpu_util_target`).
+- `<DAYS>`: Number of days in the time window (default is 7).
+- `<NUM-JOBS>`: Total number of jobs that fit the constraints.
+- `<TABLE>`: Table of job data.
+- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 
 ## Usage
 
-Send emails to users with jobs that could have used the MIG GPUs instead of full GPUs:
+Send emails to users with jobs that could have used less powerful GPU models:
 
 ```
-$ python job_defense_shield.py --gpu-model-too-powerful --clusters=della --partition=gpu --days=7 --email
+$ python job_defense_shield.py --gpu-model-too-powerful --email  --clusters=della --partition=gpu
 ```
 
-Exactly the same as above:
+## Tip
 
-```
-$ python job_defense_shield.py --gpu-model-too-powerful -M della -r gpu --email
-```
+Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes. See the [nodelist](../nodelist) example.

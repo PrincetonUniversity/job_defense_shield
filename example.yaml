@@ -444,16 +444,16 @@ serial-allocating-multiple-1:
     - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
 
 
-########################
-## EXCESS TIME LIMITS ##
-########################
+###############################
+## EXCESSIVE RUN TIME LIMITS ##
+###############################
 excessive-time-1:
   cluster: della
   partitions:
     - cpu
   min_run_time: 0               # minutes
   mode: cpu                     # cpu or gpu
-  absolute_thres_hours: 100000  # cpu-hours or gpu-hours
+  absolute_thres_hours: 100000  # unused cpu/gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold: 1.0     # [0.0, 1.0]
   median_ratio_threshold: 1.0   # [0.0, 1.0]
@@ -470,7 +470,7 @@ excessive-time-2:
     - gpu
   min_run_time: 61              # minutes
   mode: gpu                     # cpu or gpu
-  absolute_thres_hours: 1000    # cpu-hours or gpu-hours
+  absolute_thres_hours: 1000    # unused cpu/gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold: 0.2     # [0.0, 1.0]
   median_ratio_threshold: 0.2   # [0.0, 1.0]

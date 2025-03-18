@@ -4,12 +4,12 @@ Here we demonstrate how to setup an alert that sends emails to users for excessi
 
 ## Step 1: Add the Alert to the Configuration File
 
-First, add the following to your `config.yaml` with the appropriate changes to `cluster` and `partiions`:
+First, add the following to your `config.yaml` with the appropriate changes to `cluster` and `partitions`:
 
 ```yaml
-########################
-## EXCESS TIME LIMITS ##
-########################
+###############################
+## EXCESSIVE RUN TIME LIMITS ##
+###############################
 excessive-time-1:
   cluster: della
   partitions:
@@ -129,34 +129,38 @@ Make sure you set `email-files-path` in the global settings of `config.yaml` to 
 
 ## Step 3: Testing the Emails
 
-Before running the live alert, let's run a test by including `--email` with `--no-emails-to-users`:
+Let's run a test by adding the `--email` flag with the `--no-emails-to-users` modifier:
 
 ```
 $ python job_defense_shield.py --excessive-time --email --no-emails-to-users
 ```
 
-The command above will only send emails to the addresses in `admin_emails`.
+The command above will only send emails to the addresses in `admin_emails`. Make changes to your email message and then rerun the test.
 
 ## Step 4: Send the Emails to Users
 
-When you are happy with the settings in `config.yaml` and the email message, run the alert to send emails to the offending users:
+When you are happy with the settings in `config.yaml` and the email message, run the alert with only `--email` to send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --excessive-time --email
 ```
 
-Once again, those in `admin_emails` will receive copies of the emails.
+Once again, those listed in `admin_emails` will receive copies of the emails.
 
 ## Step 5: Examining the Violation Files
 
-Note that if you run the same command again it will not send any emails. This is because a user can only receive an email for a given alert once per week.
+Note that if you run the same command again it will not send any emails. This is because a user can only receive an email for a given alert once per week (by default).
 
-Take a look at the violation files that were written:
+Take a look at the violation files that were written (with the path set by `violation-logs-path`):
 
 ```
 $ ls /path/to/violations/excessive_time_limits/
 u18587.csv
 u45521.csv
+
+$ cat /path/to/violations/excessive_time_limits/u18587.csv
+User,Cluster,Alert-Partitions,CPU-Hours-Unused,Jobs,Email-Sent
+u18587,della,cpu,497596,644,03/17/2025 18:35:58
 ```
 
 !!! warning "Changing partitions"
@@ -178,7 +182,7 @@ excessive-time-2:
 
 ## Step 7: Update `crontab`
 
-Finally, add the appropriate command to crontab. Something like:
+Finally, add the appropriate entry to crontab. Something like:
 
 ```
 0  9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
@@ -186,11 +190,12 @@ Finally, add the appropriate command to crontab. Something like:
 
 Because our alert only needs data for the `cpu` partition of the `della` cluster, we used `-M della -r cpu`. This is not necessary but by default the data for all clusters and all partitions is requested from the Slurm database.
 
-To receive a report to `report-emails` add the `--report` flag.
+To have a report sent to the addresses in `report-emails`, add the `--report` flag.
 
 ## Continue by Adding More Alerts
 
-Take a look at the various alerts and add what you like to your configuration file.
+Take a look at the various alerts and add what you like to your configuration file. Here are three popular ones:
 
 - [Automatically Cancel GPU Jobs with 0% Utilization](cancel_gpu_jobs.md)
+- [GPU-Hours at 0% Utilization](zero_gpu_util.md)
 - [Low GPU Efficiency](low_gpu_util.md)

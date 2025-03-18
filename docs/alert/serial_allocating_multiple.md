@@ -73,6 +73,8 @@ Partitions: cpu
 
 ## Email
 
+Below is an example email to a user:
+
 ```
 Hello Alan (u12345),
 

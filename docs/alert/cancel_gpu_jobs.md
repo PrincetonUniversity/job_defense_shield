@@ -265,3 +265,7 @@ Note that the alert is ran every 15 minutes. This must also be the value of `sam
 ## Report
 
 There is no report for this alert. To find out which users have the most GPU-hours at 0% utilization, see [this alert](zero_gpu_util.md). If you are automatically cancelling GPU jobs then no users should be able to waste significant resources.
+
+## Other Projects
+
+One can also automatically cancel GPU jobs using the [HPC Dashboard](https://www.slurmdash.com/) by Arizona State University.

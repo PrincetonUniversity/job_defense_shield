@@ -1,6 +1,6 @@
 # Excessive Run Time Limits
 
-This alert identifies users that are requesting too much run time.
+This alert identifies users that are using excessive run time limits for their jobs (e.g., requesting 3 days but only needing 3 hours).
 
 ## Configuration File
 

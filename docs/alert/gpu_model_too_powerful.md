@@ -119,4 +119,4 @@ $ python job_defense_shield.py --gpu-model-too-powerful --email  --clusters=dell
 
 ## Tip
 
-Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes. See the [nodelist](../nodelist) example.
+Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes. See the [nodelist](../nodelist.md) example.

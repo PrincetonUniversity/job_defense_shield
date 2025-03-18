@@ -11,19 +11,19 @@ nav:
     - Your First Alert:            alert/your_first_alert.md
     - Cancel 0% GPU Jobs:          alert/cancel_gpu_jobs.md
     - Zero GPU Utilization:        alert/zero_gpu_util.md
-    - Low CPU Utilization:         alert/low_cpu_util.md
     - Low GPU Utilization:         alert/low_gpu_util.md
-    - Serial Allocating Multiple:  alert/serial_allocating_multiple.md
-    - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
-    - CPU Mem per GPU:             alert/excess_cpu_mem_per_gpu.md
+    - Excess CPU Memory per GPU: alert/excess_cpu_mem_per_gpu.md
     - Too Many Cores per GPU:      alert/too_many_cores_per_gpu.md
-    - Multinode CPU Fragmentation: alert/cpu_fragmentation.md
+    - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
+    - Multinode CPU Fragmentation: alert/cpu_fragmentation.md
+    - Low CPU Utilization:         alert/low_cpu_util.md
+    - Serial Allocating Multiple:  alert/serial_allocating_multiple.md
     - Excess CPU Memory:           alert/excess_cpu_memory.md
     - Run Time Limits:             alert/time_limits.md
     - New Alert:                   alert/new_alert.md
   - Reports:
-    - Overview:             reports/overview.md
+    - Overview: reports/overview.md
     - Usage By Slurm Account: reports/account.md
   - Nodelist: nodelist.md
   - Tips: extra.md

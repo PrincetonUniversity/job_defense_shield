@@ -57,6 +57,21 @@ Below is an example report:
 
 ```
 $ python job_defense_shield.py --too-many-cores-per-gpu
+
+                                Too Many CPU-Cores Per GPU                                   
+-------------------------------------------------------------------------------
+ JobID     User  Hours CPU-Eff  GPUs Cores-per-GPU  Cores-per-GPU-Target Emails
+-------------------------------------------------------------------------------
+62675166  u79355  1.8     5%      1         48                12            0   
+62733079  u73812  1.3    15%      2         32                12            0   
+62735106  u73812  1.4    15%      2         32                12            0   
+62950436  u23992  1.2     7%      1         32                12            0   
+62952770  u23992  1.2     1%      1         32                12            0   
+-------------------------------------------------------------------------------
+   Cluster: della
+Partitions: gpu
+     Start: Tue Mar 04, 2025 at 11:32 AM
+       End: Tue Mar 18, 2025 at 11:32 AM
 ```
 
 ## Email

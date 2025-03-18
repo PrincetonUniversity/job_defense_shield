@@ -193,4 +193,4 @@ You must have a `low-cpu-efficiency` entry in `config.yaml` for this alert to wo
 
 ## Related Alerts
 
-See [low CPU utilization](low_cpu_util.md)
+See [low GPU utilization](low_gpu_util.md)

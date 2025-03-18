@@ -451,10 +451,29 @@ excessive-time-1:
   cluster: della
   partitions:
     - cpu
-  min_run_time: 61             # minutes
-  absolute_thres_hours: 10000  # cpu-hours
-  mean_ratio_threshold: 20     # [0%, 100%]
-  median_ratio_threshold: 20   # [0%, 100%]
+  min_run_time: 0               # minutes
+  mode: cpu                     # cpu or gpu
+  absolute_thres_hours: 100000  # cpu-hours or gpu-hours
+  overall_ratio_threshold: 0.2  # [0.0, 1.0]
+  mean_ratio_threshold: 1.0     # [0.0, 1.0]
+  median_ratio_threshold: 1.0   # [0.0, 1.0]
+  num_top_users: 10
+  num_jobs_display: 10
+  email_file: "excessive_time.txt"
+  admin_emails:
+    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
+    - halverson@princeton.edu
+
+excessive-time-2:
+  cluster: della
+  partitions:
+    - gpu
+  min_run_time: 61              # minutes
+  mode: gpu                     # cpu or gpu
+  absolute_thres_hours: 1000    # cpu-hours or gpu-hours
+  overall_ratio_threshold: 0.2  # [0.0, 1.0]
+  mean_ratio_threshold: 0.2     # [0.0, 1.0]
+  median_ratio_threshold: 0.2   # [0.0, 1.0]
   num_top_users: 5
   num_jobs_display: 10
   email_file: "excessive_time.txt"
@@ -481,53 +500,6 @@ excess-cpu-memory-1:
   num_top_users: 10
   num_jobs_display: 10
   email_file: "excess_cpu_memory.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-#e
-xcess-cpu-memory-2:
-  cluster: della
-  partitions:
-    - datasci
-  min_run_time: 61 # minutes
-  cores_per_node: 10000
-  mem_per_core_default: 5.0
-  tb_hours_per_day: 10000
-  ratio_threshold: 0.25
-  mean_ratio_threshold: 0.25
-  median_ratio_threshold: 0.25
-  num_top_users: 10
-  num_jobs_display: 10
-  email_file: "excess_cpu_memory.txt"
-  excluded_users:
-    - aturing
-    - einstein
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-#e
-xcess-cpu-memory-3:
-  cluster: stellar
-  partitions:
-    - all
-    - pppl
-    - pu
-    - serial
-  min_run_time: 61  # minutes
-  cores_per_node: 76.8  # 0.8 * 96
-  mem_per_core_default: 8.0  # 768.0 / 96
-  tb_hours_per_day: 10000
-  ratio_threshold: 0.25
-  mean_ratio_threshold: 0.25
-  median_ratio_threshold: 0.25
-  num_top_users: 5
-  num_jobs_display: 10
-  email_file: "excess_cpu_memory.txt"
-  excluded_users:
-    - aturing
-    - einstein
   admin_emails:
     - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
     - halverson@princeton.edu

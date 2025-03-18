@@ -6,7 +6,7 @@ Below are <CASE> that ran on <CLUSTER> (<PARTITIONS>) in the past <DAYS> days:
 
 It appears that you are requesting too much time for your jobs since you are
 only using on average <AVERAGE>% of the allocated time (for the <NUM-JOBS> jobs). This has
-resulted in <UNUSED-HOURS> CPU-hours that you scheduled but did not use (it was made
+resulted in <UNUSED-HOURS> <MODE-UPPER>-hours that you scheduled but did not use (it was made
 available to other jobs, however).
 
 Please request less time by modifying the --time Slurm directive. This will

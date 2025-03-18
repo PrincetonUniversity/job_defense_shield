@@ -23,13 +23,15 @@ def test_excessive_time_limits():
                                  partitions=["cpu"],
                                  min_run_time=0,
                                  num_top_users=10,
+                                 mode="cpu",
                                  absolute_thres_hours=10000,
-                                 mean_ratio_threshold=100,
-                                 median_ratio_threshold=100)
-    actual = limits.gp[["User", "CPU-Hours-Unused", "median(%)", "rank", "jobs"]]
+                                 overall_ratio_threshold=1.0,
+                                 mean_ratio_threshold=1.0,
+                                 median_ratio_threshold=1.0)
+    actual = limits.gp[["User", "CPU-Hours-Unused", "median-ratio", "rank", "jobs"]]
     expected = pd.DataFrame({"User":["user1", "user2"],
-                             "CPU-Hours-Unused":[95000+90000+85000, 81000+81000],
-                             "median(%)":[10, 19],
+                             "CPU-Hours-Unused":[95000+90000+85000.0, 81000+81000.0],
+                             "median-ratio":[0.10, 0.19],
                              "rank":[3, 2],
                              "jobs":[3, 2]})
     expected.index += 1

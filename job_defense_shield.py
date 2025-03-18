@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from utils import SECONDS_PER_MINUTE
-from utils import SECONDS_PER_HOUR
+from utils import SECONDS_PER_MINUTE as spm
+from utils import SECONDS_PER_HOUR as sph
 from utils import gpus_per_job
 from utils import send_email
 from utils import show_history_of_emails_sent
@@ -335,16 +335,17 @@ if __name__ == "__main__":
         df["cpu-seconds"] = df["elapsedraw"] * df["cores"]
         df["gpus"] = df.alloctres.apply(gpus_per_job)
         df["gpu-seconds"] = df["elapsedraw"] * df["gpus"]
-        df["gpu-job"] = np.where((df["alloctres"].str.contains("gres/gpu=")) & (~df["alloctres"].str.contains("gres/gpu=0")), 1, 0)
+        df["gpu-job"] = np.where((df["alloctres"].str.contains("gres/gpu=")) &
+                                 (~df["alloctres"].str.contains("gres/gpu=0")), 1, 0)
         df["cpu-only-seconds"] = np.where(df["gpus"] == 0, df["cpu-seconds"], 0)
-        df["elapsed-hours"] = df["elapsedraw"] / SECONDS_PER_HOUR
+        df["elapsed-hours"] = df["elapsedraw"] / sph
         df.loc[df["start"] != "Unknown", "start-date"] = pd.to_datetime(df["start"].astype(int), unit='s').dt.strftime("%a %-m/%d")
-        df["cpu-waste-hours"] = np.round((df["limit-minutes"] * SECONDS_PER_MINUTE - df["elapsedraw"]) * df["cores"] / SECONDS_PER_HOUR)
-        df["gpu-waste-hours"] = np.round((df["limit-minutes"] * SECONDS_PER_MINUTE - df["elapsedraw"]) * df["gpus"] / SECONDS_PER_HOUR)
-        df["cpu-alloc-hours"] = np.round(df["limit-minutes"] * SECONDS_PER_MINUTE * df["cores"] / SECONDS_PER_HOUR)
-        df["gpu-alloc-hours"] = np.round(df["limit-minutes"] * SECONDS_PER_MINUTE * df["gpus"] / SECONDS_PER_HOUR)
-        df["cpu-hours"] = df["cpu-seconds"] / SECONDS_PER_HOUR
-        df["gpu-hours"] = df["gpu-seconds"] / SECONDS_PER_HOUR
+        df["cpu-waste-hours"] = (df["limit-minutes"] * spm - df["elapsedraw"]) * df["cores"] / sph
+        df["gpu-waste-hours"] = (df["limit-minutes"] * spm - df["elapsedraw"]) * df["gpus"] / sph
+        df["cpu-alloc-hours"] = df["limit-minutes"] * spm * df["cores"] / sph
+        df["gpu-alloc-hours"] = df["limit-minutes"] * spm * df["gpus"] / sph
+        df["cpu-hours"] = df["cpu-seconds"] / sph
+        df["gpu-hours"] = df["gpu-seconds"] / sph
         df["admincomment"] = df["admincomment"].apply(get_stats_dict)
         return df
 

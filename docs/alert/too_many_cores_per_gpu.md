@@ -64,6 +64,21 @@ $ python job_defense_shield.py --too-many-cores-per-gpu
 For an example see `email/too_many_cores_per_gpu.txt`:
 
 ```
+Hello Alan (u12345),
+
+Your Della (PLI) jobs may be using more CPU-cores per GPU than necessary:
+
+    JobID   Hours CPU-Eff  Cores  GPUs Cores-per-GPU  Cores-per-GPU-Target
+   62733079  1.3    15%     64     2         32                12         
+   62735106  1.4    15%     64     2         32                12         
+
+Each node on Della (PLI) has 96 CPU-cores and 8 GPUs. If possible please try
+to use only up to 12 CPU-cores per GPU. This will prevent the situation
+where there are free GPUs on a node but not enough CPU-cores to accept new
+jobs. CPU-Eff is the CPU efficiency.
+
+Replying to this automated email will open a support ticket with Research
+Computing.
 ```
 
 ### Tags

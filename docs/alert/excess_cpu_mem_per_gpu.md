@@ -1,6 +1,6 @@
 # Too Much Allocated CPU Memory per GPU
 
-The alert finds jobs that allocate excess CPU memory per GPU.
+This alert identifies jobs that allocate excess CPU memory per GPU.
 
 ## Configuration File
 

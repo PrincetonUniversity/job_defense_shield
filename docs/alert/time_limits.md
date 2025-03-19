@@ -35,7 +35,7 @@ per alert.
 
 - `mode`: Either `cpu` or `gpu`. Default: `cpu`
 
-- `absolute_thres_hours`: (Required) Minimum number of unused CPU-cores for the user to be included. If `mode` is `gpu` then this is the number of GPU-hours.
+- `absolute_thres_hours`: (Required) Minimum number of CPU/GPU-hours for the user to be included. If `mode` is `gpu` then this is the number of GPU-hours.
 
 - `overall_ratio_threshold`: (Required) Used CPU/GPU-hours divided by total allocated CPU/GPU-hours.
 
@@ -56,6 +56,28 @@ in reports for system administrators when `--report` is used.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
+
+Below is an example entry for an alert with GPU partitions (note the `mode: gpu` setting):
+
+```yaml
+excessive-time-1:
+  cluster: della
+  partitions:
+    - gpu
+    - llm
+  mode: gpu
+  min_run_time: 61              # minutes
+  absolute_thres_hours: 100000  # used gpu-hours
+  overall_ratio_threshold: 0.2  # [0.0, 1.0]
+  mean_ratio_threshold: 0.2     # [0.0, 1.0]
+  median_ratio_threshold: 0.2   # [0.0, 1.0]
+  num_top_users: 10
+  email_file: "excessive_time_gpu.txt"
+  admin_emails:
+    - admin@institution.edu
+```
+
+One will typically need a smaller value for `absolute_thres_hours` for GPU partitions versus CPU partitions.
 
 ## Report
 
@@ -142,4 +164,12 @@ Send emails to offending users:
 
 ```
 $ python job_defense_shield.py --excessive-time --email
+```
+
+## Cron
+
+Below is an exmaple `crontab` entry:
+
+```
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
 ```

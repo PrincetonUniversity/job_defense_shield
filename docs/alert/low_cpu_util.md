@@ -1,64 +1,20 @@
 # Low CPU Utilization
 
-This option lists the users with the most CPU-hours along with their mean CPU efficiencies.
-The CPU efficiency is weighted by the number of CPU-cores per job. Jobs with
-0% utilization on a node are ignored since they are captured by another alert.
-
-This alert is important because it enables system administrators to identify users
-that are using the most resources in an inefficient way.
-
-## Report for System Administrators
-
-Here is an example of the report:
-
-```
-$ python job_defense_shield.py --low-cpu-efficiency
-
-                                       Low GPU Efficiencies                                      
--------------------------------------------------------------------------------------------------
-    user  cluster partition  gpu-hours  proportion(%)  eff(%)  jobs  interactive  cores  coverage
--------------------------------------------------------------------------------------------------
-1  u76174   della     gpu      3791          20          29     58        0        1.2      1.0  
-3  u64732   della     gpu      3201          17          50     43        0        1.0      1.0  
-4  u13301   della     gpu      2281          12          43     35        0        8.0      1.0  
-```
-
-The table lists users from the most GPU-hours to the least. The GPU efficiency is
-listed.
-
-To receive the report by email:
-
-```
-$ python job_defense_shield --low-cpu-efficency --emain-admin
-```
-
-Specify your email in the `admin_emails` in the configuration file entry for this alert.
+This alert identifies the users that are consuming the most CPU-hours with low efficiency.
 
 ## Configuration File
 
 Below is an example entry for `config.yaml`:
 
-Minimal configuration for generating reports only (not sending emails to users):
-
 ```yaml
 low-cpu-efficiency-1:
   cluster: della
   partitions:
-    - gpu
-```
-
-This configuration can be used for reports and sending emails:
-
-
-```yaml
-low-gpu-efficiency-1:
-  cluster: della
-  partitions:
-    - gpu
-  eff_thres_pct: 15         # percent
-  absolute_thres_hours: 50  # gpu-hours
+    - cpu
+  eff_thres_pct: 60         # percent
+  absolute_thres_hours: 50  # cpu-hours
   eff_target_pct: 50        # percent
-  email_file: "email/low_gpu_efficiency.txt"
+  email_file: "low_cpu_efficiency.txt"
   admin_emails:
     - admin@university.edu
     - admin@princeton.edu
@@ -68,68 +24,70 @@ low-gpu-efficiency-1:
 The parameters are explained below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
-per alert. Use multiple `zero-util-gpu-hours` alerts for multiple clusters.
+per alert.
 
-- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all partitions. It most cases it is better to create a separate alert for each partition.
+- `partitions`: Specify one or more Slurm partitions.
 
 - `eff_thres_pct`: Efficiency threshold percentage. Users with a `eff_thres_pct` os less than or equal to this value will receive an email. plus more
 
-- `absolute_thres_hours`: A user must have allocated more than this number of GPU-hours to be considered to receive an email.
+- `absolute_thres_hours`: A user must have used more than this number of CPU-hours to be considered to receive an email.
 
-- `eff_target_pct`: The target value for GPU utilization that users should strive for. It is only used in emails. This value can be referenced as the tag `<TARGET>` in email messages (see `email/low_gpu_efficiencies.txt`).
+- `eff_target_pct`: The target value for CPU utilization that users should strive for. It is only used in emails. This value can be referenced as the tag `<TARGET>` in email messages (see `low_cpu_efficiency.txt`).
 
 - `email_file`: The file used as a email body. This file must be found in the `email-files-path` setting in `config.yaml`. Learn more about writing custom emails.
 
-Below is a full set of parameters:
-
-```yaml
-low-gpu-efficiency-1:
-  cluster: della
-  partitions:
-    - gpu
-  eff_thres_pct: 15         # percent
-  proportion_thres_pct: 2   # percent
-  absolute_thres_hours: 50  # gpu-hours
-  eff_target_pct: 50        # percent
-  num_top_users: 15         # count
-  min_run_time: 30          # minutes
-  email_file: "email/low_gpu_efficiency.txt"
-  excluded_users:
-    - aturing
-    - einstein
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - msbc@princeton.edu
-```
-
-- `num_top_users`: After sorting all users by GPU-hours, only consider the top `num_top_users` for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports.
+- `num_top_users`: After sorting all users by CPU-hours, only consider the top `num_top_users` for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports.
 
 - `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. The default is 0.
 
-- `proportion_thres_pct`: A user must being using this proportion of the total GPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total GPU-hours.
+- `proportion_thres_pct`: A user must being using this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours.
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
 in reports for system administrators when `--report` is used.
 
-- `user_emails_bcc`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
+- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
 
-- `report_emails`: (Optional) Reports will be sent to these administator emails. This applies
-when the `--report` option is used.
+!!! info "How is CPU efficiency calculated?"
+The CPU efficiency is weighted by the number of CPU-cores per job. Jobs with
+0% utilization on a node are ignored since they are captured by another alert.
+
+## Report for System Administrators
+
+Here is an example report:
+
+```
+$ python job_defense_shield.py --low-cpu-efficiency
+
+                     Low CPU Efficiencies                                  
+-----------------------------------------------------------------
+ User   CPU-Hours  Proportion(%)  CPU-Eff  Jobs  AvgCores  Emails
+-----------------------------------------------------------------
+u12345   163770         4           58%     998    15.8     0   
+u85632   125364         3           44%    1034    16.3     2 (6)   
+u39731   102277         2           50%    2477     2.0     0   
+-----------------------------------------------------------------
+   Cluster: della
+Partitions: cpu
+     Start: Mon Feb 17, 2025 at 02:05 PM
+       End: Wed Mar 19, 2025 at 02:05 PM
+```
+
+The table lists users from the most CPU-hours to the least. The CPU efficiency is
+listed.
 
 ## How to Write the Email File
 
-Below is the email message that is generated by the template in `email/low_gpu_efficiencies.txt`:
+Below is an example email message (see `low_cpu_efficiency.txt`):
 
 ```
 Hello Alan (u12345),
 
-Over the last 7 days you have used the 3rd most CPU-hours on della (physics) but
+Over the last 7 days you have used the 3rd most CPU-hours on della (cpu) but
 your mean CPU efficiency is only 23%:
 
      User  Partition(s)  Jobs  CPU-Hours CPU-Rank Efficiency AvgCores
-    u12345   physics      33     2062      3/10      23%        8    
+    u12345     cpu        33     29062     3/250      23%       8    
 
 A good target value for "Efficiency" is 90% and above. Please investigate the reason
 for the low efficiency. Common reasons for low CPU efficiency are discussed here:
@@ -142,9 +100,12 @@ Computing.
 
 You can modified the file as you like. The tags that can be used in the email message are:
 
-- `<GREETING>`: The greeting that will be generated based on the choice of `greeting_method` in `config.yaml`. An example is "Hello Alan (aturing),".
-- `<CLUSTER>`: The name of the cluster as defined in `config.yaml`.
+- `<GREETING>`: The greeting that will be generated based on the choice of `greeting-method`.
+- `<CLUSTER>`: The name of the cluster in the Slurm database.
 - `<PARTITIONS>`: A comma-separated list of partitions as defined for the alert in `config.yaml`.
+- `<EFFICIENCY>`: Mean efficiency for the user (e.g., 23%).
+- `<TARGET>`: Minimum target value for the mean efficiency.
+- `<DAYS>`: Number of days in the time window (default is 7 days).
 - `<TABLE>`: A table of jobs for the user.
 - `<JOBSTATS>`: A line showing how to run the `jobstats` command on one of the jobs of the user. An example is `$ jobstats 1234567`.
 
@@ -162,7 +123,7 @@ Same as above but over the past month:
 $ python job_defense_shield.py --low-cpu-efficiency --days=30
 ```
 
-Send emails to users with low GPU efficiencies over the past 7 days:
+Send emails to users with low CPU efficiencies over the past 7 days:
 
 ```
 $ python job_defense_shield.py --low-cpu-efficiency --email
@@ -171,25 +132,19 @@ $ python job_defense_shield.py --low-cpu-efficiency --email
 Same as above but only pull data for a specific cluster and partition:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency --email -M traverse -r gpu
+$ python job_defense_shield.py --low-cpu-efficiency --email -M traverse -r cpu
 ```
 
 
 ## cron
 
-It is recommended to run this alert with a time window of 7 days:
-
 ```bash
 PY=/home/sysadmin/.conda/envs/jds-env/bin
-JDS=/homem/sysadmin/bin/job_defense_shield
+JDS=/home/sysadmin/bin/job_defense_shield
 MYLOG=${JDS}/log
 
 0 9 * * * ${PY}/python ${JDS}/job_defense_shield.py --low-cpu-efficiency --email > ${MYLOG}/low_cpu_efficiency.log 2>&1
 ```
-
-## Troubleshooting
-
-You must have a `low-cpu-efficiency` entry in `config.yaml` for this alert to work.
 
 ## Related Alerts
 

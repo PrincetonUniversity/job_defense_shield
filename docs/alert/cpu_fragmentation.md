@@ -12,21 +12,122 @@ for fragmentation.
 Jobs with 0% CPU utilization on a node are ignored since those will captured
 by a different alert.
 
+## Configuration File
+
+Below is an example alert entry for `config.yaml`:
+
+```yaml
+multinode-cpu-fragmentation-1:
+  cluster: della
+  partitions:
+    - cpu
+  min_run_time: 120     # minutes
+  cores_per_node: 32    # count
+  cores_fraction: 0.5   # [0.0, 1.0]
+  mem_per_node: 190     # GB
+  safety_fraction: 0.2  # [0.0, 1.0]
+  email_file: "multinode_cpu_fragmentation.txt"
+  admin_emails:
+    - admin@institution.edu
+```
+
+The parameters are explained below:
+
+- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
+per alert. Use multiple `zero-util-gpu-hours` alerts for multiple clusters.
+
+- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all partitions. It most cases it is better to create a separate alert for each partition.
+
+- `cores_per_node`: Cores per node.
+
+- `cores_fraction`: The ratio of allocated CPU-cores to the product of the number of nodes and CPU-cores per node. Jobs that use greater than the value of `cores_fraction` will be ignored.
+
+- `mem_per_node`: Total CPU memory per node in GB.
+
+- `safety_frac`: The memory usage of the job is multiplied by 1 + `safety_frac` and this number is compared against the product of the number of nodes and the memory per node in deciding whether or not sufficent memory was used to ignore the job independent of the number of allocated CPU-cores. The idea is to ignore jobs that are almost using all of the CPU memory on the nodes.
+
+- `email_file`: The file used as a email body. This file must be found in the `email-files-path` setting in `config.yaml`. Learn more about writing custom emails.
+
+- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. The default is 0.
+
+- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
+in reports for system administrators when `--report` is used.
+
+- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
+when the `--email` option is used.
+
 ## Report for System Administrators
+
+Below is an example report:
 
 ```
 $ python job_defense_shield --multinode-cpu-fragmentation
+
+                     Multinode CPU Jobs with Fragmentation                         
+-------------------------------------------------------------------------------
+ JobID    User   Nodes  Cores Mem-per-Node-Used Cores-per-Node Min-Nodes Emails
+-------------------------------------------------------------------------------
+6286517  u45923   20     20          1 GB             1            1        0   
+6286840  u45923   10     10          1 GB             1            1        0   
+6287417  u45923   10     10          3 GB             1            1        0   
+6288471  u45923   10     10          4 GB             1            1        0   
+6289852  u45923    5     10         12 GB             2            1        0   
+-------------------------------------------------------------------------------
+   Cluster: della
+Partitions: cpu
+     Start: Wed Mar 12, 2025 at 11:44 AM
+       End: Wed Mar 19, 2025 at 11:44 AM
 ```
+
+The `Min-Nodes` field is calculated based on the hardware specifications and the number of CPU-cores allocated by the user. All of the jobs in the table above could have ran on one node.
 
 ## Email
 
 Below is an example:
 
-## Configuration File
+```
+Hello Alan (u45923),
 
-Below is the minimal settings for this alert:
+Below are your jobs over the past 7 days on Della which appear to be using
+more nodes than necessary:
 
+     JobID   Nodes  Mem-per-Node  Cores-per-Node  Hours  Nodes-Needed
+    62862517   20        1 GB            1         2.2        1      
+    62869840   10        1 GB            1         2.9        1      
+    62874417   10        3 GB            1          12        1      
+    62886471   10        4 GB            1          12        1      
+    62892852    5       12 GB            2          22        1      
+
+The "Nodes" column shows the number of nodes used to run the job. The
+"Nodes-Needed" column shows the minimum number of nodes needed to run the
+job (these values are calculated based on the number of requested CPU-cores
+while taking into account the CPU memory usage of the job). "Mem-per-Node"
+is the mean CPU memory used per node.
+
+Replying to this automated email will open a support ticket with Research
+Computing.
+```
+### Tags
+
+The following tags can be used to construct custom email messages:
+
+- `<GREETING>`: The greeting that will be generated based on the choice of `greeting_method` in `config.yaml`. An example is "Hello Alan (aturing),".
+- `<CLUSTER>`: The name of the cluster as defined in `config.yaml`.
+- `<PARTITIONS>`: A comma-separated list of partitions as defined for the alert in `config.yaml`.
+- `<GPUS-PER-NODE>`: The number of GPUs per node (i.e., `gpus_per_node`).
+- `<TABLE>`: A table of jobs for the user.
+- `<DAYS>`: The number of days in the time window (default is 7 days).
 
 ## Usage
 
-Use it
+The command below will send emails to the offending users:
+
+```
+$ python job_defense_shield.py --multinode-cpu-fragmentation --email
+```
+
+## cron
+
+```
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --multinode-cpu-fragmentation --email -M della -r cpu > /path/to/log/cpu_fragmentation.log 2>&1
+```

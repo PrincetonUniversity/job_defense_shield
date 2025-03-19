@@ -3,7 +3,7 @@
 We assume that the [Jobstats platform](https://github.com/PrincetonUniversity/jobstats) is available and working.
 
 !!! info "Cancelling Jobs at 0% GPU Utilization"
-    To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software. All of the other alerts can be ran as a regular user. It may make sense to have one installation on a secure machine which cancels GPU jobs and a second installation on a login node which is ran as a regular user for the other alerts.
+    To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software. All of the other alerts can be ran as a regular user.
 
 The installation requirements for Job Defense Shield are `pandas` and `pyyaml`. The `requests` module is needed only if one wants to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
 

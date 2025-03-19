@@ -87,15 +87,13 @@ Below is second example entry for `config.yaml`:
 zero-util-gpu-hours:
   cluster: stellar
   partitions:
-    - h100
+    - gpu
   min_run_time: 30               # minutes
   gpu_hours_threshold_user: 24   # hours
   gpu_hours_threshold_admin: 12  # hours
-  email_file: "zero_util_gpu_hours.txt"
   max_num_jobid: 3               # count
+  email_file: "zero_util_gpu_hours.txt"
   admin_emails:
-    - admin@institution.edu
-  report_emails:
     - admin@institution.edu
 ```
 

@@ -1,27 +1,6 @@
 # Low GPU Utilization
 
-This alert finds jobs with low GPU utilization. It ignores jobs with GPUs at
-0% utilization since the zero GPU utiliation alert catching those cases.
-
-This alert is important because it enables system administrators to identify users on the cluster that are using a large amounts of GPU-hours at low utilization.
-
-Here is an example of the report:
-
-```
-$ python job_defense_shield.py --low-gpu-efficiency
-
-                                       Low GPU Efficiencies                                      
--------------------------------------------------------------------------------------------------
-    user  cluster partition  gpu-hours  proportion(%)  eff(%)  jobs  interactive  cores  coverage
--------------------------------------------------------------------------------------------------
-1  u76174   della     gpu      3791          20          29     58        0        1.2      1.0  
-3  u64732   della     gpu      3201          17          50     43        0        1.0      1.0  
-4  u13301   della     gpu      2281          12          43     35        0        8.0      1.0  
-```
-
-
-The table lists users from the most GPU-hours to the least. The GPU efficiency is
-listed.
+This alert identifies the users that are consuming the most GPU-hours with a low efficiency.
 
 ## Configuration File
 
@@ -35,7 +14,7 @@ low-gpu-efficiency-1:
   cluster: della
   partitions:
     - gpu
-  eff_thres_pct: 15         # percent
+  eff_thres_pct: 25         # percent
   absolute_thres_hours: 50  # gpu-hours
   eff_target_pct: 50        # percent
   email_file: "low_gpu_efficiency.txt"
@@ -46,11 +25,11 @@ low-gpu-efficiency-1:
 The parameters are explained below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
-per alert. Use multiple `zero-util-gpu-hours` alerts for multiple clusters.
+per alert.
 
-- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all partitions. It most cases it is better to create a separate alert for each partition.
+- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all partitions.
 
-- `eff_thres_pct`: Efficiency threshold percentage. Users with a `eff_thres_pct` os less than or equal to this value will receive an email. plus more
+- `eff_thres_pct`: Efficiency threshold percentage. Users with a `eff_thres_pct` os less than or equal to this value will receive an email.
 
 - `absolute_thres_hours`: A user must have allocated more than this number of GPU-hours to be considered to receive an email.
 
@@ -65,36 +44,52 @@ low-gpu-efficiency-1:
   cluster: della
   partitions:
     - gpu
-  eff_thres_pct: 15         # percent
+  eff_thres_pct: 25         # percent
   proportion_thres_pct: 2   # percent
   absolute_thres_hours: 50  # gpu-hours
   eff_target_pct: 50        # percent
   num_top_users: 15         # count
   min_run_time: 30          # minutes
-  email_file: "email/low_gpu_efficiency.txt"
-  excluded_users:
-    - aturing
-    - einstein
+  email_file: "low_gpu_efficiency.txt"
   admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - msbc@princeton.edu
+    - admin@institution.edu
 ```
 
 - `num_top_users`: After sorting all users by GPU-hours, only consider the top `num_top_users` for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports.
 
-- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. The default is 0.
+- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. Default: 0
 
-- `proportion_thres_pct`: A user must being using this proportion of the total GPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total GPU-hours.
+- `proportion_thres_pct`: A user must being using this proportion of the total GPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total GPU-hours. Default: 0
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
+- `excluded_users`: (Optional) List of usernames to exclude from receiving emails. These users will still appear
 in reports for system administrators when `--report` is used.
 
-- `user_emails_bcc`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
+- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
 
-- `report_emails`: (Optional) Reports will be sent to these administator emails. This applies
-when the `--report` option is used.
+## Report
+
+Here is an example of the report:
+
+```
+$ python job_defense_shield.py --low-gpu-efficiency
+
+                    Low GPU Efficiencies                                      
+------------------------------------------------------------
+ User   GPU-Hours  Proportion(%)  GPU-Eff(%)  Jobs  AvgCores
+------------------------------------------------------------
+u76174    3791         20             19       58     1.2  
+u64732    3201         17             15       43     1.0 
+u13301    2281         12              9       35     8.0
+------------------------------------------------------------
+   Cluster: della
+Partitions: gpu
+     Start: Wed Mar 12, 2025 at 09:56 AM
+       End: Wed Mar 19, 2025 at 09:56 AM
+```
+
+The table lists users from the most GPU-hours to the least. The GPU efficiency is
+listed.
 
 ## How to Write the Email File
 

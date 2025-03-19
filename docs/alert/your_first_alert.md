@@ -1,10 +1,10 @@
 # Your First Alert
 
-Here we demonstrate how to setup an alert that sends emails to users for excessive run time limits (e.g., requesting 3 days but only using 3 hours).
+Here we demonstrate how to set up an alert that sends emails to users for excessive run time limits (e.g., requesting 3 days but only using 3 hours).
 
 ## Step 1: Add the Alert to the Configuration File
 
-First, add the following to your `config.yaml` with the appropriate changes to `cluster` and `partitions`:
+Add the following to your `config.yaml` with the appropriate changes to `cluster` and `partitions`:
 
 ```yaml
 ###############################
@@ -106,7 +106,7 @@ $ cat /path/to/email/excessive_time.txt
 As you learned in the [Emails](../emails.md) section, you can modify this file just as you would any text file. Special tags can be used for each alert.
 
 
-Next, let's add the `email_file` to the alert:
+Next, let's add the `email_file` to the alert entry:
 
 ```yaml
 excessive-time-1:
@@ -135,7 +135,7 @@ Let's run a test by adding the `--email` flag with the `--no-emails-to-users` mo
 $ python job_defense_shield.py --excessive-time --email --no-emails-to-users
 ```
 
-The command above will only send emails to the addresses in `admin_emails`. Make changes to your email message and then rerun the test.
+The command above will only send emails to the addresses in `admin_emails`. Users will not receive emails. Make changes to your email message and then rerun the test.
 
 ## Step 4: Send the Emails to Users
 
@@ -163,8 +163,10 @@ User,Cluster,Alert-Partitions,CPU-Hours-Unused,Jobs,Email-Sent
 u18587,della,cpu,497596,644,03/17/2025 18:35:58
 ```
 
+The violation file of user is read when determining whether or not sufficient time has passed to send the user another email. This is the purpose of the `Email-Sent` column. The software is written so that users receive at most one email about any given job.
+
 !!! warning "Changing partitions"
-    When deciding if a user should receive an email, the software first filters the violation file by `Cluster` and `Alert-Partitions`. If you add or remove a partition to an alert this will change `Alert-Partitions` which may cause the user to receive a second email in less than seven days. After adding or removing a partition, it is best to turn the alert off for a week to avoid this.
+    When deciding if a user should receive an email, the software first filters the violation file by `Cluster` and `Alert-Partitions`. `Alert-Partitions` is a comma-seperated string of the list of partitions. If you add or remove a partition to an alert this will change `Alert-Partitions` which may cause the user to receive a second email in less than seven days. After adding or removing a partition, it is best to turn the alert off for a week to avoid this.
 
 ## Step 6: Add Additional Alerts
 
@@ -185,8 +187,10 @@ excessive-time-2:
 Finally, add the appropriate entry to crontab. Something like:
 
 ```
-0  9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
 ```
+
+The `--excessive-time` flag will trigger all of the alert of type `excessive-time-#`.
 
 Because our alert only needs data for the `cpu` partition of the `della` cluster, we used `-M della -r cpu`. This is not necessary but by default the data for all clusters and all partitions is requested from the Slurm database.
 

@@ -84,6 +84,9 @@ def test_gpu_model_too_powerful():
                                     min_run_time=0,
                                     num_cores_threshold=1,
                                     gpu_hours_threshold=24,
+                                    gpu_util_threshold=15,
+                                    gpu_mem_threshold=10,
+                                    cpu_mem_threshold=32,
                                     excluded_users=["aturing"])
     actual = too_power.df[["User", "GPU-Util", "GPU-Mem-Used", "CPU-Mem-Used", "Hours"]]
     expected = pd.DataFrame({"User":["user1", "user2", "user1"],

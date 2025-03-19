@@ -13,7 +13,7 @@ excessive-time-1:
     - cpu
   min_run_time: 61              # minutes
   mode: cpu                     # cpu or gpu
-  absolute_thres_hours: 100000  # used cpu-hours/gpu-hours
+  absolute_thres_hours: 100000  # used cpu/gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold: 0.2     # [0.0, 1.0]
   median_ratio_threshold: 0.2   # [0.0, 1.0]

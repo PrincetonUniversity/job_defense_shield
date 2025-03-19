@@ -1,4 +1,4 @@
-# Too Many CPU-Cores per GPU
+# Too Many Allocated CPU-Cores per GPU
 
 The alert finds jobs that are allocating too many CPU-cores per GPU. The goal is prevent the situation where there are free GPUs on a node but not enough CPU-cores to accept new jobs.
 

@@ -40,30 +40,25 @@ zero-cpu-utilization-1:
     - admin@institution.edu
 ```
 
-Below each line of the global settings are explained. See [example.yaml](https://github.com/jdh4/job_defense_shield/blob/main/example.yaml) in the GitHub repository for a full configuration file example.
+Each line of the global settings is explained below. See [example.yaml](https://github.com/jdh4/job_defense_shield/blob/main/example.yaml) in the GitHub repository for a full configuration file example.
 
 ## Global Settings
 
-### Jobstats Path
+### Jobstats Module and Config Paths
 
-This setting is only needed for addressing the underutilization of actively running jobs. If you do not need this feature then use settings such as:
-
-```yaml
-jobstats-module-path: /tmp
-jobstats-config-path: /tmp
-```
-
-If you do need this feature then specify the paths to `jobstats.py` and `config.py`:
+These paths are only needed for addressing the underutilization of actively running jobs:
 
 ```yaml
 jobstats-module-path: /path/to/jobstats/module/  # jobstats.py
 jobstats-config-path: /path/to/jobstats/config/  # config.py
 ```
 
-Here are the paths for a particular system:
+If you are only interested in completed jobs then you do not need this feature. In this case, remove these lines from `config.yaml`.
+
+Here is an example for a particular system:
 
 ```yaml
-jobstats-module-path: /usr/local/jobstat/
+jobstats-module-path: /usr/local/jobstats/
 jobstats-config-path: /etc/jobstats/
 ```
 

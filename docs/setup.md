@@ -58,10 +58,7 @@ $ cat config.yaml
 #####################
 ## GLOBAL SETTINGS ##
 #####################
-jobstats-module-path: /tmp
-jobstats-config-path: /tmp
 violation-logs-path: /tmp
-email-files-path: /tmp
 email-domain-name: "@institution.edu"
 sender: support@institution.edu
 reply-to: support@institution.edu
@@ -70,7 +67,7 @@ report-emails:
 ```
 
 !!! tip
-    If the path that you use for `violation-logs-path` does not exist then the software will try to make it. If `/tmp` does not exist then use something else like `/scratch`.
+    If the path that you use for `violation-logs-path` does not exist then the software will try to make it. If `/tmp` does not exist then use something else like `/scratch`. In the next section, you will choose a proper path.
 
 Be sure to replace `email-domain-name`, `sender`, `reply-to` and `report-emails` with your values.
 

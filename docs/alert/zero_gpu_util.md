@@ -4,37 +4,6 @@ This alert sends emails to users that have consumed GPU-hours
 at 0% utilization. It can also be used to generate a report of these users for
 system administrators.
 
-## Report
-
-Here is an example report:
-
-```
-$ job_defense_shield --zero-util-gpu-hours
-
-                           Zero Utilization GPU-Hours
-------------------------------------------------------------------------
-     User   GPU-Hours-At-0%  Jobs                     JobID                    
-------------------------------------------------------------------------
-1   u20461       397          16    60458831,60460188,60478799,60479839+
-2   u99704       196           8    60552976,60552983,60552984,60552985+
-3   u04204        62          39    60457297,60457395,60457408,60460181+
-4   u39983        32          40    60419086,60419088,60419089,60419090+
-5   u93550        22           6    60423037,60423668,60424743,60425344+
-6   u92847        17           5    60516409,60516469,60516554,60516718+
-7   u18225        17          17    60461780,60467419,60467445,60487739+
-8   u99455         9           4    60475110,60496234,60496390,60554903
-9   u30193         8           2                      60424873,60444734
-10  u62696         7          13    60422906,60540828,60545878,60545878+
-------------------------------------------------------------------------
-   Cluster: della
-Partitions: gpu, llm
-     Start: Thu Sept 1, 2025 at 08:00 AM
-       End: Thu Sept 8, 2025 at 12:37 PM
-```
-
-The table above shows that user `u20461` consumed 397 GPU-hours at 0% utilization.
-Four of the sixteen JobID's are shown.
-
 ## Configuration File
 
 Below is an example entry for `config.yaml`:
@@ -101,6 +70,37 @@ For the configuration above, only jobs that ran for 30 minutes or more are consi
 an email (when `--email` is used) if they consumed 24 GPU-hours or more at 0% utilization. System
 administrators will see users in the report (using `--report`) that consumed 12 GPU-hours or more.
 The JobID will be shown for up to three jobs per user.
+
+## Report
+
+Here is an example report:
+
+```
+$ job_defense_shield --zero-util-gpu-hours
+
+                           Zero Utilization GPU-Hours
+------------------------------------------------------------------------
+     User   GPU-Hours-At-0%  Jobs                     JobID                    
+------------------------------------------------------------------------
+1   u20461       397          16    60458831,60460188,60478799,60479839+
+2   u99704       196           8    60552976,60552983,60552984,60552985+
+3   u04204        62          39    60457297,60457395,60457408,60460181+
+4   u39983        32          40    60419086,60419088,60419089,60419090+
+5   u93550        22           6    60423037,60423668,60424743,60425344+
+6   u92847        17           5    60516409,60516469,60516554,60516718+
+7   u18225        17          17    60461780,60467419,60467445,60487739+
+8   u99455         9           4    60475110,60496234,60496390,60554903
+9   u30193         8           2                      60424873,60444734
+10  u62696         7          13    60422906,60540828,60545878,60545878+
+------------------------------------------------------------------------
+   Cluster: della
+Partitions: gpu, llm
+     Start: Thu Sep 1, 2024 at 08:00 AM
+       End: Thu Sep 8, 2024 at 08:00 AM
+```
+
+The table above shows that user `u20461` consumed 397 GPU-hours at 0% utilization.
+Four of the sixteen JobID's are shown.
 
 ## How to Write Your Email File
 

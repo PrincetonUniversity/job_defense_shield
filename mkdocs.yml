@@ -25,9 +25,9 @@ nav:
     - New Alert:                   alert/new_alert.md
   - Reports:
     - Overview: reports/overview.md
-    - Usage By Slurm Account: reports/account.md
+#    - Usage By Slurm Account: reports/account.md
   - Nodelist: nodelist.md
-  - Tips: extra.md
+#  - Tips: extra.md
   - Contributions: contributions.md
   - Support: support.md
   - Publications: publications.md

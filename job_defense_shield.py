@@ -150,9 +150,9 @@ if __name__ == "__main__":
             raise
 
     if "jobstats-module-path" not in cfg:
-        cfg["jobstats-module-path"] = "/tmp"
+        cfg["jobstats-module-path"] = "/usr/local/jobstats/"
     if "jobstats-config-path" not in cfg:
-        cfg["jobstats-config-path"] = "/tmp"
+        cfg["jobstats-config-path"] = "/etc/jobstats"
     if "verbose" not in cfg:
         cfg["verbose"] = False
     if "external-emails" not in cfg:

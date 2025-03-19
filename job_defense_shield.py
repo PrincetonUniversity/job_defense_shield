@@ -151,6 +151,8 @@ if __name__ == "__main__":
 
     if "jobstats-module-path" not in cfg:
         cfg["jobstats-module-path"] = "/tmp"
+    if "jobstats-config-path" not in cfg:
+        cfg["jobstats-config-path"] = "/tmp"
     if "verbose" not in cfg:
         cfg["verbose"] = False
     if "external-emails" not in cfg:
@@ -165,7 +167,8 @@ if __name__ == "__main__":
         cfg["partition-renamings"] = {}
 
     sys_cfg = {"no_emails_to_users": args.no_emails_to_users,
-               "jobstats_path":      cfg["jobstats-module-path"],
+               "jobstats_module_path":      cfg["jobstats-module-path"],
+               "jobstats_config_path":      cfg["jobstats-config-path"],
                "email_files_path":   cfg["email-files-path"],
                "verbose":            cfg["verbose"],
                "sender":             cfg["sender"],

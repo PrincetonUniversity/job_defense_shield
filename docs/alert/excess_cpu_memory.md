@@ -1,4 +1,4 @@
-# Excess CPU Memory
+# Over-Allocating CPU Memory
 
 This alert sends emails to users that are allocating excess CPU memory.
 For example, jobs that use 1 GB but allocate 100 GB.

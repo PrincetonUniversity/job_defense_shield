@@ -11,14 +11,12 @@ low-cpu-efficiency-1:
   cluster: della
   partitions:
     - cpu
-  eff_thres_pct: 60         # percent
-  absolute_thres_hours: 50  # cpu-hours
-  eff_target_pct: 50        # percent
+  eff_thres_pct: 60          # percent
+  absolute_thres_hours: 100  # cpu-hours
+  eff_target_pct: 90         # percent
   email_file: "low_cpu_efficiency.txt"
   admin_emails:
-    - admin@university.edu
-    - admin@princeton.edu
-    - sysadmin@princeton.edu
+    - admin@institution.edu
 ```
 
 The parameters are explained below:
@@ -49,8 +47,7 @@ in reports for system administrators when `--report` is used.
 when the `--email` option is used.
 
 !!! info "How is CPU efficiency calculated?"
-The CPU efficiency is weighted by the number of CPU-cores per job. Jobs with
-0% utilization on a node are ignored since they are captured by another alert.
+    The CPU efficiency is weighted by the number of CPU-cores per job. Jobs with 0% utilization on a node are ignored since they are captured by another alert.
 
 ## Report for System Administrators
 
@@ -63,13 +60,13 @@ $ python job_defense_shield.py --low-cpu-efficiency
 -----------------------------------------------------------------
  User   CPU-Hours  Proportion(%)  CPU-Eff  Jobs  AvgCores  Emails
 -----------------------------------------------------------------
-u12345   163770         4           58%     998    15.8     0   
-u85632   125364         3           44%    1034    16.3     2 (6)   
-u39731   102277         2           50%    2477     2.0     0   
+u12345    16377         4           58%     998    15.8     0   
+u85632    12536         3           14%    1034    16.3     2 (6)   
+u39731    10227         2           50%    2477     2.0     0   
 -----------------------------------------------------------------
    Cluster: della
 Partitions: cpu
-     Start: Mon Feb 17, 2025 at 02:05 PM
+     Start: Wed Mar 12, 2025 at 02:05 PM
        End: Wed Mar 19, 2025 at 02:05 PM
 ```
 

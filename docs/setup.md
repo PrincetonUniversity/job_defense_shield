@@ -59,6 +59,7 @@ $ cat config.yaml
 ## GLOBAL SETTINGS ##
 #####################
 jobstats-module-path: /tmp
+jobstats-config-path: /tmp
 violation-logs-path: /tmp
 email-files-path: /tmp
 email-domain-name: "@institution.edu"

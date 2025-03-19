@@ -125,7 +125,8 @@ class Alert:
     def get_admincomment_for_running_jobs(self) -> pd.Series:
         """Query the Prometheus server for the admincomment of
         jobs in a RUNNING state."""
-        sys.path.append(self.jobstats_path)
+        sys.path.append(self.jobstats_module_path)
+        sys.path.append(self.jobstats_config_path)
         from jobstats import Jobstats
         from config import PROM_SERVER
         num_jobs = len(self.df[self.df.state == "RUNNING"])

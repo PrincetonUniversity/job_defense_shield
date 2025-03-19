@@ -10,7 +10,8 @@ Below is a minimal configuration file (`config.yaml`) with one alert:
 #####################
 ## GLOBAL SETTINGS ##
 #####################
-jobstats-module-path: /path/to/jobstats/
+jobstats-module-path: /path/to/jobstats/module/
+jobstats-config-path: /path/to/jobstats/config/
 violation-logs-path: /path/to/violations/
 email-files-path: /path/to/email/
 email-domain-name: "@institution.edu"
@@ -45,23 +46,25 @@ Below each line of the global settings are explained. See [example.yaml](https:/
 
 ### Jobstats Path
 
-This setting is only needed for addressing the underutilization of actively running jobs. If you do not need this feature then use a setting such as:
+This setting is only needed for addressing the underutilization of actively running jobs. If you do not need this feature then use settings such as:
 
 ```yaml
 jobstats-module-path: /tmp
+jobstats-config-path: /tmp
 ```
 
-If you do need this feature then set this path to the `jobstats` directory which contains `jobstats.py` and `config.py`:
+If you do need this feature then specify the paths to `jobstats.py` and `config.py`:
 
 ```yaml
-jobstats-module-path: /path/to/jobstats/
+jobstats-module-path: /path/to/jobstats/module/  # jobstats.py
+jobstats-config-path: /path/to/jobstats/config/  # config.py
 ```
 
-These two files are needed for getting the summary statistics of actively running jobs. To be clear, `/path/to/jobstats/` should contain these files:
+Here are the paths for a particular system:
 
-```
-/path/to/jobstats/jobstats.py
-/path/to/jobstats/config.py
+```yaml
+jobstats-module-path: /usr/local/jobstat/
+jobstats-config-path: /etc/jobstats/
 ```
 
 The value of `PROM_SERVER` is taken from `config.py`.

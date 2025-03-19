@@ -22,11 +22,13 @@ class GpuModelTooPowerful(Alert):
             self.report_title = "GPU Model Too Powerful"
         if not hasattr(self, "max_num_jobid_admin"):
             self.max_num_jobid_admin = 3
+        if not hasattr(self, "num_cores_threshold"):
+            self.num_cores_threshold = 1
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
-                          (self.df.cores == self.num_cores_threshold) &
+                          (self.df.cores <= self.num_cores_threshold) &
                           (self.df.gpus == 1) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df.state != "OUT_OF_MEMORY") &
@@ -60,13 +62,10 @@ class GpuModelTooPowerful(Alert):
                 self.df[cols] = pd.DataFrame(self.df["memory-tuple"].tolist(), index=self.df.index)
                 self.df = self.df[self.df["error_code"] == 0]
                 # find jobs that could have used less powerful gpus
-                gpu_eff_threshold = 15 # percent
-                gpu_mem_threshold = 10 # GB
-                cpu_mem_threshold = 32 # GB
-                self.df = self.df[(self.df["GPU-Util"] <= gpu_eff_threshold) &
+                self.df = self.df[(self.df["GPU-Util"] <= self.gpu_util_threshold) &
                                   (self.df["GPU-Util"] != 0) &
-                                  (self.df["GPU-Mem-Used"] < gpu_mem_threshold) &
-                                  (self.df["CPU-Mem-Used"] < cpu_mem_threshold)]
+                                  (self.df["GPU-Mem-Used"] < self.gpu_mem_threshold) &
+                                  (self.df["CPU-Mem-Used"] < self.cpu_mem_threshold)]
                 self.df["CPU-Mem-Used"] = self.df["CPU-Mem-Used"].apply(lambda x: f"{round(x)} GB")
                 self.df["GPU-Mem-Used"] = self.df["GPU-Mem-Used"].apply(lambda x: f"{round(x)} GB")
                 self.df["GPU-Util"]     = self.df["GPU-Util"].apply(lambda x: f"{round(x)}%"
@@ -130,26 +129,23 @@ class GpuModelTooPowerful(Alert):
  
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.df.empty:
-            column_names = ["JobID",
-                            "User",
-                            "GPU-Util",
-                            "GPU-Mem-Used",
-                            "CPU-Mem-Used",
-                            "Hours",
+            column_names = ["User",
+                            "GPU-Hours",
+                            "JobID",
                             "Emails"]
             self.df = pd.DataFrame(columns=column_names)
             return add_dividers(self.create_empty_report(self.df), self.report_title)
         def jobid_list(series):
-            ellipsis = "+" if len(series) > self.max_num_jobid_admin else ""
+            ellipsis = "+" if len(series) > self.max_num_jobid_admin else " "
             return ",".join(series[:self.max_num_jobid_admin]) + ellipsis
         d = {"Hours":"sum", "User":"size", "JobID":jobid_list}
         self.admin = self.df.groupby("User").agg(d)
-        self.admin["Hours"] = self.admin["Hours"].apply(lambda x: str(round(x, 1))
-                                                        if x < 5 else str(round(x)))
         renamings = {"User":"Jobs", "Hours":"GPU-Hours"}
         self.admin = self.admin.rename(columns=renamings)
-        self.admin = self.admin.sort_values(by="GPU-Hours", ascending=False)
         self.admin.reset_index(drop=False, inplace=True)
+        self.admin = self.admin.sort_values(by="GPU-Hours", ascending=False)
+        self.admin["GPU-Hours"] = self.admin["GPU-Hours"].apply(lambda x: str(round(x, 1))
+                                                                if x < 5 else str(round(x)))
         self.admin.index += 1
         self.admin["Emails"] = self.admin["User"].apply(lambda user:
                                     self.get_emails_sent_count(user, self.violation))

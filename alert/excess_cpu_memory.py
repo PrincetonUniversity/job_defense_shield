@@ -9,7 +9,7 @@ from email_translator import EmailTranslator
 
 class ExcessCPUMemory(Alert):
 
-    """Find users that allocating too much CPU memory."""
+    """Find users that are allocating too much CPU memory."""
  
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
@@ -25,6 +25,7 @@ class ExcessCPUMemory(Alert):
             self.num_top_users = 100000
 
     def _filter_and_add_new_fields(self):
+        # exclude gpu jobs?
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
                           (self.df.state != "OUT_OF_MEMORY") &
@@ -37,9 +38,10 @@ class ExcessCPUMemory(Alert):
             self.df = self.filter_by_nodelist()
         if self.combine_partitions:
             self.df.partition = ",".join(sorted(set(self.partitions)))
-        # only consider jobs that do not use (approximately) full nodes
-        thres = self.cores_fraction * self.cores_per_node
-        self.df = self.df[self.df["cores"] / self.df["nodes"] <= thres]
+        if hasattr(self, "cores_fraction") and hasattr(self, "cores_per_node"):
+            # only consider jobs that do not use (approximately) full nodes
+            thres = self.cores_fraction * self.cores_per_node
+            self.df = self.df[self.df["cores"] / self.df["nodes"] <= thres]
         # initialize gp and admin in case df is empty
         self.gp = pd.DataFrame({"User":[]})
         self.admin = pd.DataFrame()
@@ -55,9 +57,10 @@ class ExcessCPUMemory(Alert):
             self.df["mem-unused"] = self.df["mem-alloc"] - self.df["mem-used"]
             # filter out jobs using approximately default memory
             self.df["GB-per-core"] = self.df["mem-alloc"] / self.df["cores"]
-            # ignore jobs using default memory or less?
-            thres = self.mem_per_node / self.cores_per_node
-            self.df = self.df[self.df["GB-per-core"] > thres]
+            if hasattr(self, "mem_per_node") and hasattr(self, "cores_per_node"):
+                # ignore jobs using default memory or less?
+                thres = self.mem_per_node / self.cores_per_node
+                self.df = self.df[self.df["GB-per-core"] > thres]
             # IF STATEMENT
             GB_per_TB = 1000
             self.df["mem-hrs-used"]   = self.df["mem-used"] * self.df["elapsed-hours"] / GB_per_TB
@@ -106,7 +109,6 @@ class ExcessCPUMemory(Alert):
                          "cores":"avg-cores",
                          "cpu-hours":"cpu-hrs"}
             self.gp = self.gp.rename(columns=renamings)
-            # should email be computed for a specific cluster and partition?
             self.gp["emails"] = self.gp["User"].apply(lambda user:
                                      self.get_emails_sent_count(user, self.violation))
             cols = ["Mem-Hrs-Unused", "mem-hrs-used", "mem-hrs-alloc", "cpu-hrs"]
@@ -119,9 +121,9 @@ class ExcessCPUMemory(Alert):
             self.gp = self.gp.head(self.num_top_users)
             self.admin = self.gp.copy()
             self.gp = self.gp[(self.gp["Mem-Hrs-Unused"] > self.tb_hours_threshold) &
-                              (self.gp["Ratio"] < self.ratio_threshold) &
-                              (self.gp["mean-ratio"] < self.mean_ratio_threshold) &
-                              (self.gp["median-ratio"] < self.median_ratio_threshold)]
+                              (self.gp["Ratio"] <= self.ratio_threshold) &
+                              (self.gp["mean-ratio"] <= self.mean_ratio_threshold) &
+                              (self.gp["median-ratio"] <= self.median_ratio_threshold)]
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)
@@ -135,9 +137,10 @@ class ExcessCPUMemory(Alert):
                 case = f"{num_disp} of your {total_jobs} jobs" if total_jobs > num_disp else "your jobs"
                 pct = round(100 * usr["mean-ratio"].values[0])
                 unused = usr["Mem-Hrs-Unused"].values[0]
-                hours_per_week = 7 * 24
-                tb_mem_per_node = self.mem_per_node / 1e3
-                num_wasted_nodes = round(unused / hours_per_week / tb_mem_per_node)
+                if hasattr(self, "mem_per_node"):
+                    hours_per_week = 7 * 24
+                    tb_mem_per_node = self.mem_per_node / 1e3
+                    num_wasted_nodes = round(unused / hours_per_week / tb_mem_per_node)
                 jobs = jobs.sort_values(by="mem-hrs-unused", ascending=False).head(num_disp)
                 jobs = jobs[["jobid",
                              "mem-used",
@@ -167,7 +170,8 @@ class ExcessCPUMemory(Alert):
                 tags["<PERCENT>"] = f"{pct}%"
                 tags["<NUM-JOBS>"] = str(total_jobs)
                 # is next line optional based on config params?
-                tags["<NUM-WASTED-NODES>"] = str(num_wasted_nodes)
+                if hasattr(self, "mem_per_node"):
+                    tags["<NUM-WASTED-NODES>"] = str(num_wasted_nodes)
                 tags["<UNUSED>"] = str(usr["Mem-Hrs-Unused"].values[0])
                 table = jobs.to_string(index=False, justify="center").split("\n")
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])

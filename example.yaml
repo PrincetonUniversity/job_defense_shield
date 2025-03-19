@@ -54,10 +54,13 @@ gpu-model-too-powerful-1:
   cluster: della
   partitions:
     - gpu
-  min_run_time: 61 # minutes
-  num_cores_threshold: 1
-  gpu_util_target: "50%"
-  gpu_hours_threshold: 24 # gpu-hours
+  min_run_time: 61         # minutes
+  gpu_hours_threshold: 24  # gpu-hours
+  num_cores_threshold: 1   # count
+  gpu_util_threshold: 15   # percent
+  gpu_mem_threshold: 10    # GB
+  cpu_mem_threshold: 32    # GB
+  gpu_util_target: 50      # percent
   email_file: "gpu_model_too_powerful.txt"
   excluded_users:
     - jzp
@@ -490,9 +493,6 @@ excess-cpu-memory-1:
   partitions:
     - cpu
   min_run_time: 30        # minutes
-  cores_per_node: 32      # count
-  cores_fraction: 0.8     # [0, 1]
-  mem_per_node: 190       # GB
   tb_hours_threshold: 65  # TB-hours
   ratio_threshold: 0.35
   mean_ratio_threshold: 0.35

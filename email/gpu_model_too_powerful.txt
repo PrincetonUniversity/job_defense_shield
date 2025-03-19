@@ -28,7 +28,7 @@ you will help keep A100 GPUs free for jobs that need them. For more info:
     https://researchcomputing.princeton.edu/systems/della#gpus
 
 As an alternative to MIG, you may consider trying to improve the GPU
-utilization of your code. A good target value is greater than <TARGET>. Consider
+utilization of your code. A good target value is greater than <TARGET>%. Consider
 writing to the mailing list of the software that you are using or attend
 an in-person Research Computing help session:
 

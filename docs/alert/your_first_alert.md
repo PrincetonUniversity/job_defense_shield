@@ -203,3 +203,7 @@ Take a look at the various alerts and add what you like to your configuration fi
 - [Automatically Cancel GPU Jobs with 0% Utilization](cancel_gpu_jobs.md)
 - [GPU-Hours at 0% Utilization](zero_gpu_util.md)
 - [Low GPU Efficiency](low_gpu_util.md)
+
+## How does Job Defense Shield work?
+
+Summary statistics for each completed job are stored in a compressed format in the `AdminComment` field in the Slurm database. The software described here works by calling the Slurm `sacct` command while requesting several fields including `AdminComment`. The `sacct` output is stored in a `pandas` dataframe for processing. For running jobs the Prometheus database must be queried.

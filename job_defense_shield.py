@@ -152,7 +152,7 @@ if __name__ == "__main__":
     if "jobstats-module-path" not in cfg:
         cfg["jobstats-module-path"] = "/usr/local/jobstats/"
     if "jobstats-config-path" not in cfg:
-        cfg["jobstats-config-path"] = "/etc/jobstats"
+        cfg["jobstats-config-path"] = "/etc/jobstats/"
     if "verbose" not in cfg:
         cfg["verbose"] = False
     if "external-emails" not in cfg:
@@ -166,15 +166,15 @@ if __name__ == "__main__":
     if "partition-renamings" not in cfg:
         cfg["partition-renamings"] = {}
 
-    sys_cfg = {"no_emails_to_users": args.no_emails_to_users,
-               "jobstats_module_path":      cfg["jobstats-module-path"],
-               "jobstats_config_path":      cfg["jobstats-config-path"],
-               "email_files_path":   cfg["email-files-path"],
-               "verbose":            cfg["verbose"],
-               "sender":             cfg["sender"],
-               "reply_to":           cfg["reply-to"],
-               "email_domain":       cfg["email-domain-name"],
-               "external_emails":    cfg["external-emails"]}
+    sys_cfg = {"no_emails_to_users":   args.no_emails_to_users,
+               "jobstats_module_path": cfg["jobstats-module-path"],
+               "jobstats_config_path": cfg["jobstats-config-path"],
+               "email_files_path":     cfg["email-files-path"],
+               "verbose":              cfg["verbose"],
+               "sender":               cfg["sender"],
+               "reply_to":             cfg["reply-to"],
+               "email_domain":         cfg["email-domain-name"],
+               "external_emails":      cfg["external-emails"]}
 
     greeting_method = cfg["greeting-method"]
     violation_logs_path = cfg["violation-logs-path"]

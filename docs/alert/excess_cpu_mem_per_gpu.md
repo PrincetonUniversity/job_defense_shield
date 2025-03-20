@@ -59,8 +59,10 @@ when the `--email` option is used.
 
 ## Report
 
+An example report is shown below:
+
 ```
-                                     Too Much CPU Memory Per GPU                                     
+                         Too Much CPU Memory Per GPU                          
 -------------------------------------------------------------------------------
  JobID    User  Hours Mem-Eff GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit Emails
 -------------------------------------------------------------------------------
@@ -68,7 +70,7 @@ when the `--email` option is used.
 6279179  u29427   31     2%     1       500 GB            240 GB          1 (4)
 6270434  u15404   48     6%     1       512 GB            240 GB          3 (2)
 6293177  u15404  1.4     1%     1       512 GB            240 GB          3 (2)
-6291411  u81448  3.8     0%     1       512 GB            240 GB          0     
+6291411  u81448  3.8     0%     1       512 GB            240 GB          0    
 6283444  u35452  1.8     0%     1       500 GB            240 GB          1 (5)
 -------------------------------------------------------------------------------
    Cluster: della

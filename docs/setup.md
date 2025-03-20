@@ -47,7 +47,9 @@ The simplest test is to run the help menu:
 $ python job_defense_shield.py --help
 ```
 
-Try running a simple informational alert. First, make a trivial configuration file called `config.yaml` in the same directory as `job_defense_shield.py`:
+If the command above failed then see [Troubleshooting the Installation](#troubleshooting-the-installation).
+
+Next, try running a simple informational alert. To do this, make a trivial configuration file called `config.yaml` in the same directory as `job_defense_shield.py`:
 
 ```
 $ cat config.yaml
@@ -78,9 +80,7 @@ $ python job_defense_shield.py --utilization-overview
 ```
 
 The command above will show an overview of the number of CPU-hours and GPU-hours
-across all clusters and partitions in the Slurm database over the past 7 days.
-
-Here is an example output:
+across all clusters and partitions in the Slurm database over the past 7 days. Here is an example:
 
 ```
 $ python job_defense_shield.py --utilization-overview

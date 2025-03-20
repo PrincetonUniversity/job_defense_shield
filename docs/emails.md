@@ -2,6 +2,8 @@
 
 ## When Are Emails Sent?
 
+Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email of the same nature.
+
 By default, users can only receive an email for a particular instance of underutilization once per week. The email they receive will contain either the individual jobs or a summary for that week. This time window can be modified by the `--days` option. Note that users can received multiple emails about the same type of underutilization if there are multiple alerts covering different partitions or different clusters.
 
 The `Email` column in the table below shows the number of emails that each user has received about this particular instance of underutilization:

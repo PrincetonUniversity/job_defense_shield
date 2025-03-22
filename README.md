@@ -5,28 +5,7 @@
 
 # Job Defense Shield
 
-Job Defense Shield is a software tool for sending automated email alerts to HPC users for the underutilization. It also creates reports for system administrators. The software is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
-
-Automated email alerts to users are available for these cases:
-
-- Automatically cancel jobs at 0% GPU utilization
-- CPU jobs with 0% utilization
-- Top users with low mean CPU or GPU efficiency
-- Jobs that allocate excess CPU memory
-- Jobs that allocate too many CPU-cores per GPU
-- Jobs that allocate too much CPU memory per GPU
-- Serial jobs that allocate multiple CPU-cores
-- Users that routinely run with excessive time limits
-- Jobs that could have used a smaller number of nodes
-- Jobs that could have used less powerful GPUs
-- Jobs thar ran on specialized nodes but did not need to
-
-All of the instances in the list above can be formulated as a report
-for system administrators. The most popular reports are:
-
-- A list of users with the most GPU-hours at 0% utilization
-- A list of users that are over-allocating the most CPU memory
-- A list of the top users with low CPU/GPU utilization
+Job Defense Shield is a software tool for identifying and reducing instances of underutilization by the users of high-performance computing systems. The software sends automated email alerts to users and generates reports for system administrators. It is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
 
 Below is an example report for 0% GPU utilization:
 

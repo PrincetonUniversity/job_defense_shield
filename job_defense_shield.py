@@ -28,7 +28,8 @@ from alert.utilization_overview import UtilizationOverview
 from alert.utilization_by_slurm_account import UtilizationBySlurmAccount
 from alert.longest_queued import LongestQueuedJobs
 from alert.jobs_overview import JobsOverview
-from alert.excessive_time_limits import ExcessiveTimeLimits
+from alert.excessive_time_limits import ExcessiveTimeLimitsCPU
+from alert.excessive_time_limits import ExcessiveTimeLimitsGPU
 from alert.serial_allocating_multiple_cores import SerialAllocatingMultipleCores
 from alert.multinode_cpu_fragmentation import MultinodeCpuFragmentation
 from alert.multinode_gpu_fragmentation import MultinodeGpuFragmentation
@@ -59,8 +60,10 @@ if __name__ == "__main__":
                         help='Identify CPU jobs that are split across too many nodes')
     parser.add_argument('--multinode-gpu-fragmentation', action='store_true', default=False,
                         help='Identify GPU jobs that are split across too many nodes')
-    parser.add_argument('--excessive-time', action='store_true', default=False,
-                        help='Identify users with excessive run time limits')
+    parser.add_argument('--excessive-time-cpu', action='store_true', default=False,
+                        help='Identify users with excessive run time limits for CPU jobs')
+    parser.add_argument('--excessive-time-gpu', action='store_true', default=False,
+                        help='Identify users with excessive run time limits for GPU jobs')
     parser.add_argument('--serial-allocating-multiple', action='store_true', default=False,
                         help='Indentify serial codes allocating multiple CPU-cores')
     parser.add_argument('--too-many-cores-per-gpu', action='store_true', default=False,
@@ -259,10 +262,16 @@ if __name__ == "__main__":
                                         "too_much_cpu_mem_per_gpu",
                                         "TOO MUCH CPU MEMORY PER GPU",
                                         args.days)
-        if args.excessive_time:
+        if args.excessive_time_cpu:
             show_history_of_emails_sent(violation_logs_path,
-                                        "excessive_time_limits",
-                                        "EXCESSIVE TIME LIMITS",
+                                        "excessive_time_limits_cpu",
+                                        "EXCESSIVE TIME LIMITS (CPU)",
+                                        args.days)
+
+        if args.excessive_time_gpu:
+            show_history_of_emails_sent(violation_logs_path,
+                                        "excessive_time_limits_gpu",
+                                        "EXCESSIVE TIME LIMITS (GPU)",
                                         args.days)
         if args.most_gpus or \
            args.most_cores or \
@@ -579,17 +588,39 @@ if __name__ == "__main__":
             s += mpg.add_report_metadata(start_date, end_date)
 
 
-    ###########################
-    ## EXCESSIVE TIME LIMITS ##
-    ###########################
-    if args.excessive_time:
-        alerts = [alert for alert in cfg.keys() if "excessive-time" in alert]
+    #################################
+    ## EXCESSIVE TIME LIMITS (CPU) ##
+    #################################
+    if args.excessive_time_cpu:
+        alerts = [alert for alert in cfg.keys() if "excessive-time-cpu" in alert]
         for alert in alerts:
             params = cfg[alert]
             params.update(sys_cfg)
-            time_limits = ExcessiveTimeLimits(df,
+            time_limits = ExcessiveTimeLimitsCPU(
+                                              df,
                                               days_between_emails=args.days,
-                                              violation="excessive_time_limits",
+                                              violation="excessive_time_limits_cpu",
+                                              vpath=violation_logs_path,
+                                              **params)
+            if args.email and is_workday:
+                time_limits.create_emails(greeting_method)
+                time_limits.send_emails_to_users()
+            s += time_limits.generate_report_for_admins()
+            s += time_limits.add_report_metadata(start_date, end_date)
+
+
+    #################################
+    ## EXCESSIVE TIME LIMITS (GPU) ##
+    #################################
+    if args.excessive_time_gpu:
+        alerts = [alert for alert in cfg.keys() if "excessive-time-gpu" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            params.update(sys_cfg)
+            time_limits = ExcessiveTimeLimitsGPU(
+                                              df,
+                                              days_between_emails=args.days,
+                                              violation="excessive_time_limits_gpu",
                                               vpath=violation_logs_path,
                                               **params)
             if args.email and is_workday:

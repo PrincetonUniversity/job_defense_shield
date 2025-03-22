@@ -10,7 +10,7 @@ Add the following to your `config.yaml` with the appropriate changes to `cluster
 ###############################
 ## EXCESSIVE RUN TIME LIMITS ##
 ###############################
-excessive-time-1:
+excessive-time-cpu-1:
   cluster: della
   partitions:
     - cpu
@@ -34,7 +34,7 @@ Multiple partitions can be entered as a YAML list:
 Next, run the alert without `--email` so that no emails are sent but the output is displayed in the terminal:
 
 ```
-$ python job_defense_shield.py --excessive-time
+$ python job_defense_shield.py --excessive-time-cpu
 
                          Excessive Time Limits                          
 ------------------------------------------------------------------------
@@ -63,7 +63,7 @@ CPU-Hours (Unused) is the product of the number of CPU-cores and run time limit 
 Looking at the data in the table above, we can decide on the threshold values to use for the alert. The following choices look like good starting values:
 
 ```yaml
-excessive-time-1:
+excessive-time-cpu-1:
   cluster: della
   partitions:
     - cpu
@@ -77,7 +77,7 @@ The settings above will only include users that have more than 100,000 unused (a
 Let's run the alert again to check the filtering:
 
 ```
-$ python job_defense_shield.py --excessive-time
+$ python job_defense_shield.py --excessive-time-cpu
 
                         Excessive Time Limits
 ----------------------------------------------------------------------
@@ -105,25 +105,24 @@ $ cat /path/to/email/excessive_time.txt
 
 As you learned in the [Emails](../emails.md) section, you can modify this file just as you would any text file. Special tags can be used for each alert.
 
-
 Next, let's add the `email_file` to the alert entry:
 
 ```yaml
-excessive-time-1:
+excessive-time-cpu-1:
   cluster: della
   partitions:
     - cpu
-  min_run_time: 61              # minutes
+  min_run_time:             61  # minutes
   absolute_thres_hours: 100000  # unused cpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
-  num_top_users: 10 
-  num_jobs_display: 10
+  num_top_users:            10  # count
+  num_jobs_display:         10  # count
   email_file: "excessive_time.txt"
   admin_emails:
     - admin@institution.edu
 ```
 
-We also added a few of the optional settings which are covered in [Excessive Run Time Limits](time_limits.md). If you are wondering about GPU partitions, one can use `mode: gpu` to do the same for GPU-hours.
+We also added a few of the optional settings which are covered in [Excessive Run Time Limits](time_limits.md). If you are wondering about GPU partitions, one can use `--excessive-time-gpu` to do the same for GPU-hours.
 
 Make sure you set `email-files-path` in the global settings of `config.yaml` to the directory containing `excessive_time.txt`
 
@@ -132,7 +131,7 @@ Make sure you set `email-files-path` in the global settings of `config.yaml` to 
 Let's run a test by adding the `--email` flag with the `--no-emails-to-users` modifier:
 
 ```
-$ python job_defense_shield.py --excessive-time --email --no-emails-to-users
+$ python job_defense_shield.py --excessive-time-cpu --email --no-emails-to-users
 ```
 
 The command above will only send emails to the addresses in `admin_emails`. Users will not receive emails. Make changes to your email message and then rerun the test.
@@ -142,7 +141,7 @@ The command above will only send emails to the addresses in `admin_emails`. User
 When you are happy with the settings in `config.yaml` and the email message, run the alert with only `--email` to send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --excessive-time --email
+$ python job_defense_shield.py --excessive-time-cpu --email
 ```
 
 Once again, those listed in `admin_emails` will receive copies of the emails.
@@ -154,11 +153,11 @@ Note that if you run the same command again it will not send any emails. This is
 Take a look at the violation files that were written (with the path set by `violation-logs-path`):
 
 ```
-$ ls /path/to/violations/excessive_time_limits/
+$ ls /path/to/violations/excessive_time_limits_cpu/
 u18587.csv
 u45521.csv
 
-$ cat /path/to/violations/excessive_time_limits/u18587.csv
+$ cat /path/to/violations/excessive_time_limits_cpu/u18587.csv
 User,Cluster,Alert-Partitions,CPU-Hours-Unused,Jobs,Email-Sent
 u18587,della,cpu,497596,644,03/17/2025 18:35:58
 ```
@@ -173,11 +172,11 @@ The violation file of user is read when determining whether or not sufficient ti
 Add as many alerts to the configuration file as you need to cover your partitions and clusters. Be sure to give them different names:
 
 ```yaml
-excessive-time-1:
+excessive-time-cpu-1:
   cluster: della
   ...
 
-excessive-time-2:
+excessive-time-cpu-2:
   cluster: stellar
   ...
 ```
@@ -187,10 +186,10 @@ excessive-time-2:
 Finally, add the appropriate entry to crontab. Something like:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-cpu --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
 ```
 
-The `--excessive-time` flag will trigger all of the alert of type `excessive-time-#`.
+The `--excessive-time-cpu` flag will trigger all of the alert of type `excessive-time-cpu-#`.
 
 Because our alert only needs data for the `cpu` partition of the `della` cluster, we used `-M della -r cpu`. This is not necessary but by default the data for all clusters and all partitions is requested from the Slurm database.
 

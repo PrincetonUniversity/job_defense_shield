@@ -12,10 +12,10 @@ Below is a minimal configuration file (`config.yaml`) with one alert:
 #####################
 jobstats-module-path: /path/to/jobstats/module/
 jobstats-config-path: /path/to/jobstats/config/
-violation-logs-path: /path/to/violations/
-email-files-path: /path/to/email/
+violation-logs-path:  /path/to/violations/
+email-files-path:     /path/to/email/
 email-domain-name: "@institution.edu"
-sender: support@institution.edu
+sender:   support@institution.edu
 reply-to: support@institution.edu
 greeting-method: getent
 workday-method: file
@@ -78,7 +78,7 @@ The files stored in this directory are read when deciding whether or not suffici
 
 ### Email Settings
 
-Set the path to your email files. These are the files that are read and enhanced by the software. A set of examples in found in the `email` directory of the `job_defense_shield` GitHub repository. It is recommended to copy the example email files to another directory outside of `job_defense_shield` and put that under version control.
+Set the path to your email files. A set of example files is found in the `email` directory of the `job_defense_shield` GitHub repository. It is recommended to copy the example email files to another directory outside of `job_defense_shield` and put that under version control. As you will learn, placeholders like <GREETING> are replaced by the actual values as computed in the Python code.
 
 ```yaml
 email-files-path: /path/to/email/

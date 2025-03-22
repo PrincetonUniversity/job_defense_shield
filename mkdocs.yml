@@ -7,20 +7,22 @@ nav:
   - Installation: setup.md
   - Configuration: configuration.md
   - Emails: emails.md
-  - Alerts:
-    - Your First Alert:            alert/your_first_alert.md
+  - Your First Alert:              alert/your_first_alert.md
+  - GPU Alerts:
     - Cancel 0% GPU Jobs:          alert/cancel_gpu_jobs.md
     - Zero GPU Utilization:        alert/zero_gpu_util.md
     - Low GPU Utilization:         alert/low_gpu_util.md
-    - Excess CPU Memory per GPU: alert/excess_cpu_mem_per_gpu.md
+    - Excess CPU Memory per GPU:   alert/excess_cpu_mem_per_gpu.md
     - Too Many Cores per GPU:      alert/too_many_cores_per_gpu.md
     - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
-    - Multinode CPU Fragmentation: alert/cpu_fragmentation.md
+    - Run Time Limits:             alert/time_limits_gpu.md
+  - CPU Alerts:
     - CPUs with 0% Utilization:    alert/zero_cpu_util.md
+    - Over-Allocating CPU Memory:  alert/excess_cpu_memory.md
     - Low CPU Utilization:         alert/low_cpu_util.md
     - Serial Allocating Multiple:  alert/serial_allocating_multiple.md
-    - Excess CPU Memory:           alert/excess_cpu_memory.md
+    - Multinode CPU Fragmentation: alert/cpu_fragmentation.md
     - Run Time Limits:             alert/time_limits.md
     - New Alert:                   alert/new_alert.md
   - Reports:

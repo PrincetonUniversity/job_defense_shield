@@ -6,11 +6,11 @@ on the <PARTITIONS> partition(s) of <CLUSTER>.
 See this webpage for three common reasons why a user may encounter 0% GPU
 utilization:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/gpu-computing
+    https://your-institution.edu/KB/gpu-computing
 
 Consider attending an in-person Research Computing help session for assistance:
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+    https://your-institution.edu/support/help-sessions
 
 It is your responsibility to ensure that the GPUs and other resources are being
 used efficiently. Please monitor your jobs using the "jobstats" command:

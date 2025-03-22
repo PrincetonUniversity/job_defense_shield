@@ -19,7 +19,7 @@ class ExcessiveTimeLimits(Alert):
         if not hasattr(self, "email_subject"):
             self.email_subject = "Requesting Too Much Time for Jobs"
         if not hasattr(self, "report_title"):
-            self.report_title = "Excessive Time Limits"
+            self.report_title = "Excessive Run Time Limits"
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 100000
         if not hasattr(self, "num_jobs_display"):
@@ -28,19 +28,15 @@ class ExcessiveTimeLimits(Alert):
             self.mean_ratio_threshold = 1.0
         if not hasattr(self, "median_ratio_threshold"):
             self.median_ratio_threshold = 1.0
-        if not hasattr(self, "mode"):
-            self.mode = "cpu"
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
-                          (self.df.state.isin(["COMPLETED", "RUNNING"])) &
+                          (self.df.state.isin(["COMPLETED"])) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
 
-        # include running jobs and ignore jobs without summary statistics
-        if not self.df.empty and self.include_running_jobs:
-            self.df.admincomment = self.get_admincomment_for_running_jobs()
+        # ignore jobs without summary statistics
         self.df = self.df[self.df.admincomment != {}]
         # filter by nodelist if provided
         if not self.df.empty and hasattr(self, "nodelist"):
@@ -166,3 +162,20 @@ class ExcessiveTimeLimits(Alert):
         self.gp.columns = column_names
         report_str = self.gp.to_string(index=keep_index, justify="center")
         return add_dividers(report_str, self.report_title, units_row=True)
+
+class ExcessiveTimeLimitsCPU(ExcessiveTimeLimits):
+
+    """Specialized implementation of ExcessiveTimeLimits for CPUs."""
+
+    def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
+        self.mode = "cpu"
+        super().__init__(df, days_between_emails, violation, vpath, **kwargs)
+
+
+class ExcessiveTimeLimitsGPU(ExcessiveTimeLimits):
+
+    """Specialized implementation of ExcessiveTimeLimits for GPUs."""
+
+    def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
+        self.mode = "gpu"
+        super().__init__(df, days_between_emails, violation, vpath, **kwargs)

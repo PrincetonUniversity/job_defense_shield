@@ -181,14 +181,13 @@ gpu-model-too-powerful-1:
 #######################################
 ## EXCESSIVE RUN TIME LIMITS (ALERT) ##
 #######################################
-excessive-time-1:
+excessive-time-gpu-1:
   cluster: stellar
   partitions:
     - gpu
     - llm
-  mode: gpu                     # cpu or gpu
   min_run_time:             61  # minutes
-  absolute_thres_hours:   1000  # unused cpu/gpu-hours
+  absolute_thres_hours:   1000  # unused gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]
@@ -295,13 +294,12 @@ serial-allocating-multiple-1:
 #######################################
 ## EXCESSIVE RUN TIME LIMITS (ALERT) ##
 #######################################
-excessive-time-1:
+excessive-time-cpu-1:
   cluster: della
   partitions:
     - cpu
-  mode: cpu                     # cpu or gpu
   min_run_time:             61  # minutes
-  absolute_thres_hours: 100000  # unused cpu/gpu-hours
+  absolute_thres_hours: 100000  # unused cpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]

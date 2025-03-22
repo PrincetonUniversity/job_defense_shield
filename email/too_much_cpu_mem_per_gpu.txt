@@ -18,7 +18,7 @@ value for the --mem, --mem-per-cpu or --mem-per-gpu Slurm directive. For job
 
 To learn more about allocating CPU memory, please see this page:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/memory
+    https://your-institution.edu/KB/cpu-memory
 
 Replying to this automated email will open a support ticket with Research
 Computing.

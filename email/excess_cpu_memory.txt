@@ -10,11 +10,6 @@ has resulted in <UNUSED> TB-hours of unused memory which is equivalent to making
 <NUM-WASTED-NODES> nodes unavailable to all users (including yourself) for one week! A TB-hour is
 the allocation of 1 terabyte of memory for 1 hour.
 
-AS PER THE RESEARCH COMPUTING ADVISORY GROUP, EXCESSIVE CPU MEMORY ALLOCATION
-CAN RESULT IN YOUR ADVISOR BEING CONTACTED. AFTER THAT IF THE MATTER IS NOT
-RESOLVED WITHIN 7 DAYS THEN YOUR ACCOUNT WILL BE SUSPENDED. FOR MORE INFO:
-
-    https://researchcomputing.princeton.edu/get-started/utilization-policies
 
 Please request less memory by modifying the --mem-per-cpu or --mem Slurm
 directive. For instance, if your job requires 8 GB per node then use:
@@ -24,7 +19,7 @@ directive. For instance, if your job requires 8 GB per node then use:
 The value above includes an extra 20% for safety. A good target value for
 Percent-Used is 80%. For more on allocating CPU memory with Slurm:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/memory
+    https://your-institution.edu/KB/cpu-memory
 
 You can check the CPU memory utilization of completed and actively running jobs
 by using the "jobstats" command. For example:
@@ -33,7 +28,7 @@ by using the "jobstats" command. For example:
 
 Consider attending an in-person Research Computing help session for assistance:
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+    https://your-institution.edu/support/help-sessions
 
 Replying to this automated email will open a support ticket with Research
 Computing.

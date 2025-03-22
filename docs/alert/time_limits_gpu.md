@@ -1,18 +1,19 @@
-# Excessive Run Time Limits for CPU Jobs
+# Excessive Run Time Limits for GPU Jobs
 
-This alert identifies users that are using excessive run time limits for their CPU jobs (e.g., requesting 3 days but only needing 3 hours).
+This alert identifies users that are using excessive run time limits for their GPU jobs (e.g., requesting 3 days but only needing 3 hours).
 
 ## Configuration File
 
 Below is an example entry for `config.yaml`:
 
 ```yaml
-excessive-time-cpu-1:
+excessive-time-gpu-1:
   cluster: della
   partitions:
-    - cpu
+    - gpu
+    - llm
   min_run_time:             61  # minutes
-  absolute_thres_hours: 100000  # used cpu-hours
+  absolute_thres_hours:   1000  # used gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]
@@ -32,11 +33,11 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `absolute_thres_hours`: (Required) Minimum number of CPU-hours for the user to be included.
+- `absolute_thres_hours`: (Required) Minimum number of GPU-hours for the user to be included.
 
-- `overall_ratio_threshold`: (Required) Used CPU-hours divided by total allocated CPU-hours.
+- `overall_ratio_threshold`: (Required) Used GPU-hours divided by total allocated GPU-hours.
 
-- `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used CPU-hours to allocated CPU-hours.
+- `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used GPU-hours to allocated GPU-hours.
 
 - `median_ratio_threshold`: (Optional) Same as above but for the median instead of the mean.
 
@@ -59,29 +60,20 @@ when the `--email` option is used.
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu
+$ python job_defense_shield.py --excessive-time-gpu
 
-                         Excessive Time Limits                          
-------------------------------------------------------------------------
-  User   CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs Emails
-          (Unused)    (Used)  Overall  Mean  Median
-------------------------------------------------------------------------
-  u18587   495341      13716    0.03   0.03   0.02     10     643   0
-  u81279   105666      80061    0.43   0.43   0.38      2      41   0
-  u45521   105509      21595    0.17   0.17   0.13      8     109   0
-  u73275    89469       8475    0.09   0.14   0.09     16      86   0
-  u43409    88689     125583    0.59   0.59   0.59      1     279   0
-  u39889    81659       1002    0.01   0.01   0.01     46    1718   0
-  u42091    74348      52606    0.41   0.33   0.31      3    1437   0
-  u75621    63365      21265    0.25   0.22   0.21      9    3741   0
-  u60876    53043      31705    0.37   0.38   0.35      6    4425   0
-  u41590    51491       9565    0.16   0.16   0.15     15     318   0
-------------------------------------------------------------------------
+                      Excessive Run Time Limits                        
+-----------------------------------------------------------------------
+ User   GPU-Hours  GPU-Hours  Ratio  Ratio   Ratio GPU-Rank Jobs Emails
+         (Unused)    (Used)  Overall  Mean  Median                     
+-----------------------------------------------------------------------
+u14480    4088       184      0.04   0.04   0.04     15     60    0   
+u72284    2055       105      0.05   0.05   0.04     23     45    2 (3)   
+-----------------------------------------------------------------------
    Cluster: della
-Partitions: cpu
-     Start: Mon Mar 10, 2025 at 06:23 PM
-       End: Mon Mar 17, 2025 at 06:23 PM
-
+Partitions: gpu, llm
+     Start: Sat Mar 15, 2025 at 02:34 PM
+       End: Sat Mar 22, 2025 at 02:34 PM
 ```
 
 ## Email
@@ -89,20 +81,20 @@ Partitions: cpu
 For an example see `email/excessive_time.txt`:
 
 ```
-Hello Alan (u18587),
+Hello Alan (u14480),
 
-Below are 5 of your 643 jobs that ran on della (cpu) in the past 7 days:
+Below are 5 of your 60 jobs that ran on della (gpu) in the past 7 days:
 
-     JobID   Time-Used Time-Allocated Percent-Used  CPU-Cores
-    62776009  01:36:11   2-00:00:00        3%          32    
-    62776014  01:32:11   2-00:00:00        3%          32    
-    62776016  01:22:41   2-00:00:00        3%          32    
-    62776019  01:17:48   2-00:00:00        3%          32    
-    62776020  01:29:20   2-00:00:00        3%          32    
+     JobID    Time-Used  Time-Allocated  Percent-Used  GPUs
+    62776009   01:36:11    2-00:00:00         3%        4 
+    62776014   01:32:11    2-00:00:00         3%        4
+    62776016   01:22:41    2-00:00:00         3%        4
+    62776019   01:17:48    2-00:00:00         3%        4
+    62776020   01:29:20    2-00:00:00         3%        4
 
 It appears that you are requesting too much time for your jobs since you are
-only using on average 3% of the allocated time (for the 643 jobs). This has
-resulted in 495341 CPU-hours that you scheduled but did not use (it was made
+only using on average 3% of the allocated time (for the 60 jobs). This has
+resulted in 4341 GPU-hours that you scheduled but did not use (it was made
 available to other jobs, however).
 
 Please request less time by modifying the --time Slurm directive. This will
@@ -125,20 +117,20 @@ The following tags can be used in the email file:
 - `<GREETING>`: The greeting generated by `greeting-method`.
 - `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
 - `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
-- `<MODE-UPPER>`: Equal to "CPU"
-- `<AVERAGE>`: Mean of per job CPU-hours used divided by allocated.
+- `<MODE-UPPER>`: Equal to "GPU"
+- `<AVERAGE>`: Mean of per job GPU-hours used divided by allocated.
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<NUM-JOBS>`: Total number of jobs.
 - `<NUM-JOBS-DISPLAY>`: Number of jobs to list in table in email to user.
 - `<TABLE>`: Table of job data.
-- `<UNUSED-HOURS>`: Total number of unused CPU-hours.
+- `<UNUSED-HOURS>`: Total number of unused GPU-hours.
 
 ## Usage
 
 Send emails to offending users:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu --email
+$ python job_defense_shield.py --excessive-time-gpu --email
 ```
 
 ## Cron
@@ -146,5 +138,5 @@ $ python job_defense_shield.py --excessive-time-cpu --email
 Below is an exmaple `crontab` entry:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-cpu --email -M della -r cpu > /path/to/log/excessive_time_cpu.log 2>&1
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-gpu --email -M della -r gpu,llm > /path/to/log/excessive_time_gpu.log 2>&1
 ```

@@ -134,3 +134,14 @@ There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](a
 ```yaml
   do_not_cancel: True
 ```
+
+## Hyperlinks
+
+Instead of explicitly displaying URLs in email files, one can create hyperlinks. For example:
+
+```
+If you believe that the code is capable of using more than 1 CPU-core then
+consider attending an in-person <a href="https://your-institution.edu/support/help-sessions">Research Computing help session</a> for assistance.
+```
+
+Hyperlinks shorten the email message which presumably makes it more likely to be read.

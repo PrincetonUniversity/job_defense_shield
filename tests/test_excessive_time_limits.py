@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.excessive_time_limits import ExcessiveTimeLimits
+from alert.excessive_time_limits import ExcessiveTimeLimitsCPU
 
 def test_excessive_time_limits():
     n_jobs = 6
@@ -15,7 +15,8 @@ def test_excessive_time_limits():
                        "cpu-alloc-hours":[wallclock_hrs * cpus] * n_jobs,
                        "cpu-hours":[95e3, 5e3, 10e3, 19e3, 15e3, 19e3]})
     df["cpu-waste-hours"] = df["cpu-alloc-hours"] - df["cpu-hours"]
-    limits = ExcessiveTimeLimits(df,
+    limits = ExcessiveTimeLimitsCPU(
+                                 df,
                                  0,
                                  "",
                                  "",
@@ -23,7 +24,6 @@ def test_excessive_time_limits():
                                  partitions=["cpu"],
                                  min_run_time=0,
                                  num_top_users=10,
-                                 mode="cpu",
                                  absolute_thres_hours=10000,
                                  overall_ratio_threshold=1.0,
                                  mean_ratio_threshold=1.0,

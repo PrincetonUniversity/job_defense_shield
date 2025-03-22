@@ -22,21 +22,16 @@ For interactive sessions use, for example:
 If you are using Jupyter OnDemand then set the "Node type" to "mig" when
 creating the session.
 
-By running jobs on the MIG GPUs you will experience shorter queue times and
-you will help keep A100 GPUs free for jobs that need them. For more info:
-
-    https://researchcomputing.princeton.edu/systems/della#gpus
-
 As an alternative to MIG, you may consider trying to improve the GPU
 utilization of your code. A good target value is greater than <TARGET>%. Consider
 writing to the mailing list of the software that you are using or attend
 an in-person Research Computing help session:
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+    https://your-institution.edu/support/help-sessions
 
-For general information about GPU computing at Princeton:
+For general information about GPU computing:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/gpu-computing
+    https://your-institution.edu/KB/gpu-computing
 
 Replying to this automated email will open a support ticket with Research
 Computing.

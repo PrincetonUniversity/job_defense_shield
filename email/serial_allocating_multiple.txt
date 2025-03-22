@@ -13,7 +13,7 @@ CPU utilization is 90% and above.
 Please consult the documentation of the software to see if it is parallelized.
 For a general overview of parallel computing:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/parallel-code
+    https://your-institution.edu/KB/parallel-computing
 
 If the code cannot run in parallel then please use the following Slurm
 directives:
@@ -24,9 +24,6 @@ directives:
 
 You will experience shorter queue times by allocating only 1 CPU-core per job.
 In some cases this will also allow you run more jobs simultaneously.
-
-If you believe that the code is capable of using more than 1 CPU-core then
-consider attending an in-person <a href="https://researchcomputing.princeton.edu/support/help-sessions">Research Computing help session</a> for assistance.
 
 You can check the CPU utilization of completed and actively running jobs by using
 the "jobstats" command. For example:

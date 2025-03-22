@@ -8,7 +8,7 @@ not be using the GPU(s):
 Your jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
 GPUs for <CANCEL-HRS> hours. For more information see the the utilization policies:
 
-    https://your-institution.xyz/KB/utilization-policies
+    https://your-institution.edu/KB/utilization-policies
 
 Please consider cancelling the job(s) listed above by using the "scancel" command:'
 
@@ -21,8 +21,7 @@ Run the "jobstats" command to see the GPU utilization:
 See our GPU Computing webpage for three common reasons for encountering zero GPU
 utilization:
 
-    https://your-institution.xyz/KB/gpu-computing
+    https://your-institution.edu/KB/gpu-computing
 
-Consider attending an in-person Research Computing help session for assistance.
 Replying to this automated email will open a support ticket with Research
 Computing.

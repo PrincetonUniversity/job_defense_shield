@@ -24,22 +24,11 @@ use, for example:
 If you are unsure about the meanings of --nodes, --ntasks, --ntasks-per-node and
 --cpus-per-task, see our Slurm webpage:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/slurm
-
-Additionally, see this general overview on parallel computing:
-
-    https://researchcomputing.princeton.edu/support/knowledge-base/parallel-code
-
-It is very important to conduct a scaling analysis to find the optimal number
-of nodes and CPU-cores to use for a given parallel job. The calculation of
-"Nodes-Needed" above is based on your choice of the total CPU-cores which
-may not be optimal. For information on conducting a scaling analysis:
-
-    https://researchcomputing.princeton.edu/support/knowledge-base/scaling-analysis
+    https://your-institution.edu/KB/slurm
 
 Consider attending an in-person Research Computing help session for assistance:
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+    https://your-institution.edu/support/help-sessions
 
 Replying to this automated email will open a support ticket with Research
 Computing.

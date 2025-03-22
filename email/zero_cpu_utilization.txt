@@ -14,11 +14,11 @@ nodes before running additional jobs.
 
 See the following webpage for information about Slurm:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/slurm
+    https://your-institution.edu/KB/slurm
 
 Consider attending an in-person Research Computing help session for assistance:
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+    https://your-institution.edu/support/help-sessions
 
 Replying to this automated email will open a support ticket with Research
 Computing.

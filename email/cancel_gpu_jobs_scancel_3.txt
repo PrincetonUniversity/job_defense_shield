@@ -7,11 +7,7 @@ at 0% GPU utilization:
 
 For more information about job cancellations see our utilization policies:
 
-    https://researchcomputing.princeton.edu/get-started/utilization-policies
+    https://your-institution.edu/KB/utilization-policies
 
-See our GPU Computing webpage for three common reasons for encountering zero GPU
-utilization.
-
-Consider attending an in-person Research Computing help session for assistance.
 Replying to this automated email will open a support ticket with Research
 Computing.

@@ -9,18 +9,14 @@ please allocate all of the GPUs within a node before splitting your job
 across multiple nodes. This is done by decreasing the value of the
 --nodes Slurm directive and increasing the value of --gres, as explained here:
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/slurm#gpus
+    https://your-institution.edu/KB/slurm
 
 If any of your jobs have a low GPU utilization then please consider using a
 smaller number of GPUs per job to improve efficiency.
 
-For more information about the Della GPU nodes:
-
-    https://researchcomputing.princeton.edu/systems/della#gpus
-
 Consider attending an in-person Research Computing help session for assistance:
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+    https://your-institution.edu/support/help-sessions
 
 Replying to this automated email will open a support ticket with Research
 Computing.

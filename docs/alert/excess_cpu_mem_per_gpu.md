@@ -62,6 +62,8 @@ when the `--email` option is used.
 An example report is shown below:
 
 ```
+$ python job_defense_shield.py --too-much-cpu-mem-per-gpu
+
                          Too Much CPU Memory Per GPU                          
 -------------------------------------------------------------------------------
  JobID    User  Hours Mem-Eff GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit Emails

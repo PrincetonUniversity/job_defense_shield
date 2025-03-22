@@ -1,14 +1,12 @@
-.holidays
-.jobid_cache.pkl
 *.csv
-__pycache__/
 violations/
 log/
+holidays.txt
+.jobid_cache.pkl
+__pycache__/
 .pytest_cache/
 .ruff_cache/
-cron.backup
 .coverage
-email/multinode_gpu_fragmentation_2.txt
 
 ##################################################################
 # Everything below is taken from                                 #

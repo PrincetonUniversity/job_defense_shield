@@ -5,8 +5,8 @@ from datetime import datetime
 from abc import abstractmethod
 import pandas as pd
 from utils import send_email
-from utils import SECONDS_PER_HOUR
-from utils import HOURS_PER_DAY
+from utils import SECONDS_PER_HOUR as sph
+from utils import HOURS_PER_DAY as hpd
 from efficiency import get_nodelist
 
 
@@ -173,17 +173,17 @@ class Alert:
         """Return boolean specifying whether sufficient time has passed."""
         last_sent_email_date = datetime(1970, 1, 1)
         if os.path.isfile(vfile):
-            violation_history = pd.read_csv(vfile,
-                                            parse_dates=["Email-Sent"],
-                                            date_format="mixed",
-                                            dayfirst=False)
+            vhist = pd.read_csv(vfile,
+                                parse_dates=["Email-Sent"],
+                                date_format="mixed",
+                                dayfirst=False)
             alert_partitions = ",".join(sorted(set(self.partitions)))
-            violation_history = violation_history[(violation_history["Cluster"] == self.cluster) &
-                                                  (violation_history["Alert-Partitions"] == alert_partitions)]
-            if not violation_history.empty:
-                last_sent_email_date = violation_history["Email-Sent"].max()
+            vhist = vhist[(vhist["Cluster"] == self.cluster) &
+                          (vhist["Alert-Partitions"] == alert_partitions)]
+            if not vhist.empty:
+                last_sent_email_date = vhist["Email-Sent"].max()
         seconds_since_last_email = datetime.now().timestamp() - last_sent_email_date.timestamp()
-        seconds_threshold = self.days_between_emails * HOURS_PER_DAY * SECONDS_PER_HOUR
+        seconds_threshold = self.days_between_emails * hpd * sph 
         return seconds_since_last_email >= seconds_threshold
 
     def get_emails_sent_count(self, user: str, violation: str) -> str:
@@ -194,14 +194,18 @@ class Alert:
             print(f"Warning: {root_violations} not found in get_emails_sent_count()")
         user_violations = f"{root_violations}/{user}.csv"
         if os.path.isfile(user_violations):
-            d = pd.read_csv(user_violations,
-                            parse_dates=["Email-Sent"],
-                            date_format="mixed",
-                            dayfirst=False)
-            num_emails_sent = d["Email-Sent"].unique().size
-            dt = datetime.now() - d["Email-Sent"].unique().max()
-            days_ago_last_email_sent = round(dt.total_seconds() / 24 / 3600)
-            return f"{num_emails_sent} ({days_ago_last_email_sent})"
+            vhist = pd.read_csv(user_violations,
+                                parse_dates=["Email-Sent"],
+                                date_format="mixed",
+                                dayfirst=False)
+            alert_partitions = ",".join(sorted(set(self.partitions)))
+            vhist = vhist[(vhist["Cluster"] == self.cluster) &
+                          (vhist["Alert-Partitions"] == alert_partitions)]
+            if not vhist.empty:
+                num_emails_sent = vhist["Email-Sent"].unique().size
+                dt = datetime.now() - vhist["Email-Sent"].unique().max()
+                days_ago_last_email_sent = round(dt.total_seconds() / hpd / sph)
+                return f"{num_emails_sent} ({days_ago_last_email_sent})"
         return "0 (-)"
 
     def format_email_counts(self, counts: pd.Series) -> pd.Series:

@@ -3,141 +3,89 @@
 #####################
 ## GLOBAL SETTINGS ##
 #####################
-jobstats-module-path: /home/jdh4/software/jobstats
-violation-logs-path: /projects/j/jdh4/utilities/job_defense_shield/violations
-email-files-path: /projects/j/jdh4/utilities/job_defense_shield/email
-email-domain-name: "@princeton.edu"
-sender: cses@princeton.edu
-reply-to: rcsystems@princeton.edu
+jobstats-module-path: /usr/local/jobstats/
+jobstats-config-path: /etc/jobstats/
+violation-logs-path:  /usr/local/job_defense_shield/violations/
+email-files-path:     /usr/local/job_defense_shield/email/
+email-domain-name: "@institution.edu"
+sender:   support@institution.edu
+reply-to: support@institution.edu
 greeting-method: getent
 workday-method: file
-holidays-file: /projects/j/jdh4/utilities/job_defense_shield/.holidays
+holidays-file: /usr/local/job_defense_shield/holidays.txt
 report-emails:
-  - halverson@princeton.edu
-verbose: False
-partition-renamings:
-  datascience: datasci
-external-emails:
-  u12345: first.last@gmail.com
-  u23456: first.last@gmail.com
+  - admin1@institution.edu
+  - admin2@institution.edu
 
 
-#########################################
-## CANCEL JOBS WITH 0% GPU UTILIZATION ##
-#########################################
-cancel-zero-gpu-jobs:
-  cluster: della
+#################################################
+## CANCEL JOBS WITH 0% GPU UTILIZATION (ALERT) ##
+#################################################
+cancel-zero-gpu-jobs-1:
+  cluster: stellar
   partitions:
     - gpu
-    - pli-c
-    - pli-p
-    - pli
-    - pli-lc
-  sampling_period_minutes: 15  # minutes
+    - llm
+  sampling_period_minutes: 15  # minutes (use same for cron)
   first_warning_minutes:   60  # minutes
   second_warning_minutes: 105  # minutes
-  cancel_minutes:          90  # minutes
+  cancel_minutes:         120  # minutes
   email_file_first_warning:  "cancel_gpu_jobs_warning_1.txt"
   email_file_second_warning: "cancel_gpu_jobs_warning_2.txt"
   email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
-  jobid_cache_path: /projects/j/jdh4/utilities/job_defense_shield
-  max_interactive_hours: 8
-  max_interactive_gpus: 1
+  jobid_cache_path: /usr/local/job_defense_shield/
   admin_emails:
-    - halverson@princeton.edu
-
-
-####################################
-## GPU MODEL TOO POWERFUL (ALERT) ##
-####################################
-gpu-model-too-powerful-1:
-  cluster: della
-  partitions:
-    - gpu
-  min_run_time: 61         # minutes
-  gpu_hours_threshold: 24  # gpu-hours
-  num_cores_threshold: 1   # count
-  gpu_util_threshold: 15   # percent
-  gpu_mem_threshold: 10    # GB
-  cpu_mem_threshold: 32    # GB
-  gpu_util_target: 50      # percent
-  email_file: "gpu_model_too_powerful.txt"
-  excluded_users:
-    - jzp
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-
-##################################
-## ZERO CPU UTILIZATION (ALERT) ##
-##################################
-zero-cpu-utilization-1:
-  cluster: stellar
-  partitions:
-    - all
-    - pppl
-    - pu
-  min_run_time: 61 # minutes
-  email_file: "zero_cpu_utilization.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-zero-cpu-utilization-2:
-  cluster: della
-  partitions:
-    - cpu
-    - physics
-  min_run_time: 61 # minutes
-  email_file: "zero_cpu_utilization.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
+    - admin@institution.edu
+  warnings_to_admin: False
 
 
 #########################################
 ## GPU-HOURS AT 0% UTILIZATION (ALERT) ##
 #########################################
 zero-util-gpu-hours-1:
-  cluster: della
+  cluster: stellar
   partitions:
     - gpu
-    - pli-c
-    - pli-p
-    - pli
-    - pli-lc
-  min_run_time: 10              # minutes
-  gpu_hours_threshold_user: 100 # hours
-  gpu_hours_threshold_admin: 24 # hours
+    - llm
+  min_run_time:              30  # minutes
+  gpu_hours_threshold_user: 100  # gpu-hours
+  gpu_hours_threshold_admin: 24  # gpu-hours
   email_file: "zero_util_gpu_hours.txt"
   admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - kl5675@princeton.edu
+    - admin@institution.edu
 
 
-####################################
-## TOO MANY CORES PER GPU (ALERT) ##
-####################################
-too-many-cores-per-gpu-1:
-  cluster: della
+################################
+## LOW GPU EFFICIENCY (ALERT) ##
+################################
+low-gpu-efficiency-1:
+  cluster: stellar
   partitions:
-    - pli
-    - pli-c
-    - pli-p
-    - pli-lc
-  cluster_name: "Della (PLI)"
-  cores_per_node: 96
-  gpus_per_node: 8
-  cores_per_gpu_target: 12
-  cores_per_gpu_limit: 18
-  min_run_time: 61 # minutes
-  email_file: "too_many_cores_per_gpu.txt"
+    - gpu
+    - llm
+  min_run_time:         30  # minutes
+  eff_thres_pct:        25  # percent
+  eff_target_pct:       50  # percent
+  absolute_thres_hours: 50  # gpu-hours
+  proportion_thres_pct:  2  # percent
+  num_top_users:        10  # count
+  email_file: "low_gpu_efficiency.txt"
   admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - kl5675@princeton.edu
+    - admin@institution.edu
+
+low-gpu-efficiency-2:
+  cluster: traverse
+  partitions:
+    - gpu
+  min_run_time:         30  # minutes
+  eff_thres_pct:        25  # percent
+  eff_target_pct:       50  # percent
+  absolute_thres_hours: 50  # gpu-hours
+  proportion_thres_pct:  2  # percent
+  num_top_users:        10  # count
+  email_file: "low_gpu_efficiency.txt"
+  admin_emails:
+    - admin@institution.edu
 
 
 #########################################
@@ -146,52 +94,16 @@ too-many-cores-per-gpu-1:
 too-much-cpu-mem-per-gpu-1:
   cluster: della
   partitions:
-    - pli
-    - pli-c
-    - pli-p
-    - pli-lc
-  cluster_name: "Della (PLI)"
-  cores_per_node: 96
-  gpus_per_node: 8
-  cpu_mem_per_node: 1000       # GB
-  cpu_mem_per_gpu_target: 115  # GB
-  cpu_mem_per_gpu_limit: 128   # GB
-  mem_eff_thres: 0.8           # [0, 1]
-  min_run_time: 61             # minutes
-  email_file: "too_much_cpu_mem_per_gpu.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - kl5675@princeton.edu
-
-too-much-cpu-mem-per-gpu-2:
-  cluster: della
-  partitions:
     - gpu
-  cluster_name: "Della (gpu)"
-  cores_per_node: 48
-  gpus_per_node: 4
-  cpu_mem_per_node: 1000       # GB
+  min_run_time:            61  # minutes
+  cores_per_node:          48  # count
+  gpus_per_node:            4  # count
+  cpu_mem_per_node:      1000  # GB
   cpu_mem_per_gpu_target: 240  # GB
-  cpu_mem_per_gpu_limit: 250   # GB
-  mem_eff_thres: 0.8           # [0, 1]
-  min_run_time: 61             # minutes
-  email_file: "too_much_cpu_mem_per_gpu_2.txt"
+  cpu_mem_per_gpu_limit:  250  # GB
+  mem_eff_thres:          0.8  # [0.0, 1.0]
+  email_file: "too_much_cpu_mem_per_gpu.txt"
   nodelist:
-    - della-l01g3
-    - della-l01g4
-    - della-l01g5
-    - della-l01g6
-    - della-l01g7
-    - della-l01g8
-    - della-l01g9
-    - della-l01g10
-    - della-l01g11
-    - della-l01g12
-    - della-l01g13
-    - della-l01g14
-    - della-l01g15
-    - della-l01g16
     - della-l02g1
     - della-l02g2
     - della-l02g3
@@ -200,56 +112,151 @@ too-much-cpu-mem-per-gpu-2:
     - della-l02g6
     - della-l02g7
     - della-l02g8
-    - della-l02g9
-    - della-l02g10
-    - della-l02g11
-    - della-l02g12
-    - della-l02g13
-    - della-l02g14
-    - della-l02g15
-    - della-l02g16
-    - della-l03g1
-    - della-l03g2
-    - della-l03g3
-    - della-l03g4
-    - della-l03g5
-    - della-l03g6
-    - della-l03g7
-    - della-l03g8
-    - della-l03g9
-    - della-l03g10
-    - della-l03g11
-    - della-l03g12
-    - della-l03g13
-    - della-l03g14
-    - della-l03g15
-    - della-l03g16
-    - della-l04g1
-    - della-l04g2
-    - della-l04g3
-    - della-l04g4
-    - della-l04g5
-    - della-l04g6
-    - della-l04g7
-    - della-l04g8
-    - della-l04g9
-    - della-l04g10
-    - della-l04g11
-    - della-l04g12
-    - della-l04g13
-    - della-l04g14
-    - della-l04g15
-    - della-l04g16
-    - della-l05g1
-    - della-l05g2
-    - della-l05g3
-    - della-l05g4
-    - della-l05g5
-    - della-l05g6
-    - della-l05g7
   admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
+    - admin@institution.edu
+
+
+####################################
+## TOO MANY CORES PER GPU (ALERT) ##
+####################################
+too-many-cores-per-gpu-1:
+  cluster: stellar
+  partitions:
+    - gpu
+    - llm
+  min_run_time:         61  # minutes
+  cores_per_node:       96  # count
+  gpus_per_node:         8  # count
+  cores_per_gpu_target: 12  # count
+  cores_per_gpu_limit:  18  # count
+  email_file: "too_many_cores_per_gpu.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
+#########################################
+## MULTINODE GPU FRAGMENTATION (ALERT) ##
+#########################################
+multinode-gpu-fragmentation-1:
+  cluster: stellar
+  partitions:
+    - gpu
+    - llm
+  gpus_per_node: 8  # count
+  min_run_time: 61  # minutes
+  email_file: "multinode_gpu_fragmentation.txt"
+  admin_emails:
+    - admin@institution.edu
+
+multinode-gpu-fragmentation-2:
+  cluster: traverse
+  partitions:
+    - gpu
+  gpus_per_node: 4  # count
+  min_run_time: 61  # minutes
+  email_file: "multinode_gpu_fragmentation.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
+####################################
+## GPU MODEL TOO POWERFUL (ALERT) ##
+####################################
+gpu-model-too-powerful-1:
+  cluster: stellar
+  partitions:
+    - gpu
+  min_run_time:        61  # minutes
+  gpu_hours_threshold: 24  # gpu-hours
+  num_cores_threshold:  2  # count
+  gpu_util_threshold:  15  # percent
+  gpu_mem_threshold:   10  # GB
+  cpu_mem_threshold:   32  # GB
+  gpu_util_target:     50  # percent
+  email_file: "gpu_model_too_powerful.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
+#######################################
+## EXCESSIVE RUN TIME LIMITS (ALERT) ##
+#######################################
+excessive-time-1:
+  cluster: stellar
+  partitions:
+    - gpu
+    - llm
+  mode: gpu                     # cpu or gpu
+  min_run_time:             61  # minutes
+  absolute_thres_hours:   1000  # unused cpu/gpu-hours
+  overall_ratio_threshold: 0.2  # [0.0, 1.0]
+  mean_ratio_threshold:    0.2  # [0.0, 1.0]
+  median_ratio_threshold:  0.2  # [0.0, 1.0]
+  num_top_users:             5  # count
+  num_jobs_display:         10  # count
+  email_file: "excessive_time.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
+##################################
+## ZERO CPU UTILIZATION (ALERT) ##
+##################################
+zero-cpu-utilization-1:
+  cluster: stellar
+  partitions:
+    - cpu
+  min_run_time: 61  # minutes
+  email_file: "zero_cpu_utilization.txt"
+  admin_emails:
+    - admin@institution.edu
+
+zero-cpu-utilization-2:
+  cluster: della
+  partitions:
+    - cpu
+    - physics
+  min_run_time: 61  # minutes
+  email_file: "zero_cpu_utilization.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
+###############################
+## EXCESS CPU MEMORY (ALERT) ##
+###############################
+excess-cpu-memory-1:
+  cluster: della
+  partitions:
+    - cpu
+  min_run_time:             30  # minutes
+  tb_hours_threshold:       65  # TB-hours
+  ratio_threshold:        0.35  # [0.0, 1.0]
+  mean_ratio_threshold:   0.35  # [0.0, 1.0]
+  median_ratio_threshold: 0.35  # [0.0, 1.0]
+  num_top_users:            10  # count
+  num_jobs_display:         10  # count
+  email_file: "excess_cpu_memory.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
+################################
+## LOW CPU EFFICIENCY (ALERT) ##
+################################
+low-cpu-efficiency-1:
+  cluster: stellar
+  partitions:
+    - cpu
+  min_run_time:         30  # minutes
+  eff_thres_pct:        60  # percent
+  eff_target_pct:       90  # percent
+  proportion_thres_pct:  2  # percent
+  absolute_thres_hours: 50  # cpu-hours
+  num_top_users:        15  # count
+  email_file: "low_cpu_efficiency.txt"
+  admin_emails:
+    - admin@institution.edu
 
 
 #########################################
@@ -259,174 +266,14 @@ multinode-cpu-fragmentation-1:
   cluster: della
   partitions:
     - cpu
-  min_run_time: 120    # minutes
-  cores_per_node: 32   # count
-  cores_fraction: 0.5  # [0, 1]
-  mem_per_node: 190    # GB
-  safety_fraction: 0.2 # [0, 1]
+  min_run_time:    120  # minutes
+  cores_per_node:   32  # count
+  cores_fraction:  0.5  # [0.0, 1.0]
+  mem_per_node:    190  # GB
+  safety_fraction: 0.2  # [0.0, 1.0]
   email_file: "multinode_cpu_fragmentation.txt"
   admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-multinode-cpu-fragmentation-2:
-  cluster: della
-  partitions:
-    - physics
-  min_run_time: 61     # minutes
-  cores_per_node: 40   # count
-  cores_fraction: 0.8  # [0, 1]
-  mem_per_node: 380    # GB
-  safety_fraction: 0.2 # [0, 1]
-  email_file: "multinode_cpu_fragmentation.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-multinode-cpu-fragmentation-3:
-  cluster: stellar
-  partitions:
-    - all
-    - pppl
-    - pu
-  min_run_time: 61     # minutes
-  cores_per_node: 96   # count
-  cores_fraction: 0.8  # [0, 1]
-  mem_per_node: 768    # GB
-  safety_fraction: 0.2 # [0, 1]
-  email_file: "multinode_cpu_fragmentation.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-
-#########################################
-## MULTINODE GPU FRAGMENTATION (ALERT) ##
-#########################################
-multinode-gpu-fragmentation-1:
-  cluster: della
-  partitions:
-    - pli
-    - pli-c
-    - pli-p
-    - pli-lc
-  gpus_per_node: 8  # count
-  min_run_time: 61  # minutes
-  email_file: "multinode_gpu_fragmentation.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - kl5675@princeton.edu
-
-multinode-gpu-fragmentation-2:
-  cluster: della
-  partitions:
-    - gpu
-  gpus_per_node: 2  # count
-  min_run_time: 61  # minutes
-  email_file: "multinode_gpu_fragmentation_2.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-
-########################
-## LOW CPU EFFICIENCY ##
-########################
-low-cpu-efficiency-1:
-  cluster: della
-  partitions:
-    - cpu
-  eff_thres_pct: 60         # percent
-  eff_target_pct: 90        # percent
-  proportion_thres_pct: 2   # percent
-  absolute_thres_hours: 50  # cpu-hours
-  num_top_users: 15         # count
-  min_run_time: 30          # minutes
-  email_file: "low_cpu_efficiency.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - msbc@princeton.edu
-
-low-cpu-efficiency-2:
-  cluster: della
-  partitions:
-    - physics
-  eff_thres_pct: 50         # percent
-  eff_target_pct: 90        # percent
-  proportion_thres_pct: 2   # percent
-  absolute_thres_hours: 100 # cpu-hours
-  num_top_users: 3          # count
-  min_run_time: 30          # minutes
-  email_file: "low_cpu_efficiency.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - msbc@princeton.edu
-
-low-cpu-efficiency-3:
-  cluster: stellar
-  partitions:
-    - all
-    - pppl
-    - pu
-    - serial
-  eff_thres_pct: 60         # percent
-  eff_target_pct: 90        # percent
-  proportion_thres_pct: 2   # percent
-  absolute_thres_hours: 50  # cpu-hours
-  num_top_users: 15         # count
-  min_run_time: 30          # minutes
-  email_file: "low_cpu_efficiency.txt"
-  excluded_users:
-    - aturing
-    - hejia
-    - einstein
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - msbc@princeton.edu
-
-
-########################
-## LOW GPU EFFICIENCY ##
-########################
-low-gpu-efficiency-1:
-  cluster: della
-  partitions:
-    - gpu
-  eff_thres_pct: 15         # percent
-  eff_target_pct: 50        # percent
-  proportion_thres_pct: 2   # percent
-  absolute_thres_hours: 50  # gpu-hours
-  num_top_users: 15         # count
-  min_run_time: 30          # minutes
-  email_file: "low_gpu_efficiency.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - msbc@princeton.edu
-
-low-gpu-efficiency-2:
-  cluster: della
-  partitions:
-    - pli-c   # core
-    - pli     # campus, low priority
-    - pli-p   # campus, higher priority than pli
-    - pli-lc  # large campus
-  eff_thres_pct: 40         # percent
-  eff_target_pct: 75        # percent
-  proportion_thres_pct: 2   # percent
-  absolute_thres_hours: 168 # gpu-hours
-  num_top_users: 5          # count
-  min_run_time: 30          # minutes
-  email_file: "low_gpu_efficiency.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-    - kl5675@princeton.edu
-    - msbc@princeton.edu
+    - admin@institution.edu
 
 
 ###################################################
@@ -436,70 +283,30 @@ serial-allocating-multiple-1:
   cluster: della
   partitions:
     - cpu
-  cores_per_node: 32       # (optional)
-  min_run_time: 61         # minutes
-  cpu_hours_threshold: 100 # cpu-hours
-  lower_ratio: 0.85        # [0, 1]
-  num_top_users: 5
+  min_run_time:         61  # minutes
+  cpu_hours_threshold: 100  # cpu-hours
+  lower_ratio:        0.85  # [0.0, 1.0]
+  num_top_users:         5  # count
   email_file: "serial_allocating_multiple.txt"
   admin_emails:
-    - halverson@princeton.edu
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
+    - admin@institution.edu
 
 
-###############################
-## EXCESSIVE RUN TIME LIMITS ##
-###############################
+#######################################
+## EXCESSIVE RUN TIME LIMITS (ALERT) ##
+#######################################
 excessive-time-1:
   cluster: della
   partitions:
     - cpu
-  min_run_time: 0               # minutes
   mode: cpu                     # cpu or gpu
+  min_run_time:             61  # minutes
   absolute_thres_hours: 100000  # unused cpu/gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
-  mean_ratio_threshold: 1.0     # [0.0, 1.0]
-  median_ratio_threshold: 1.0   # [0.0, 1.0]
-  num_top_users: 10
-  num_jobs_display: 10
+  mean_ratio_threshold:    0.2  # [0.0, 1.0]
+  median_ratio_threshold:  0.2  # [0.0, 1.0]
+  num_top_users:            10
+  num_jobs_display:         10
   email_file: "excessive_time.txt"
   admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-excessive-time-2:
-  cluster: della
-  partitions:
-    - gpu
-  min_run_time: 61              # minutes
-  mode: gpu                     # cpu or gpu
-  absolute_thres_hours: 1000    # unused cpu/gpu-hours
-  overall_ratio_threshold: 0.2  # [0.0, 1.0]
-  mean_ratio_threshold: 0.2     # [0.0, 1.0]
-  median_ratio_threshold: 0.2   # [0.0, 1.0]
-  num_top_users: 5
-  num_jobs_display: 10
-  email_file: "excessive_time.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
-
-
-#######################
-## EXCESS CPU MEMORY ##
-#######################
-excess-cpu-memory-1:
-  cluster: della
-  partitions:
-    - cpu
-  min_run_time: 30        # minutes
-  tb_hours_threshold: 65  # TB-hours
-  ratio_threshold: 0.35
-  mean_ratio_threshold: 0.35
-  median_ratio_threshold: 0.35
-  num_top_users: 10
-  num_jobs_display: 10
-  email_file: "excess_cpu_memory.txt"
-  admin_emails:
-    - alerts-jobs-aaaalegbihhpknikkw2fkdx6gi@princetonrc.slack.com
-    - halverson@princeton.edu
+    - admin@institution.edu

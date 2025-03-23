@@ -2,7 +2,7 @@ from base import Alert
 from utils import add_dividers
 
 
-class UtilizationBySlurmAccount(Alert):
+class UsageBySlurmAccount(Alert):
 
     """Utilization of each user within each Slurm account."""
 
@@ -11,7 +11,7 @@ class UtilizationBySlurmAccount(Alert):
 
     def _add_required_fields(self):
         if not hasattr(self, "report_title"):
-            self.report_title = "Utilization by Slurm Account"
+            self.report_title = "Usage by Slurm Account"
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[self.df["elapsedraw"] > 0].copy()
@@ -41,9 +41,10 @@ class UtilizationBySlurmAccount(Alert):
         # dataframe 2 of 2 where the values for each user are explicit
         d = {"cpu-hours":"sum",
              "gpu-hours":"sum"}
-        self.by_user = self.df.groupby(["cluster", "partition", "account", "user"]).agg(d)
+        cols = ["cluster", "partition", "account"]
+        self.by_user = self.df.groupby(cols + ["user"]).agg(d)
         self.by_user = self.by_user.reset_index()
-        self.by_user = self.by_user.sort_values(by=["cluster", "partition", "account", "cpu-hours"],
+        self.by_user = self.by_user.sort_values(by=cols + ["cpu-hours"],
                                                 ascending=[True, True, True, False])
         cols = ["cpu-hours", "gpu-hours"]
         self.by_user[cols] = self.by_user[cols].apply(round).astype("int64")

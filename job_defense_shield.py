@@ -24,8 +24,8 @@ from alert.excess_cpu_memory import ExcessCPUMemory
 from alert.zero_cpu_utilization import ZeroCPU
 from alert.most_gpus import MostGPUs
 from alert.most_cores import MostCores
-from alert.utilization_overview import UtilizationOverview
-from alert.utilization_by_slurm_account import UtilizationBySlurmAccount
+from alert.usage_overview import UsageOverview
+from alert.usage_by_slurm_account import UsageBySlurmAccount
 from alert.longest_queued import LongestQueuedJobs
 from alert.jobs_overview import JobsOverview
 from alert.excessive_time_limits import ExcessiveTimeLimitsCPU
@@ -70,10 +70,10 @@ if __name__ == "__main__":
                         help='Indentify jobs allocating too many CPU-cores per GPU')
     parser.add_argument('--too-much-cpu-mem-per-gpu', action='store_true', default=False,
                         help='Indentify jobs allocating too much CPU memory per GPU')
-    parser.add_argument('--utilization-overview', action='store_true', default=False,
-                        help='Generate a utilization report by cluster and partition')
-    parser.add_argument('--utilization-by-slurm-account', action='store_true', default=False,
-                        help='Generate a utilization report by cluster, partition and account')
+    parser.add_argument('--usage-overview', action='store_true', default=False,
+                        help='Generate a usage report by cluster and partition')
+    parser.add_argument('--usage-by-slurm-account', action='store_true', default=False,
+                        help='Generate a usage report by cluster, partition and account')
     parser.add_argument('--longest-queued', action='store_true', default=False,
                         help='List the longest queued jobs')
     parser.add_argument('--most-cores', action='store_true', default=False,
@@ -275,12 +275,12 @@ if __name__ == "__main__":
                                         args.days)
         if args.most_gpus or \
            args.most_cores or \
-           args.utilization_overview or \
-           args.utilization_by_slurm_account or \
+           args.usage_overview or \
+           args.usage_by_slurm_account or \
            args.jobs_overview or \
            args.longest_queued:
             print(("Nothing to check for --most-gpus, --most-cores, "
-                   "--utilization-overview, --utilization-by-slurm-account, "
+                   "--usage-overview, --usage-by-slurm-account, "
                    "--jobs-overview or --longest-queued."))
         sys.exit()
 
@@ -650,27 +650,32 @@ if __name__ == "__main__":
             s += too_power.add_report_metadata(start_date, end_date)
 
 
-    ##########################
-    ## UTILIZATION OVERVIEW ##
-    ##########################
-    if args.utilization_overview:
-        util = UtilizationOverview(df,
-                                   days_between_emails=args.days,
-                                   violation="null",
-                                   vpath=violation_logs_path)
-        s += util.generate_report_for_admins()
-        s += util.add_report_metadata(start_date, end_date, dates_only=True)
+    ####################
+    ## USAGE OVERVIEW ##
+    ####################
+    if args.usage_overview:
+        usage = UsageOverview(df,
+                              days_between_emails=args.days,
+                              violation="null",
+                              vpath=violation_logs_path)
+        s += usage.generate_report_for_admins()
+        s += usage.add_report_metadata(start_date,
+                                       end_date,
+                                       dates_only=True)
 
 
-    ##################################
-    ## UTILIZATION BY SLURM ACCOUNT ##
-    ##################################
-    if args.utilization_by_slurm_account:
-        util_account = UtilizationBySlurmAccount(df,
-                                                 days_between_emails=args.days,
-                                                 violation="null",
-                                                 vpath=violation_logs_path)
-        s += util_account.generate_report_for_admins()
+    ############################
+    ## USAGE BY SLURM ACCOUNT ##
+    ############################
+    if args.usage_by_slurm_account:
+        usage_acc = UsageBySlurmAccount(df,
+                                        days_between_emails=args.days,
+                                        violation="null",
+                                        vpath=violation_logs_path)
+        s += usage_acc.generate_report_for_admins()
+        s += usage_acc.add_report_metadata(start_date,
+                                           end_date,
+                                           dates_only=True)
 
 
     #########################
@@ -693,6 +698,9 @@ if __name__ == "__main__":
                             violation="null",
                             vpath=violation_logs_path)
         s += jobs.generate_report_for_admins()
+        s += jobs.add_report_metadata(start_date,
+                                      end_date,
+                                      dates_only=True)
 
 
     ####################
@@ -704,6 +712,9 @@ if __name__ == "__main__":
                                violation="null",
                                vpath=violation_logs_path)
         s += most_cores.generate_report_for_admins()
+        s += most_cores.add_report_metadata(start_date,
+                                            end_date,
+                                            dates_only=True)
 
 
     ###############
@@ -715,6 +726,9 @@ if __name__ == "__main__":
                              violation="null",
                              vpath=violation_logs_path)
         s += most_gpus.generate_report_for_admins()
+        s += most_gpus.add_report_metadata(start_date,
+                                           end_date,
+                                           dates_only=True)
 
 
     ####################################

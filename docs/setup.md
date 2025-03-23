@@ -1,6 +1,6 @@
 # Installation
 
-We assume that the [Jobstats platform](https://github.com/PrincetonUniversity/jobstats) is available and working.
+We assume that the [Jobstats](https://github.com/PrincetonUniversity/jobstats) platform is available and working.
 
 !!! info "Cancelling Jobs at 0% GPU Utilization"
     To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software. All of the other alerts can be ran as a regular user.
@@ -76,16 +76,16 @@ Be sure to replace `email-domain-name`, `sender`, `reply-to` and `report-emails`
 To test the software, run this command (which does not send any emails):
 
 ```
-$ python job_defense_shield.py --utilization-overview
+$ python job_defense_shield.py --usage-overview
 ```
 
 The command above will show an overview of the number of CPU-hours and GPU-hours
 across all clusters and partitions in the Slurm database over the past 7 days. Here is an example:
 
 ```
-$ python job_defense_shield.py --utilization-overview
+$ python job_defense_shield.py --usage-overview
 
-           Utilization Overview          
+           Usage Overview          
 -----------------------------------------
 cluster   users   cpu-hours    gpu-hours 
 -----------------------------------------
@@ -96,7 +96,7 @@ traverse    1    189987  (2%) 47497 (34%)
 
 
 
-          Utilization Overview by Partition           
+          Usage Overview by Partition           
 ------------------------------------------------------
 cluster  partition   users   cpu-hours     gpu-hours  
 ------------------------------------------------------
@@ -132,7 +132,7 @@ traverse        all    1    189987 (100%) 47497 (100%)
 You can go further back in time by using the `--days` option:
 
 ```
-$ python job_defense_shield.py --utilization-overview --days=14
+$ python job_defense_shield.py --usage-overview --days=14
 ```
 
 !!! info
@@ -141,12 +141,12 @@ $ python job_defense_shield.py --utilization-overview --days=14
 One can only include data from specific clusters or partitions using the `-M` and `-r` options from `sacct`:
 
 ```
-$ python job_defense_shield.py --utilization-overview -M della -r cpu,gpu
+$ python job_defense_shield.py --usage-overview -M della -r cpu,gpu
 ```
 Or equivalently:
 
 ```
-$ python job_defense_shield.py --utilization-overview --clusters=della --partition=cpu,gpu
+$ python job_defense_shield.py --usage-overview --clusters=della --partition=cpu,gpu
 ```
 
 The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to `sacct`. See `man sacct` for more information.
@@ -156,7 +156,7 @@ The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to red
 By having your email address in `report-emails` in `config.yaml`, the `--report` flag can be used to send the output to administrators by email:
 
 ```
-$ python job_defense_shield.py --utilization-overview --report
+$ python job_defense_shield.py --usage-overview --report
 ```
 
 This feature is useful when combined with `cron`. That is, one can receive a daily report showing all of the instances of underutilization across all of the systems. This is shown later.
@@ -174,7 +174,7 @@ $ python -c "import pyyaml; print(pyyaml.__version__)"
 If the configuration file is not found then try specifying the full path:
 
 ```
-$ python job_defense_shield.py --config-file=/path/to/config.yaml --utilization-overview --report
+$ python job_defense_shield.py --config-file=/path/to/config.yaml --usage-overview --report
 ```
  
 ## Creating a Configuration File for Production

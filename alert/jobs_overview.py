@@ -1,6 +1,6 @@
 from base import Alert
 from utils import add_dividers
-from utils import SECONDS_PER_HOUR
+from utils import SECONDS_PER_HOUR as sph
 
 
 class JobsOverview(Alert):
@@ -28,7 +28,6 @@ class JobsOverview(Alert):
                 "gpu-job"]
         self.df = self.df[cols]
         # add new fields
-        self.df.state  = self.df.state.apply(lambda s: "CANCELLED" if "CANCEL" in s else s)
         self.df["CLD"] = self.df.state.apply(lambda s: s == "CANCELLED")
         self.df["COM"] = self.df.state.apply(lambda s: s == "COMPLETED")
         self.df["OOM"] = self.df.state.apply(lambda s: s == "OUT_OF_MEMORY")
@@ -48,13 +47,13 @@ class JobsOverview(Alert):
         self.gp = self.gp.rename(columns={"user":"jobs"})
         self.gp = self.gp.reset_index(drop=False)
         self.gp = self.gp.sort_values("jobs", ascending=False)
-        self.gp = self.gp.rename(columns={"partition":"partitions", "gpu-job":"gpu"})
+        self.gp = self.gp.rename(columns={"partition":"partitions",
+                                          "gpu-job":"gpu"})
         self.gp["cpu"] = self.gp["jobs"] - self.gp["gpu"]
-        self.gp["cpu-hours"] = self.gp["cpu-seconds"] / SECONDS_PER_HOUR
-        self.gp["gpu-hours"] = self.gp["gpu-seconds"] / SECONDS_PER_HOUR
-        self.gp["cpu-hours"] = self.gp["cpu-hours"].apply(round)
-        self.gp["gpu-hours"] = self.gp["gpu-hours"].apply(round)
-        self.gp.drop(columns=["cpu-seconds", "gpu-seconds"], inplace=True)
+        self.gp["cpu-hours"] = self.gp["cpu-seconds"] / sph
+        self.gp["gpu-hours"] = self.gp["gpu-seconds"] / sph
+        self.gp["cpu-hours"] = self.gp["cpu-hours"].apply(round).astype("int64")
+        self.gp["gpu-hours"] = self.gp["gpu-hours"].apply(round).astype("int64")
         cols = ["user",
                 "cluster",
                 "jobs",
@@ -69,9 +68,19 @@ class JobsOverview(Alert):
                 "gpu-hours",
                 "partitions"]
         self.gp = self.gp[cols]
+        renamings = {"user":"User",
+                     "cluster":"Cluster",
+                     "jobs":"Jobs",
+                     "cpu":"CPU",
+                     "gpu":"GPU",
+                     "cpu-hours":"CPU-Hrs",
+                     "gpu-hours":"GPU-Hrs",
+                     "partitions":"Partitions"}
+        self.gp.rename(columns=renamings, inplace=True)
 
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.gp.empty:
-            return add_dividers(self.create_empty_report(self.gp), self.report_title)
+            return add_dividers(self.create_empty_report(self.gp),
+                                self.report_title)
         report_str = self.gp.head(10).to_string(index=keep_index, justify="center")
         return add_dividers(report_str, self.report_title)

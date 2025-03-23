@@ -1,6 +1,6 @@
-import time
-from utils import SECONDS_PER_HOUR
-from utils import HOURS_PER_DAY
+from time import time
+from utils import SECONDS_PER_HOUR as sph
+from utils import HOURS_PER_DAY as hpd
 from utils import add_dividers
 from base import Alert
 
@@ -8,7 +8,8 @@ from base import Alert
 class LongestQueuedJobs(Alert):
 
     """Find the pending jobs with the longest queue times while ignoring
-       array jobs."""
+       array jobs. Only jobs that have been eligible to run for 3 days
+       or more are shown. One job per user."""
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
@@ -23,17 +24,37 @@ class LongestQueuedJobs(Alert):
         # remove array jobs
         self.df = self.df[~self.df.jobid.str.contains("_")]
         # add new fields
-        self.df["s-days"] = round((time.time() - self.df["submit"])   / SECONDS_PER_HOUR / HOURS_PER_DAY)
-        self.df["e-days"] = round((time.time() - self.df["eligible"]) / SECONDS_PER_HOUR / HOURS_PER_DAY)
+        self.df["s-days"] = round((time() - self.df["submit"]) / sph / hpd)
+        self.df["e-days"] = round((time() - self.df["eligible"]) / sph / hpd)
         self.df["s-days"] = self.df["s-days"].astype("int64")
         self.df["e-days"] = self.df["e-days"].astype("int64")
-        cols = ["jobid", "user", "cluster", "nodes", "cores", "qos", "partition", "s-days", "e-days"]
-        self.df = self.df[cols].groupby("user").apply(lambda d: d.iloc[d["s-days"].argmax()])
+        cols = ["jobid",
+                "user",
+                "cluster",
+                "nodes",
+                "cores",
+                "qos",
+                "partition",
+                "s-days",
+                "e-days"]
+        self.df = self.df[cols].groupby("user").apply(lambda d:
+                                                      d.iloc[d["s-days"].argmax()])
         self.df.sort_values("s-days", ascending=False, inplace=True)
-        self.df = self.df[self.df["s-days"] >= 4][:10]
+        self.df = self.df[self.df["s-days"] >= 3][:10]
+        renamings = {"jobid":"JobID",
+                     "user":"User",
+                     "cluster":"Cluster",
+                     "nodes":"Nodes",
+                     "cores":"Cores",
+                     "qos":"QOS",
+                     "partition":"Partition",
+                     "s-days":"S-Days",
+                     "e-Days":"E-Days"}
+        self.df.rename(columns=renamings, inplace=True)
 
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.df.empty:
-            return add_dividers(self.create_empty_report(self.df), self.report_title)
+            return add_dividers(self.create_empty_report(self.df),
+                                self.report_title)
         report_str = self.df.to_string(index=keep_index, justify="center")
         return add_dividers(report_str, self.report_title)

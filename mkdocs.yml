@@ -26,10 +26,15 @@ nav:
     - Run Time Limits:             alert/time_limits.md
     - New Alert:                   alert/new_alert.md
   - Reports:
-    - Overview: reports/overview.md
-#    - Usage By Slurm Account: reports/account.md
+    - Overview:                    reports/overview.md
+    - Usage Overview:              reports/usage_overview.md
+    - Usage By Slurm Account:      reports/account.md
+    - Jobs with Most CPU-Cores:    reports/most_cores.md
+    - Jobs with Most GPUs:         reports/most_gpus.md
+    - Longest Queued Jobs:         reports/longest_queued.md
+    - Job Counts:                  reports/jobs_overview.md
   - Nodelist: nodelist.md
-#  - Tips: extra.md
+  - Check Mode: extra.md
   - Contributions: contributions.md
   - Support: support.md
   - Publications: publications.md

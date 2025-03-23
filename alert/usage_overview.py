@@ -2,16 +2,16 @@ from base import Alert
 from utils import add_dividers
 
 
-class UtilizationOverview(Alert):
+class UsageOverview(Alert):
 
-    """Utilization by cluster and by partition."""
+    """Usage by cluster and partition."""
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
 
     def _add_required_fields(self):
         if not hasattr(self, "report_title"):
-            self.report_title = "Utilization Overview"
+            self.report_title = "Usage Overview"
 
     def _filter_and_add_new_fields(self):
         def compute_utilization(fields: list, simple: bool=True):
@@ -43,7 +43,6 @@ class UtilizationOverview(Alert):
             return gp
 
         self.df = self.df[self.df["elapsedraw"] > 0].copy()
-        # running jobs are included
         self.by_cluster = compute_utilization(["cluster"])
         self.by_cluster["cpu-hours"] = self.format_email_counts(self.by_cluster["cpu-hours"])
         self.by_cluster["gpu-hours"] = self.format_email_counts(self.by_cluster["gpu-hours"])

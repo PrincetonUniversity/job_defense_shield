@@ -1,6 +1,6 @@
 # Defend the Hardware
 
-Job Defense Shield is a software tool for identifying and reducing instances of underutilization by the users of high-performance computing systems. The software sends automated email alerts to users and generates reports for system administrators. It is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
+Job Defense Shield is a software tool for identifying and reducing instances of underutilization by the users of high-performance computing systems. The software sends automated email alerts to users and creates reports for system administrators. Job Defense Shield is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
 
 Most popular feature:
 
@@ -48,9 +48,9 @@ Which users are over-allocating the most CPU memory?
     User    Unused    Used    Ratio   Ratio  Ratio   CPU-Hrs  Jobs   Emails
            (TB-Hrs) (TB-Hrs) Overall  Mean   Median                        
 ----------------------------------------------------------------------------
-1  u93714    127       10      0.07   0.08   0.07     42976    12      0  
+1  u93714    127       10      0.07   0.08   0.07     42976    12      2 (6)  
 2  u44210     17       81      0.83   0.84   0.79     31082    20      0  
-3  u61098     10        4      0.71   0.71   0.65      6790     4      2 (6)
+3  u61098     10        4      0.71   0.71   0.65      6790     4      0
 4  u13158      4        1      0.20   0.20   0.20      3961     2      0  
 ----------------------------------------------------------------------------
    Cluster: tiger

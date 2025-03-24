@@ -2,9 +2,9 @@
 
 ## When Are Emails Sent?
 
-Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email of the same nature.
+Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email for the same instance of underutilization. By default, this time period is 7 days.
 
-By default, users can only receive an email for a particular instance of underutilization once per week. The email they receive will contain either the individual jobs or a summary for that week. This time window can be modified by the `--days` option. Note that users can received multiple emails about the same type of underutilization if there are multiple alerts covering different partitions or different clusters.
+The emails sent to users either contain the individual jobs or a summary for that week. Note that users can receive multiple emails about the same type of underutilization if there are multiple alerts covering different partitions or different clusters.
 
 The `Email` column in the table below shows the number of emails that each user has received about this particular instance of underutilization:
 
@@ -108,13 +108,13 @@ idea to put them under version control along with `config.yaml` and `holidays.tx
 
 ## Testing the Sending of Emails to Users
 
-If `config.yaml` exists, an administrator can see the output of an alert by running it:
+If `config.yaml` has an entry for `low-gpu-efficiency` then an administrator can see the output by running the alert:
 
 ```
 $ python job_defense_shield.py --low-gpu-efficiency
 ```
 
-One adds the `--email` flag to send emails to users:
+One adds the `--email` flag to send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --low-gpu-efficiency --email
@@ -127,7 +127,7 @@ For testing, one can add a second flag that will only send the emails to `admin_
 $ python job_defense_shield.py --low-gpu-efficiency --email --no-emails-to-users
 ```
 
-The `--no-emails-to-users` will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml` without involving the users.
+The `--no-emails-to-users` flag will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml` without involving users.
 
 There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](alert/cancel_gpu_jobs.md). In this case, one should add the following to the alert definition:
 
@@ -137,11 +137,11 @@ There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](a
 
 ## Hyperlinks
 
-Instead of explicitly displaying URLs in email files, one can create hyperlinks. For example:
+Instead of explicitly displaying URLs in email messages, one can create hyperlinks. For example:
 
 ```
 If you believe that the code is capable of using more than 1 CPU-core then
 consider attending an in-person <a href="https://your-institution.edu/support/help-sessions">Research Computing help session</a> for assistance.
 ```
 
-Hyperlinks shorten the email message which presumably makes it more likely to be read.
+Hyperlinks condense the email message which presumably makes it more effective.

@@ -320,7 +320,12 @@ if __name__ == "__main__":
     fields = ",".join(fields)
 
     use_cache = False if (args.email or args.report) else True
-    raw = SlurmSacct(args.days, args.starttime, args.endtime, fields, args.clusters, args.partition)
+    raw = SlurmSacct(args.days,
+                     args.starttime,
+                     args.endtime,
+                     fields,
+                     args.clusters,
+                     args.partition)
     raw = raw.get_job_data()
 
     # clean the raw data
@@ -687,6 +692,9 @@ if __name__ == "__main__":
                                    violation="null",
                                    vpath=violation_logs_path)
         s += queued.generate_report_for_admins()
+        s += queued.add_report_metadata(start_date,
+                                        end_date,
+                                        dates_only=True)
 
 
     ###################

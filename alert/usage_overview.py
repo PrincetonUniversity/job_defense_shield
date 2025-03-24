@@ -11,7 +11,7 @@ class UsageOverview(Alert):
 
     def _add_required_fields(self):
         if not hasattr(self, "report_title"):
-            self.report_title = "Usage Overview"
+            self.report_title = "Usage Overview by Cluster"
 
     def _filter_and_add_new_fields(self):
         def compute_utilization(fields: list, simple: bool=True):
@@ -50,9 +50,16 @@ class UsageOverview(Alert):
         self.special = self.by_partition.copy()
         self.special["cpu-hours"] = self.format_email_counts(self.special["cpu-hours"])
         self.special["gpu-hours"] = self.format_email_counts(self.special["gpu-hours"])
+        renamings = {"cluster":"Cluster",
+                     "partition":"Partition",
+                     "users":"Users",
+                     "cpu-hours":"CPU-Hours",
+                     "gpu-hours":"GPU-Hours"}
+        self.by_cluster.rename(columns=renamings, inplace=True)
+        self.special.rename(columns=renamings, inplace=True)
  
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         clus = self.by_cluster.to_string(index=keep_index, justify="center")
         part = self.special.to_string(index=False, justify="center")
         return add_dividers(clus, self.report_title) + \
-               add_dividers(part, f"{self.report_title} by Partition")
+               add_dividers(part, f"{self.report_title} and Partition")

@@ -13,14 +13,13 @@ class JobsOverview(Alert):
 
     def _add_required_fields(self):
         if not hasattr(self, "report_title"):
-            self.report_title = "Most Jobs (Ignoring Running and Pending)"
+            self.report_title = "Users with the Most Jobs"
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[self.df["elapsedraw"] > 0].copy()
         cols = ["jobid",
                 "user",
                 "cluster",
-                "cores",
                 "state",
                 "partition",
                 "cpu-seconds",
@@ -33,10 +32,12 @@ class JobsOverview(Alert):
         self.df["OOM"] = self.df.state.apply(lambda s: s == "OUT_OF_MEMORY")
         self.df["TO"]  = self.df.state.apply(lambda s: s == "TIMEOUT")
         self.df["F"]   = self.df.state.apply(lambda s: s == "FAILED")
+        self.df["RUN"] = self.df.state.apply(lambda s: s == "RUNNING")
         d = {"user":"size",
              "COM":"sum",
              "CLD":"sum",
              "F":"sum",
+             "RUN":"sum",
              "OOM":"sum",
              "TO":"sum",
              "cpu-seconds":"sum",
@@ -62,6 +63,7 @@ class JobsOverview(Alert):
                 "COM",
                 "CLD",
                 "F",
+                "RUN",
                 "OOM",
                 "TO",
                 "cpu-hours",

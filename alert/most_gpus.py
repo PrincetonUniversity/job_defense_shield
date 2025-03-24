@@ -1,3 +1,4 @@
+import pandas as pd
 from base import Alert
 from utils import add_dividers
 from efficiency import gpu_efficiency
@@ -31,7 +32,7 @@ class MostGPUs(Alert):
         self.gp = self.df[cols].groupby("user").apply(lambda d:
                                                       d.iloc[d["gpus"].argmax()])
         self.gp = self.gp.sort_values("gpus", ascending=False)[:10]
-        self.gp.rename(columns={"elapsed-hours":"hours"}, inplace=True)
+        self.gp.rename(columns={"elapsed-hours":"Hours"}, inplace=True)
         self.gp.state = self.gp.state.apply(lambda x: JOBSTATES[x])
         if not self.gp.empty:
             self.gp["GPU-eff-tpl"] = self.gp.apply(lambda row:
@@ -49,7 +50,8 @@ class MostGPUs(Alert):
             self.gp["GPU-eff"] = self.gp["GPU-eff"].apply(lambda x:
                                                           x if x == "--"
                                                           else f"{round(x)}%")
-            self.gp["hours"] = self.gp["hours"].apply(lambda hrs: round(hrs, 1))
+            self.gp["Hours"] = self.gp["Hours"].apply(lambda h: str(round(h, 1))
+                                                      if h < 2 else str(round(h)))
             renamings = {"jobid":"JobID",
                          "user":"User",
                          "cluster":"Cluster",

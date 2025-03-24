@@ -68,7 +68,7 @@ class SlurmSacct(RawJobData):
                    "\nCall to sacct resulted in no job data. If this is surprising\n"
                    "then check the spelling of your cluster and/or partition names\n"
                    "in config.yml and -M <clusters> -r <partition>. Run again using\n"
-                   "the only option --utilization-overview to see what is available."""
+                   "the only option --usage-overview to see what is available."""
                   )
             print(msg)
             sys.exit()

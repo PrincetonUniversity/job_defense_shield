@@ -1,4 +1,5 @@
 from time import time
+import pandas as pd
 from utils import SECONDS_PER_HOUR as sph
 from utils import HOURS_PER_DAY as hpd
 from utils import add_dividers
@@ -32,7 +33,6 @@ class LongestQueuedJobs(Alert):
                 "user",
                 "cluster",
                 "nodes",
-                "cores",
                 "qos",
                 "partition",
                 "s-days",
@@ -41,20 +41,19 @@ class LongestQueuedJobs(Alert):
                                                       d.iloc[d["s-days"].argmax()])
         self.df.sort_values("s-days", ascending=False, inplace=True)
         self.df = self.df[self.df["s-days"] >= 3][:10]
-        renamings = {"jobid":"JobID",
-                     "user":"User",
-                     "cluster":"Cluster",
-                     "nodes":"Nodes",
-                     "cores":"Cores",
-                     "qos":"QOS",
-                     "partition":"Partition",
-                     "s-days":"S-Days",
-                     "e-Days":"E-Days"}
-        self.df.rename(columns=renamings, inplace=True)
+        column_names = pd.MultiIndex.from_tuples([('JobID', ''),
+                                                  ('User', ''),
+                                                  ('Cluster', ''),
+                                                  ('Nodes', ''),
+                                                  ('QOS', ''),
+                                                  ('Partition', ''),
+                                                  ('Submit', '(Days)'),
+                                                  ('Eligible', '(Days)')])
+        self.df.columns = column_names
 
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.df.empty:
             return add_dividers(self.create_empty_report(self.df),
                                 self.report_title)
         report_str = self.df.to_string(index=keep_index, justify="center")
-        return add_dividers(report_str, self.report_title)
+        return add_dividers(report_str, self.report_title, units_row=True)

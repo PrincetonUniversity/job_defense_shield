@@ -5,7 +5,7 @@
 
 # Job Defense Shield
 
-Job Defense Shield is a software tool for identifying and reducing instances of underutilization by the users of high-performance computing systems. The software sends automated email alerts to users and generates reports for system administrators. It is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
+Job Defense Shield is a software tool for identifying and reducing instances of underutilization by the users of high-performance computing systems. The software sends automated email alerts to users and creates reports for system administrators. Job Defense Shield is a component of the [Jobstats](https://github.com/PrincetonUniversity/jobstats) job monitoring platform.
 
 Below is an example report for 0% GPU utilization:
 

@@ -44,8 +44,6 @@ per alert.
 
 - `email_subject`: Subject of the email message to users.
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
-
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear

@@ -48,7 +48,9 @@ per alert. Use multiple `zero-util-gpu-hours` alerts for multiple clusters.
 
 - `email_file`: The file used as a email body. This file must be found in the `email-files-path` setting in `config.yaml`. Learn more about writing custom emails.
 
-- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. The default is 0.
+- `min_nodes_thres`: (Optional) Minimum number of allocated nodes for a job to be considered. For instance, if `min_nodes_thres: 4` then jobs that ran on 3 nodes or less will be ignored. Default: 2
+
+- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. For example, if `min_run_time: 61` then jobs that ran for an hour or less are ignored. This can be used to exclude test jobs. Default: 0
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
 in reports for system administrators when `--report` is used.

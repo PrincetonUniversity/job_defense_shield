@@ -23,6 +23,8 @@ class MultinodeCpuFragmentation(Alert):
             self.email_subject = "Multinode CPU Jobs with Fragmentation"
         if not hasattr(self, "report_title"):
             self.report_title = "Multinode CPU Jobs with Fragmentation"
+        if not hasattr(self, "min_nodes"):
+            self.min_nodes_thres = 2
 
     def is_fragmented(self, cores_per_node, mem_per_node_used) -> bool:
         """Classify the job as fragmented or not based on cores per node
@@ -46,7 +48,7 @@ class MultinodeCpuFragmentation(Alert):
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
-                          (self.df.nodes > 1) &
+                          (self.df.nodes >= self.min_nodes_thres) &
                           (self.df["gpu-job"] == 0) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df.state != "OUT_OF_MEMORY") &

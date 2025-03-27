@@ -1,5 +1,7 @@
 # Multinode GPU Fragmentation
 
+This alert identifies GPU jobs that are using too many nodes or too few GPUs per node.
+
 Consider a cluster with 4 GPUs per node. A user can run a job
 with 8 GPUs by either (1) allocating 4 GPUs on 2 nodes
 or (2) allocating 1 GPU on 8 nodes. The former is in general

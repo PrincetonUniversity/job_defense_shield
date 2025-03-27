@@ -81,22 +81,16 @@ class MultinodeCpuFragmentation(Alert):
                 self.df = self.df[self.df["error_code"] == 0]
                 self.df["memory-per-node-used"] = self.df["memory-used"] / self.df["nodes"]
                 self.df["memory-per-node-used"] = self.df["memory-per-node-used"].apply(round)
-                self.df = self.df[self.df.apply(lambda row:
-                                                self.is_fragmented(row["cores-per-node"],
-                                                                   row["memory-per-node-used"]),
-                                                                   axis="columns")]
-                if not self.df.empty:
-                    self.df["min-nodes"] = self.df.apply(lambda row:
-                                                         self.min_nodes_needed(row["nodes"],
-                                                                               row["cores"],
-                                                                               row["memory-per-node-used"]),
-                                                                               axis="columns")
-                    self.df = self.df.sort_values(["cluster", "user"], ascending=[True, True])
-                    self.df = self.df[self.df["min-nodes"] < self.df["nodes"]]
-                    self.df["memory-per-node-used"] = self.df["memory-per-node-used"].apply(lambda x: f"{x} GB")
-                    self.df["cores-per-node"] = self.df["cores-per-node"].apply(lambda x: str(x).replace(".0", ""))
-                    self.df = self.df.rename(columns={"elapsed-hours":"hours",
-                                                      "memory-per-node-used":"mem-per-node-used"})
+                self.df = self.df.rename(columns={"elapsed-hours":"hours",
+                                                  "memory-per-node-used":"mem-per-node-used"})
+                self.df = self.df.sort_values(["cluster", "user"], ascending=[True, True])
+                self.df["hours"] = self.df["hours"].apply(lambda x: str(round(x, 1))
+                                                          if x < 5 else str(round(x)))
+                if hasattr(self, "cores_per_node_thres"):
+                    self.df = self.df[self.df["cores-per-node"] < self.cores_per_node_thres]
+                    self.df["mem-per-node-used"] = self.df["mem-per-node-used"].apply(lambda x: f"{x} GB")
+                    self.df["cores-per-node"] = self.df["cores-per-node"].apply(lambda x:
+                                                                                str(x).replace(".0", ""))
                     cols = ["jobid",
                             "user",
                             "cluster",
@@ -105,11 +99,36 @@ class MultinodeCpuFragmentation(Alert):
                             "cores",
                             "mem-per-node-used",
                             "cores-per-node",
-                            "hours",
-                            "min-nodes"]
+                            "hours"]
                     self.df = self.df[cols]
-                    self.df["hours"] = self.df["hours"].apply(lambda x: str(round(x, 1))
-                                                              if x < 5 else str(round(x)))
+                    self.df["min-nodes"] = "N/A"
+                else:
+                    if not self.df.empty:
+                        self.df = self.df[self.df.apply(lambda row:
+                                                        self.is_fragmented(row["cores-per-node"],
+                                                                           row["mem-per-node-used"]),
+                                                                           axis="columns")]
+                        if not self.df.empty:
+                            self.df["min-nodes"] = self.df.apply(lambda row:
+                                                                 self.min_nodes_needed(row["nodes"],
+                                                                                       row["cores"],
+                                                                                       row["mem-per-node-used"]),
+                                                                                       axis="columns")
+                            self.df = self.df[self.df["min-nodes"] < self.df["nodes"]]
+                            self.df["mem-per-node-used"] = self.df["mem-per-node-used"].apply(lambda x: f"{x} GB")
+                            self.df["cores-per-node"] = self.df["cores-per-node"].apply(lambda x:
+                                                                                        str(x).replace(".0", ""))
+                            cols = ["jobid",
+                                    "user",
+                                    "cluster",
+                                    "partition",
+                                    "nodes",
+                                    "cores",
+                                    "mem-per-node-used",
+                                    "cores-per-node",
+                                    "hours",
+                                    "min-nodes"]
+                            self.df = self.df[cols]
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)
@@ -126,22 +145,27 @@ class MultinodeCpuFragmentation(Alert):
                              "hours":"Hours",
                              "min-nodes":"Nodes-Needed"}
                 usr = usr.rename(columns=renamings)
-                min_nodes = usr["Nodes-Needed"].mode().values[0]
                 indent = 4 * " "
                 tags = {}
                 tags["<GREETING>"] = g.greeting(user)
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<CLUSTER>"] = self.cluster
                 tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
-                tags["<CPN>"] = str(self.cores_per_node)
-                tags["<MPN>"] = str(self.mem_per_node)
-                tbl = usr.drop(columns=["user", "Partition", "cores"]).copy()
-                table = tbl.to_string(index=False, justify="center").split("\n")
-                tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                sb = f"{indent}#SBATCH --nodes={min_nodes}\n"
-                sb += f"{indent}#SBATCH --ntasks-per-node={self.cores_per_node}"
-                tags["<SBATCH>"] = sb
-                tags["<NUM-CORES>"] = str(min_nodes * self.cores_per_node)
+                if not hasattr(self, "cores_per_node_thres"):
+                    min_nodes = usr["Nodes-Needed"].mode().values[0]
+                    tags["<CPN>"] = str(self.cores_per_node)
+                    tags["<MPN>"] = str(self.mem_per_node)
+                    tbl = usr.drop(columns=["user", "Partition", "cores"]).copy()
+                    table = tbl.to_string(index=False, justify="center").split("\n")
+                    tags["<TABLE>"] = "\n".join([indent + row for row in table])
+                    sb = f"{indent}#SBATCH --nodes={min_nodes}\n"
+                    sb += f"{indent}#SBATCH --ntasks-per-node={self.cores_per_node}"
+                    tags["<SBATCH>"] = sb
+                    tags["<NUM-CORES>"] = str(min_nodes * self.cores_per_node)
+                else:
+                    tbl = usr.drop(columns=["user", "Partition", "cores", "Nodes-Needed"]).copy()
+                    table = tbl.to_string(index=False, justify="center").split("\n")
+                    tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,
@@ -156,6 +180,8 @@ class MultinodeCpuFragmentation(Alert):
                            "JobID",
                            "Partition",
                            "Nodes",
+                           "Cores-per-Node",
+                           "Mem-per-Node",
                            "Hours",
                            "Nodes-Needed"]]
                 self.emails.append((user, email, usr))

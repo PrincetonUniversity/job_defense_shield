@@ -1,5 +1,7 @@
 # Multinode CPU Fragmentation
 
+This alert identifies CPU jobs that are using too many nodes or too few CPU-cores per node.
+
 Consider a cluster with 64 CPU-cores per node. A user can run a job
 that requires 128 CPU-cores by (1) allocating 64 CPU-cores on 2 nodes
 or (2) allocating 4 CPU-cores on 32 nodes. The former is in general
@@ -9,8 +11,8 @@ number of available CPU-cores per node (e.g., 4 CPU-cores on 32 nodes).
 The memory usage of each job is taken into account when looking
 for fragmentation.
 
-Jobs with 0% CPU utilization on a node are ignored since those will captured
-by a different alert.
+Jobs with 0% CPU utilization on a node are ignored since those are captured
+by a different alert (see [CPUs with 0% Utilization](zero_cpu_util.md)).
 
 ## Configuration File
 
@@ -21,10 +23,10 @@ multinode-cpu-fragmentation-1:
   cluster: della
   partitions:
     - cpu
-  min_run_time: 120     # minutes
-  cores_per_node: 32    # count
-  cores_fraction: 0.5   # [0.0, 1.0]
-  mem_per_node: 190     # GB
+  min_run_time:     61  # minutes
+  cores_per_node:   32  # count
+  cores_fraction:  0.8  # [0.0, 1.0]
+  mem_per_node:    190  # GB
   safety_fraction: 0.2  # [0.0, 1.0]
   email_file: "multinode_cpu_fragmentation.txt"
   admin_emails:
@@ -50,6 +52,8 @@ per alert. Use multiple `zero-util-gpu-hours` alerts for multiple clusters.
 
 - `min_nodes_thres`: (Optional) Minimum number of allocated nodes for a job to be considered. For instance, if `min_nodes_thres: 4` then jobs that ran on 3 nodes or less will be ignored. Default: 2
 
+- `cores_per_node_thres`: (Optional) Only consider jobs with less than this number of cores per node. If this setting is used then the following settings will be ignored: `cores_per_node`, `mem_per_node`, and `safety_frac`. Additionally, the only placeholders that will be available are `<GREETING>`, `<DAYS>`, `<CLUSTER>`, `<PARTITIONS>`, `<TABLE>`, and `<JOBSTATS>`. The `<TABLE>` placeholder will not contain `Min-Nodes`. The `cores_per_node_thres` setting provides a simple way to address multinode CPU fragmentation on a cluster composed of hetergeneous nodes.
+
 - `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. For example, if `min_run_time: 61` then jobs that ran for an hour or less are ignored. This can be used to exclude test jobs. Default: 0
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
@@ -57,6 +61,22 @@ in reports for system administrators when `--report` is used.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
+
+Below is an entry appropriate for a heterogeneous cluster:
+
+```yaml
+multinode-cpu-fragmentation-1:
+  cluster: della
+  partitions:
+    - cpu
+  min_run_time:         61  # minutes
+  cores_per_node_thres: 16  # count
+  email_file: "multinode_cpu_fragmentation.txt"
+  admin_emails:
+    - admin@institution.edu
+```
+
+When `cores_per_node_thres` is used, other settings are ignored and a limited number of placeholders are available for creating the email message.
 
 ## Report for System Administrators
 
@@ -83,7 +103,7 @@ Partitions: cpu
 
 The `Min-Nodes` field is calculated based on the hardware specifications and the number of CPU-cores allocated by the user. All of the jobs in the table above could have ran on one node.
 
-## Email
+## Email Message to Users
 
 Below is an example:
 
@@ -109,14 +129,14 @@ is the mean CPU memory used per node.
 Replying to this automated email will open a support ticket with Research
 Computing.
 ```
-### Tags
+### Placeholders
 
-The following tags can be used to construct custom email messages:
+The following placeholders can be used to construct custom email messages:
 
 - `<GREETING>`: The greeting that will be generated based on the choice of `greeting_method` in `config.yaml`. An example is "Hello Alan (aturing),".
 - `<CLUSTER>`: The name of the cluster as defined in `config.yaml`.
 - `<PARTITIONS>`: A comma-separated list of partitions as defined for the alert in `config.yaml`.
-- `<GPUS-PER-NODE>`: The number of GPUs per node (i.e., `gpus_per_node`).
+- `<CPN>`: The number of CPU-cores per node (i.e., `cores_per_node`).
 - `<TABLE>`: A table of jobs for the user.
 - `<DAYS>`: The number of days in the time window (default is 7 days).
 

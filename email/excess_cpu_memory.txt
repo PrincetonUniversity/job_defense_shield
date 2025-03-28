@@ -10,14 +10,9 @@ has resulted in <UNUSED> TB-hours of unused memory which is equivalent to making
 <NUM-WASTED-NODES> nodes unavailable to all users (including yourself) for one week! A TB-hour is
 the allocation of 1 terabyte of memory for 1 hour.
 
-
 Please request less memory by modifying the --mem-per-cpu or --mem Slurm
-directive. For instance, if your job requires 8 GB per node then use:
-
-    #SBATCH --mem=10G
-
-The value above includes an extra 20% for safety. A good target value for
-Percent-Used is 80%. For more on allocating CPU memory with Slurm:
+directive. A good target value for Percent-Used is 80% and above. For more
+on allocating CPU memory with Slurm:
 
     https://your-institution.edu/KB/cpu-memory
 

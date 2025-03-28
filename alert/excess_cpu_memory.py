@@ -23,6 +23,8 @@ class ExcessCPUMemory(Alert):
             self.combine_partitions = False
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 100000
+        if not hasattr(self, "num_jobs_display"):
+            self.num_jobs_display = 10
 
     def _filter_and_add_new_fields(self):
         # exclude gpu jobs?
@@ -138,9 +140,9 @@ class ExcessCPUMemory(Alert):
                 pct = round(100 * usr["mean-ratio"].values[0])
                 unused = usr["Mem-Hrs-Unused"].values[0]
                 if hasattr(self, "mem_per_node"):
-                    hours_per_week = 7 * 24
+                    hours_per_period = self.days_between_emails * 24
                     tb_mem_per_node = self.mem_per_node / 1e3
-                    num_wasted_nodes = round(unused / hours_per_week / tb_mem_per_node)
+                    num_wasted_nodes = round(unused / hours_per_period / tb_mem_per_node)
                 jobs = jobs.sort_values(by="mem-hrs-unused", ascending=False).head(num_disp)
                 jobs = jobs[["jobid",
                              "mem-used",

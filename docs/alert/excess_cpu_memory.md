@@ -1,22 +1,25 @@
 # Over-Allocating CPU Memory
 
-This alert sends emails to users that are allocating excess CPU memory.
-For example, jobs that use 1 GB but allocate 100 GB.
+This alert identifies users that are over-allocating CPU memory.
+
+This should only be used for CPU-only jobs. For GPU jobs,
+see [this alert](excess_cpu_mem_per_gpu.md).
 
 ## Configuration File
 
+Below is an example entry for `config.yaml`:
 
 ```yaml
-excess-cpu-memory:
-  clusters:
-    - della
+excess-cpu-memory-1:
+  clusters: della
   partition:
     - cpu
-  tb_hours_threshold: 100       # terabyte-hours
-  ratio_threshold: 0.35         # [0.0, 1.0]
-  mean_ratio_threshold: 0.35    # [0.0, 1.0]
+  min_run_time:             61  # minutes
+  tb_hours_threshold:      100  # terabyte-hours
+  ratio_threshold:        0.35  # [0.0, 1.0]
+  mean_ratio_threshold:   0.35  # [0.0, 1.0]
   median_ratio_threshold: 0.35  # [0.0, 1.0]
-  num_top_users: 5
+  num_top_users:             5  # count
   admin_emails:
     - admin@institution.edu
 ```
@@ -49,9 +52,11 @@ and 1.
 
 - `mem_per_node`: (Optional) CPU memory per node in GB.
 
-- `cores_fraction`: (Optional) Fraction of the cores per node that will cause the job to be ignored. For instance, with `cores_fraction: 0.8` if a node has 32 cores and the job allocates 30 of them then the job will be ignored since 30/32 > 0.8.
+- `cores_fraction`: (Optional) Fraction of the cores per node that will cause the job to be ignored. For instance, with `cores_fraction: 0.8` if a node has 32 cores and the job allocates 30 of them then the job will be ignored since 30/32 > 0.8. Default: 1
 
-- `num_top_users``: (Optional) Only consider the number of users equal to `num_top_users` as sorted by "wasted CPU-hours".
+- `num_top_users`: (Optional) Only consider the number of users equal to `num_top_users` after sorting by "unused TB-hours".
+
+- `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
@@ -65,7 +70,10 @@ in reports for system administrators when `--report` is used.
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
 
-## Report
+!!! info
+    When `cores_per_node` and `mem_per_node` are defined, only jobs using more memory per core than `mem_per_node` divided by `cores_per_node` are included. For instance, if a node provides 64 cores and 512 GB of memory, only jobs allocating more than 512/64=8 GB/core are considered.
+
+## Report for System Administrators
 
 Below is a sample report:
 
@@ -89,7 +97,7 @@ Partitions: cpu
        End: Tue Mar 18, 2025 at 11:45 AM
 ```
 
-## Email
+## Email Message to Users
 
 Below is an example email message to a user (see `email/excess_cpu_memory.txt`):
 
@@ -123,11 +131,18 @@ These tags can be used to generate custom emails:
 - `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
 - `<CASE>`: The rank of the user (see email file).
 - `<DAYS>`: Time window of the alert in days.
-- `<NUM-JOBS>`: Total number of jobs with at least one idle GPU.
+- `<NUM-JOBS>`: Total number of jobs that are over-allocating memory.
 - `<UNUSED>`: Memory-hours that were unused.
 - `<PCT>`: Mean memory efficiency or average ratio of used CPU memory to allocated.
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+
+When `mem_per_node` and `cores_per_node` are used then one more placeholder is available:
+
+- `<NUM-WASTED-NODES>`: The number of wasted nodes due to the wasted CPU memory. This is equal to
+the number of unused TB-hours divided by the product of the CPU memory in TB and the number of hours in time window (default 7 days or 168 hours).
+
+
 
 ## Usage
 

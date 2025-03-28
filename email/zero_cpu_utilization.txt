@@ -9,8 +9,7 @@ this by running the "jobstats" command, for example:
 
 <JOBSTATS>
 
-Please investigate the reason(s) that the code is not using all of the allocated
-nodes before running additional jobs.
+Please investigate this issue before submitting additional jobs.
 
 See the following webpage for information about Slurm:
 

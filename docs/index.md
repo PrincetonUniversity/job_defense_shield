@@ -13,12 +13,12 @@ Automated email alerts and reports are available for:
 - too much allocated CPU memory per GPU
 - GPU model was too powerful (i.e., use MIG instead)
 - multinode GPU fragmentation
-- excesssive run time limits for GPU jobs
+- excessive run time limits for GPU jobs
 - over-allocating CPU memory
 - low CPU utilization
 - serial jobs allocating multiple CPU-cores
 - multinode CPU fragmentation
-- excesssive run time limits for CPU jobs
+- excessive run time limits for CPU jobs
 
 ## Example Reports
 

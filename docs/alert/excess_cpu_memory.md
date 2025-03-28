@@ -62,8 +62,7 @@ and 1.
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of usernames to exclude from receiving emails.
 
 - `email_file`: The text file to be used for the email message.
 
@@ -140,7 +139,7 @@ These tags can be used to generate custom emails:
 When `mem_per_node` and `cores_per_node` are used then one more placeholder is available:
 
 - `<NUM-WASTED-NODES>`: The number of wasted nodes due to the wasted CPU memory. This is equal to
-the number of unused TB-hours divided by the product of the CPU memory in TB and the number of hours in time window (default 7 days or 168 hours).
+the number of unused TB-hours divided by the product of the CPU memory per node in TB and the number of hours in the time window (default is 168 hours or 7 days).
 
 
 

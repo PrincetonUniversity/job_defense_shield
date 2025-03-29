@@ -49,7 +49,7 @@ class MultinodeCpuFragmentation(Alert):
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
                           (self.df.nodes >= self.min_nodes_thres) &
-                          (self.df["gpu-job"] == 0) &
+                          (self.df["gpus"] == 0) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df.state != "OUT_OF_MEMORY") &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()

@@ -14,7 +14,7 @@ def test_jobs_overview():
                        "partition":["cpu", "cpu", "cpu", "cpu", "serial", "gpu"],
                        "cpu-seconds":[wall_secs * num_cores] * n_jobs,
                        "gpu-seconds":[0, 0, 0, 0, 0, num_gpus * wall_secs],
-                       "gpu-job":[0, 0, 0, 0, 0, 1],
+                       "gpus":[0, 0, 0, 0, 0, num_gpus],
                        "elapsedraw":[wall_secs, wall_secs, 0, wall_secs, wall_secs, wall_secs]})
     jobs = JobsOverview(df, 7, "", "")
     actual = jobs.gp[["User", "Jobs", "CPU", "GPU", "COM", "CLD", "CPU-Hrs", "GPU-Hrs", "Partitions"]]

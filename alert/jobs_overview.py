@@ -24,7 +24,7 @@ class JobsOverview(Alert):
                 "partition",
                 "cpu-seconds",
                 "gpu-seconds",
-                "gpu-job"]
+                "gpus"]
         self.df = self.df[cols]
         # add new fields
         self.df["CLD"] = self.df.state.apply(lambda s: s == "CANCELLED")
@@ -33,6 +33,7 @@ class JobsOverview(Alert):
         self.df["TO"]  = self.df.state.apply(lambda s: s == "TIMEOUT")
         self.df["F"]   = self.df.state.apply(lambda s: s == "FAILED")
         self.df["RUN"] = self.df.state.apply(lambda s: s == "RUNNING")
+        self.df["gpu-job"] = self.df.gpus.apply(lambda g: 1 if g else 0)
         d = {"user":"size",
              "COM":"sum",
              "CLD":"sum",

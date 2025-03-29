@@ -352,8 +352,6 @@ if __name__ == "__main__":
         df["cpu-seconds"] = df["elapsedraw"] * df["cores"]
         df["gpus"] = df.alloctres.apply(gpus_per_job)
         df["gpu-seconds"] = df["elapsedraw"] * df["gpus"]
-        df["gpu-job"] = np.where((df["alloctres"].str.contains("gres/gpu=")) &
-                                 (~df["alloctres"].str.contains("gres/gpu=0")), 1, 0)
         df["cpu-only-seconds"] = np.where(df["gpus"] == 0, df["cpu-seconds"], 0)
         df["elapsed-hours"] = df["elapsedraw"] / sph
         df.loc[df["start"] != "Unknown", "start-date"] = pd.to_datetime(df["start"].astype(int), unit='s').dt.strftime("%a %-m/%d")

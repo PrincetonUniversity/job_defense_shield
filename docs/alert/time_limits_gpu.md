@@ -33,13 +33,17 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `absolute_thres_hours`: (Required) Minimum number of GPU-hours for the user to be included.
+- `absolute_thres_hours`: (Required) Minimum number of unused GPU-hours for the user to be included.
 
-- `overall_ratio_threshold`: (Required) Used GPU-hours divided by total allocated GPU-hours.
+- `overall_ratio_threshold`: (Required) Total used GPU-hours divided by total allocated GPU-hours.
 
 - `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used GPU-hours to allocated GPU-hours.
 
 - `median_ratio_threshold`: (Optional) Same as above but for the median instead of the mean.
+
+- `num_top_users`: (Optional) Only consider the number of users equal to `num_top_users` after sorting by unused GPU-hours. Default: 10
+
+- `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
 - `email_file`: The text file to be used for the email message.
 
@@ -47,8 +51,7 @@ per alert.
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of usernames to exclude from the alert.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.

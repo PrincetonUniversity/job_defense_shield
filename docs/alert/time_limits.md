@@ -1,6 +1,6 @@
 # Excessive Run Time Limits for CPU Jobs
 
-This alert identifies users that are using excessive run time limits for their CPU jobs (e.g., requesting 3 days but only needing 3 hours).
+This alert identifies users with excessive run time limits for CPU jobs (e.g., requesting 3 days but only needing 3 hours).
 
 ## Configuration File
 
@@ -32,13 +32,17 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `absolute_thres_hours`: (Required) Minimum number of CPU-hours for the user to be included.
+- `absolute_thres_hours`: (Required) Minimum number of unused CPU-hours for the user to be included.
 
-- `overall_ratio_threshold`: (Required) Used CPU-hours divided by total allocated CPU-hours.
+- `overall_ratio_threshold`: (Required) Total used CPU-hours divided by total allocated CPU-hours.
 
-- `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used CPU-hours to allocated CPU-hours.
+- `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used CPU-hours to allocated CPU-hours. Default: 1
 
-- `median_ratio_threshold`: (Optional) Same as above but for the median instead of the mean.
+- `median_ratio_threshold`: (Optional) Same as above but for the median instead of the mean. Default: 1
+
+- `num_top_users`: (Optional) Only consider the number of users equal to `num_top_users` after sorting by unused CPU-hours. Default: 10
+
+- `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
 - `email_file`: The text file to be used for the email message.
 
@@ -46,13 +50,12 @@ per alert.
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of usernames to exclude from the alert.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
 
-## Report
+## Report for System Administrators
 
 Below is an example report:
 
@@ -60,21 +63,16 @@ Below is an example report:
 $ python job_defense_shield.py --excessive-time-cpu
 
                          Excessive Time Limits                          
-------------------------------------------------------------------------
-  User   CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs Emails
+-------------------------------------------------------------------------
+  User   CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs  Emails
           (Unused)    (Used)  Overall  Mean  Median
-------------------------------------------------------------------------
-  u18587   495341      13716    0.03   0.03   0.02     10     643   0
+-------------------------------------------------------------------------
+  u18587   495341      13716    0.03   0.03   0.02     10     643   1 (4)
   u81279   105666      80061    0.43   0.43   0.38      2      41   0
-  u45521   105509      21595    0.17   0.17   0.13      8     109   0
+  u45521   105509      21595    0.17   0.17   0.13      8     109   2 (1)
   u73275    89469       8475    0.09   0.14   0.09     16      86   0
   u43409    88689     125583    0.59   0.59   0.59      1     279   0
-  u39889    81659       1002    0.01   0.01   0.01     46    1718   0
-  u42091    74348      52606    0.41   0.33   0.31      3    1437   0
-  u75621    63365      21265    0.25   0.22   0.21      9    3741   0
-  u60876    53043      31705    0.37   0.38   0.35      6    4425   0
-  u41590    51491       9565    0.16   0.16   0.15     15     318   0
-------------------------------------------------------------------------
+-------------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
      Start: Mon Mar 10, 2025 at 06:23 PM
@@ -82,7 +80,9 @@ Partitions: cpu
 
 ```
 
-## Email
+`CPU-Rank` is the rank of the user by used CPU-hours.
+
+## Email Message to Users
 
 For an example see `email/excessive_time.txt`:
 
@@ -107,18 +107,13 @@ Please request less time by modifying the --time Slurm directive. This will
 lower your queue times and allow the Slurm job scheduler to work more
 effectively for all users.
 
-Time-Used is the time (wallclock) that the job needed. The total time allocated
-for the job is Time-Allocated. The format is DD-HH:MM:SS where DD is days,
-HH is hours, MM is minutes and SS is seconds. Percent-Used is Time-Used
-divided by Time-Allocated.
-
 Replying to this automated email will open a support ticket with Research
 Computing.
 ```
 
-### Tags
+### Placeholders
 
-The following tags can be used in the email file:
+The following placeholders can be used in the email file:
 
 - `<GREETING>`: The greeting generated by `greeting-method`.
 - `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
@@ -133,7 +128,13 @@ The following tags can be used in the email file:
 
 ## Usage
 
-Send emails to offending users:
+Generate and display a report (no emails are sent):
+
+```
+$ python job_defense_shield.py --excessive-time-cpu
+```
+
+Send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --excessive-time-cpu --email

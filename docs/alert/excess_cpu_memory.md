@@ -62,7 +62,7 @@ and 1.
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of usernames to exclude from receiving emails.
+- `excluded_users`: (Optional) List of usernames to exclude from the alert.
 
 - `email_file`: The text file to be used for the email message.
 

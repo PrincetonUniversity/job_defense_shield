@@ -355,10 +355,6 @@ if __name__ == "__main__":
         df["cpu-only-seconds"] = np.where(df["gpus"] == 0, df["cpu-seconds"], 0)
         df["elapsed-hours"] = df["elapsedraw"] / sph
         df.loc[df["start"] != "Unknown", "start-date"] = pd.to_datetime(df["start"].astype(int), unit='s').dt.strftime("%a %-m/%d")
-        df["cpu-waste-hours"] = (df["limit-minutes"] * spm - df["elapsedraw"]) * df["cores"] / sph
-        df["gpu-waste-hours"] = (df["limit-minutes"] * spm - df["elapsedraw"]) * df["gpus"] / sph
-        df["cpu-alloc-hours"] = df["limit-minutes"] * spm * df["cores"] / sph
-        df["gpu-alloc-hours"] = df["limit-minutes"] * spm * df["gpus"] / sph
         df["cpu-hours"] = df["cpu-seconds"] / sph
         df["gpu-hours"] = df["gpu-seconds"] / sph
         df["admincomment"] = df["admincomment"].apply(get_stats_dict)
@@ -411,24 +407,44 @@ if __name__ == "__main__":
             s += zero_gpu_hours.add_report_metadata(start_date, end_date)
 
 
-    #################################
-    ## MULTINODE CPU FRAGMENTATION ##
-    #################################
-    if args.multinode_cpu_fragmentation:
-        alerts = [alert for alert in cfg.keys() if "multinode-cpu-fragmentation" in alert]
+    ############################
+    ## TOO MANY CORES PER GPU ##
+    ############################
+    if args.too_many_cores_per_gpu:
+        alerts = [alert for alert in cfg.keys() if "too-many-cores-per-gpu" in alert]
         for alert in alerts:
             params = cfg[alert]
             params.update(sys_cfg)
-            cpu_frag = MultinodeCpuFragmentation(df,
-                                   days_between_emails=args.days,
-                                   violation="multinode_cpu_fragmentation",
-                                   vpath=violation_logs_path,
-                                   **params)
+            cpg = TooManyCoresPerGpu(df,
+                                     days_between_emails=args.days,
+                                     violation="too_many_cores_per_gpu",
+                                     vpath=violation_logs_path,
+                                     **params)
             if args.email and is_workday:
-                cpu_frag.create_emails(greeting_method)
-                cpu_frag.send_emails_to_users()
-            s += cpu_frag.generate_report_for_admins(keep_index=False)
-            s += cpu_frag.add_report_metadata(start_date, end_date)
+                cpg.create_emails(greeting_method)
+                cpg.send_emails_to_users()
+            s += cpg.generate_report_for_admins()
+            s += cpg.add_report_metadata(start_date, end_date)
+
+
+    #################################
+    ## TOO MUCH CPU MEMORY PER GPU ##
+    #################################
+    if args.too_much_cpu_mem_per_gpu:
+        alerts = [alert for alert in cfg.keys() if "too-much-cpu-mem-per-gpu" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            params.update(sys_cfg)
+            mpg = TooMuchCpuMemPerGpu(df,
+                                      days_between_emails=args.days,
+                                      violation="too_much_cpu_mem_per_gpu",
+                                      vpath=violation_logs_path,
+                                      **params)
+            if args.email and is_workday:
+                mpg.create_emails(greeting_method)
+                mpg.send_emails_to_users()
+            s += mpg.generate_report_for_admins()
+            s += mpg.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -452,26 +468,6 @@ if __name__ == "__main__":
 
 
     ########################
-    ## LOW CPU EFFICIENCY ##
-    ########################
-    if args.low_cpu_efficiency:
-        alerts = [alert for alert in cfg.keys() if "low-cpu-efficiency" in alert]
-        for alert in alerts:
-            params = cfg[alert]
-            params.update(sys_cfg)
-            low_cpu = LowEfficiencyCPU(df,
-                                       days_between_emails=args.days,
-                                       violation="low_cpu_efficiency",
-                                       vpath=violation_logs_path,
-                                       **params)
-            if args.email and is_workday:
-                low_cpu.create_emails(greeting_method)
-                low_cpu.send_emails_to_users()
-            s += low_cpu.generate_report_for_admins()
-            s += low_cpu.add_report_metadata(start_date, end_date)
-
-
-    ########################
     ## LOW GPU EFFICIENCY ##
     ########################
     if args.low_gpu_efficiency:
@@ -489,6 +485,87 @@ if __name__ == "__main__":
                 low_gpu.send_emails_to_users()
             s += low_gpu.generate_report_for_admins()
             s += low_gpu.add_report_metadata(start_date, end_date)
+
+
+    #################################
+    ## EXCESSIVE TIME LIMITS (GPU) ##
+    #################################
+    if args.excessive_time_gpu:
+        alerts = [alert for alert in cfg.keys() if "excessive-time-gpu" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            params.update(sys_cfg)
+            time_limits = ExcessiveTimeLimitsGPU(
+                                              df,
+                                              days_between_emails=args.days,
+                                              violation="excessive_time_limits_gpu",
+                                              vpath=violation_logs_path,
+                                              **params)
+            if args.email and is_workday:
+                time_limits.create_emails(greeting_method)
+                time_limits.send_emails_to_users()
+            s += time_limits.generate_report_for_admins()
+            s += time_limits.add_report_metadata(start_date, end_date)
+
+
+    ############################
+    ## GPU MODEL TOO POWERFUL ##
+    ############################
+    if args.gpu_model_too_powerful:
+        alerts = [alert for alert in cfg.keys() if "gpu-model-too-powerful" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            params.update(sys_cfg)
+            too_power = GpuModelTooPowerful(df,
+                                            days_between_emails=args.days,
+                                            violation="gpu_model_too_powerful",
+                                            vpath=violation_logs_path,
+                                            **params)
+            if args.email and is_workday:
+                too_power.create_emails(greeting_method)
+                too_power.send_emails_to_users()
+            s += too_power.generate_report_for_admins()
+            s += too_power.add_report_metadata(start_date, end_date)
+
+
+    ##########################
+    ## ZERO CPU UTILIZATION ##
+    ##########################
+    if args.zero_cpu_utilization:
+        alerts = [alert for alert in cfg.keys() if "zero-cpu-utilization" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            params.update(sys_cfg)
+            zero_cpu = ZeroCPU(df,
+                               days_between_emails=args.days,
+                               violation="zero_cpu_utilization",
+                               vpath=violation_logs_path,
+                               **params)
+            if args.email and is_workday:
+                zero_cpu.create_emails(greeting_method)
+                zero_cpu.send_emails_to_users()
+            s += zero_cpu.generate_report_for_admins()
+            s += zero_cpu.add_report_metadata(start_date, end_date)
+
+
+    ########################
+    ## LOW CPU EFFICIENCY ##
+    ########################
+    if args.low_cpu_efficiency:
+        alerts = [alert for alert in cfg.keys() if "low-cpu-efficiency" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            params.update(sys_cfg)
+            low_cpu = LowEfficiencyCPU(df,
+                                       days_between_emails=args.days,
+                                       violation="low_cpu_efficiency",
+                                       vpath=violation_logs_path,
+                                       **params)
+            if args.email and is_workday:
+                low_cpu.create_emails(greeting_method)
+                low_cpu.send_emails_to_users()
+            s += low_cpu.generate_report_for_admins()
+            s += low_cpu.add_report_metadata(start_date, end_date)
 
 
     #######################
@@ -531,64 +608,24 @@ if __name__ == "__main__":
             s += serial.add_report_metadata(start_date, end_date)
 
 
-    ##########################
-    ## ZERO CPU UTILIZATION ##
-    ##########################
-    if args.zero_cpu_utilization:
-        alerts = [alert for alert in cfg.keys() if "zero-cpu-utilization" in alert]
-        for alert in alerts:
-            params = cfg[alert]
-            params.update(sys_cfg)
-            zero_cpu = ZeroCPU(df,
-                               days_between_emails=args.days,
-                               violation="zero_cpu_utilization",
-                               vpath=violation_logs_path,
-                               **params)
-            if args.email and is_workday:
-                zero_cpu.create_emails(greeting_method)
-                zero_cpu.send_emails_to_users()
-            s += zero_cpu.generate_report_for_admins()
-            s += zero_cpu.add_report_metadata(start_date, end_date)
-
-
-    ############################
-    ## TOO MANY CORES PER GPU ##
-    ############################
-    if args.too_many_cores_per_gpu:
-        alerts = [alert for alert in cfg.keys() if "too-many-cores-per-gpu" in alert]
-        for alert in alerts:
-            params = cfg[alert]
-            params.update(sys_cfg)
-            cpg = TooManyCoresPerGpu(df,
-                                     days_between_emails=args.days,
-                                     violation="too_many_cores_per_gpu",
-                                     vpath=violation_logs_path,
-                                     **params)
-            if args.email and is_workday:
-                cpg.create_emails(greeting_method)
-                cpg.send_emails_to_users()
-            s += cpg.generate_report_for_admins()
-            s += cpg.add_report_metadata(start_date, end_date)
-
-
     #################################
-    ## TOO MUCH CPU MEMORY PER GPU ##
+    ## MULTINODE CPU FRAGMENTATION ##
     #################################
-    if args.too_much_cpu_mem_per_gpu:
-        alerts = [alert for alert in cfg.keys() if "too-much-cpu-mem-per-gpu" in alert]
+    if args.multinode_cpu_fragmentation:
+        alerts = [alert for alert in cfg.keys() if "multinode-cpu-fragmentation" in alert]
         for alert in alerts:
             params = cfg[alert]
             params.update(sys_cfg)
-            mpg = TooMuchCpuMemPerGpu(df,
-                                      days_between_emails=args.days,
-                                      violation="too_much_cpu_mem_per_gpu",
-                                      vpath=violation_logs_path,
-                                      **params)
+            cpu_frag = MultinodeCpuFragmentation(df,
+                                   days_between_emails=args.days,
+                                   violation="multinode_cpu_fragmentation",
+                                   vpath=violation_logs_path,
+                                   **params)
             if args.email and is_workday:
-                mpg.create_emails(greeting_method)
-                mpg.send_emails_to_users()
-            s += mpg.generate_report_for_admins()
-            s += mpg.add_report_metadata(start_date, end_date)
+                cpu_frag.create_emails(greeting_method)
+                cpu_frag.send_emails_to_users()
+            s += cpu_frag.generate_report_for_admins(keep_index=False)
+            s += cpu_frag.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -610,47 +647,6 @@ if __name__ == "__main__":
                 time_limits.send_emails_to_users()
             s += time_limits.generate_report_for_admins()
             s += time_limits.add_report_metadata(start_date, end_date)
-
-
-    #################################
-    ## EXCESSIVE TIME LIMITS (GPU) ##
-    #################################
-    if args.excessive_time_gpu:
-        alerts = [alert for alert in cfg.keys() if "excessive-time-gpu" in alert]
-        for alert in alerts:
-            params = cfg[alert]
-            params.update(sys_cfg)
-            time_limits = ExcessiveTimeLimitsGPU(
-                                              df,
-                                              days_between_emails=args.days,
-                                              violation="excessive_time_limits_gpu",
-                                              vpath=violation_logs_path,
-                                              **params)
-            if args.email and is_workday:
-                time_limits.create_emails(greeting_method)
-                time_limits.send_emails_to_users()
-            s += time_limits.generate_report_for_admins()
-            s += time_limits.add_report_metadata(start_date, end_date)
-
-
-    ############################
-    ## GPU MODEL TOO POWERFUL ##
-    ############################
-    if args.gpu_model_too_powerful:
-        alerts = [alert for alert in cfg.keys() if "gpu-model-too-powerful" in alert]
-        for alert in alerts:
-            params = cfg[alert]
-            params.update(sys_cfg)
-            too_power = GpuModelTooPowerful(df,
-                                            days_between_emails=args.days,
-                                            violation="gpu_model_too_powerful",
-                                            vpath=violation_logs_path,
-                                            **params)
-            if args.email and is_workday:
-                too_power.create_emails(greeting_method)
-                too_power.send_emails_to_users()
-            s += too_power.generate_report_for_admins()
-            s += too_power.add_report_metadata(start_date, end_date)
 
 
     ####################

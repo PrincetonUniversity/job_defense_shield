@@ -1,6 +1,7 @@
 import pandas as pd
 from base import Alert
 from utils import SECONDS_PER_MINUTE as spm
+from utils import SECONDS_PER_HOUR as sph
 from utils import MINUTES_PER_HOUR as mph
 from utils import seconds_to_slurm_time_format
 from utils import add_dividers
@@ -21,7 +22,7 @@ class ExcessiveTimeLimits(Alert):
         if not hasattr(self, "report_title"):
             self.report_title = "Excessive Run Time Limits"
         if not hasattr(self, "num_top_users"):
-            self.num_top_users = 100000
+            self.num_top_users = 10
         if not hasattr(self, "num_jobs_display"):
             self.num_jobs_display = 10
         if not hasattr(self, "mean_ratio_threshold"):
@@ -30,6 +31,7 @@ class ExcessiveTimeLimits(Alert):
             self.median_ratio_threshold = 1.0
 
     def _filter_and_add_new_fields(self):
+        print(self.df.columns)
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
                           (self.df.state.isin(["COMPLETED"])) &
@@ -44,6 +46,12 @@ class ExcessiveTimeLimits(Alert):
         self.gp = pd.DataFrame({"User":[]})
         if not self.df.empty:
             xpu = self.mode
+            if xpu == "cpu":
+                self.df[f"{xpu}-waste-hours"] = (self.df["limit-minutes"] * spm - self.df["elapsedraw"]) * self.df.cores / sph
+                self.df[f"{xpu}-alloc-hours"] = self.df["limit-minutes"] * spm * self.df.cores / sph
+            elif xpu == "gpu":
+                self.df[f"{xpu}-waste-hours"] = (self.df["limit-minutes"] * spm - self.df["elapsedraw"]) * self.df.gpus / sph
+                self.df[f"{xpu}-alloc-hours"] = self.df["limit-minutes"] * spm * self.df.gpus / sph
             self.df["mean-ratio"] = self.df[f"{xpu}-hours"] / self.df[f"{xpu}-alloc-hours"]
             self.df["median-ratio"] = self.df[f"{xpu}-hours"] / self.df[f"{xpu}-alloc-hours"]
             d = {f"{xpu}-waste-hours":"sum",

@@ -3,6 +3,7 @@
 import os
 import sys
 import subprocess
+from time import time
 from datetime import datetime
 from datetime import timedelta
 from abc import ABC, abstractmethod
@@ -47,6 +48,8 @@ class SlurmSacct(RawJobData):
         cmd += f"-M {self.clusters} -o {self.fields}"
         if self.partitions:
             cmd += f" -r {self.partitions}"
+        print(f"INFO: Calling sacct ... ", end="", flush=True)
+        start = time()
         try:
             result = subprocess.run(cmd,
                                     stdout=subprocess.PIPE,
@@ -58,6 +61,7 @@ class SlurmSacct(RawJobData):
         except subprocess.CalledProcessError as error:
             msg = f"Error running sacct.\n{error.stderr}"
             raise RuntimeError(msg) from error
+        print(f"done ({round(time() - start)} seconds).", flush=True)
         rows = result.stdout.split('\n')
         if rows != [] and rows[-1] == "":
             rows = rows[:-1]

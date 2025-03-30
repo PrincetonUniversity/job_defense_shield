@@ -19,6 +19,8 @@ class TooMuchCpuMemPerGpu(Alert):
             self.email_subject = "Consider Allocating Less CPU Memory per GPU"
         if not hasattr(self, "report_title"):
             self.report_title = "Too Much CPU Memory Per GPU"
+        if not hasattr(self, "mem_eff_thres"):
+            self.mem_eff_thres = 1.0
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &

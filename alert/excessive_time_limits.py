@@ -31,7 +31,6 @@ class ExcessiveTimeLimits(Alert):
             self.median_ratio_threshold = 1.0
 
     def _filter_and_add_new_fields(self):
-        print(self.df.columns)
         self.df = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
                           (self.df.state.isin(["COMPLETED"])) &

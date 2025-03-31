@@ -110,6 +110,11 @@ if __name__ == "__main__":
         print("--no-emails-to-users must appear with --email. Exiting ...")
         sys.exit()
 
+    print("\nJob Defense Shield")
+    print("github.com/PrincetonUniversity/job_defense_shield\n")
+    print(f"INFO: Python {sys.version}")
+    print(f"INFO: Pandas {pd.__version__}")
+
     # read configuration file
     jds_path = os.path.join(os.path.dirname(__file__), "config.yaml")
     cwd_path = os.path.join(os.getcwd(), "config.yaml")
@@ -364,9 +369,7 @@ if __name__ == "__main__":
     df.reset_index(drop=True, inplace=True)
     
     fmt = "%a %b %-d"
-    s = "Job Defense Shield\n"
-    s += "github.com/PrincetonUniversity/job_defense_shield\n\n"
-    s += f"{start_date.strftime(fmt)} - {end_date.strftime(fmt)}"
+    s = f"{start_date.strftime(fmt)} - {end_date.strftime(fmt)}"
 
     ###########################################
     ## CANCEL JOBS WITH ZERO GPU UTILIZATION ##

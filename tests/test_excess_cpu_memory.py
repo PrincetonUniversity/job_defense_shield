@@ -70,7 +70,6 @@ def test_excess_cpu_memory():
                            median_ratio_threshold=0.2,
                            num_top_users=10,
                            num_jobs_display=10)
-    print(xmem)
     actual = xmem.gp[["User", "Ratio", "mean-ratio", "median-ratio", "Mem-Hrs-Unused"]]
     expected = pd.DataFrame({"User":["user1", "user2"],
                              "Ratio":[(1+5+10)/(3*100), (10+1)/(2*100)],

@@ -87,15 +87,19 @@ def test_renamings():
     pd.testing.assert_index_equal(df.columns, expected, check_names=False)
 
 
-def test_clean_partitions():
+def test_remove_comma_partitions():
     raw = pd.DataFrame({"jobid":[1, 2, 3],
-                        "partition":["gpu", "cpu,all", "all,physics"]})
+                        "cpu-seconds":["1000", "1000", "1000"],
+                        "partition":["gpu", "cpu,all", "physics"]})
     field_renamings = {}
     partition_renamings = {}
     s = SacctCleaner(raw, field_renamings, partition_renamings)
-    s.raw.partition = s.clean_partitions()
-    expected = pd.Series(["gpu", "cpu", "all"])
-    pd.testing.assert_series_equal(s.raw.partition, expected, check_names=False)
+    s.raw = s.remove_comma_partitions()
+    expected = pd.Series(["gpu", "physics"])
+    pd.testing.assert_series_equal(s.raw.partition,
+                                   expected,
+                                   check_names=False,
+                                   check_index=False)
 
 
 def test_rename_partitions():
@@ -123,10 +127,10 @@ def test_unlimited_time_limits():
     # can fail if now_secs is different in main code due to slow execution
     jobid = [1, 2, 3, 4]
     state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING"]
-    limit_minutes = [100, "UNLIMITED", "UNLIMITED", "UNLIMITED"]
+    limit_minutes = ["100", "UNLIMITED", "UNLIMITED", "UNLIMITED"]
     now_secs = int(datetime.now().timestamp())
-    start = [0, 0, now_secs - 50, 0]
-    end = [100, 100, 42, -1]
+    start = ["0", "0", str(now_secs - 50), "0"]
+    end = ["100", "100", "42", "-1"]
     raw = pd.DataFrame({"jobid":jobid,
                         "state":state,
                         "limit-minutes":limit_minutes,
@@ -136,5 +140,5 @@ def test_unlimited_time_limits():
     partition_renamings = {}
     s = SacctCleaner(raw, field_renamings, partition_renamings)
     s.raw = s.unlimited_time_limits()
-    expected = pd.Series([100, 100, 50, -1])
+    expected = pd.Series(["100", 100, 50, -1])
     pd.testing.assert_series_equal(s.raw["limit-minutes"], expected, check_names=False)

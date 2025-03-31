@@ -68,12 +68,10 @@ class SlurmSacct(RawJobData):
         cols = self.fields.split(",")
         raw = pd.DataFrame([row.split("|")[:len(cols)] for row in rows])
         if raw.empty:
-            msg = (
-                   "\nCall to sacct resulted in no job data. If this is surprising\n"
+            msg = ("\nCall to sacct resulted in no job data. If this is surprising\n"
                    "then check the spelling of your cluster and/or partition names\n"
                    "in config.yml and -M <clusters> -r <partition>. Run again using\n"
-                   "the only option --usage-overview to see what is available."""
-                  )
+                   "the only option --usage-overview to see what is available.")
             print(msg)
             sys.exit()
         raw.columns = cols

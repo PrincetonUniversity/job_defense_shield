@@ -26,7 +26,7 @@ class MultinodeGpuFragmentation(Alert):
                           (self.df.partition.isin(self.partitions)) &
                           (self.df.gpus > 0) &
                           (self.df.nodes > 1) &
-                          (self.df.gpus / self.df.nodes != self.gpus_per_node) &
+                          (self.df.gpus / self.df.nodes < self.gpus_per_node) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
         if not self.df.empty and self.include_running_jobs:

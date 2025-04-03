@@ -36,7 +36,9 @@ class SacctCleaner(BaseCleaner):
 
     """Class for cleaning a pandas dataframe containing Slurm sacct data.
        The output from the call to sacct gives a dataframe where every
-       entry is a object/string including null values ("", "nan", "None")."""
+       entry is a object/string including null values ("", "nan", "None").
+       Another approach would be to use pd.to_numeric() and let that
+       function identify the nulls."""
 
     def __init__(self, raw, field_renamings, partition_renamings):
         super().__init__(raw, field_renamings, partition_renamings)
@@ -120,7 +122,7 @@ class SacctCleaner(BaseCleaner):
                 if num_rows:
                     self.raw = self.raw[self.raw[col].str.isnumeric()]
                     print(f"{self.indent}{num_rows} rows and {cpu_seconds} " +
-                          "cpu-seconds dropped with non-numeric {col}")
+                          f"cpu-seconds dropped with non-numeric {col}")
             self.raw[col] = self.raw[col].astype("int64")
         return self.raw
 
@@ -235,5 +237,5 @@ class SacctCleaner(BaseCleaner):
         print(f"{self.indent}{len(self.raw)} jobs in the cleaned dataframe\n")
         cleaned_cpu_seconds = self.raw["cpu-seconds"].sum()
         if raw_cpu_seconds != cleaned_cpu_seconds:
-            print(f"WARNING: Jobs that consumed CPU-seconds were dropped.")
+            print("WARNING: Jobs that consumed CPU-seconds were dropped.")
         return self.raw

@@ -1,34 +1,8 @@
 # Emails
 
-## When Are Emails Sent?
-
-Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email for the same instance of underutilization. By default, this time period is 7 days.
-
-The emails sent to users either contain the individual jobs or a summary for that week. Note that users can receive multiple emails about the same type of underutilization if there are multiple alerts covering different partitions or different clusters.
-
-The `Email` column in the table below shows the number of emails that each user has received about this particular instance of underutilization:
-
-```
-                         GPU-Hours at 0% Utilization
----------------------------------------------------------------------
-    User   GPU-Hours-At-0%  Jobs             JobID             Emails
----------------------------------------------------------------------
-1  u12998        308         39   62285369,62303767,62317153+   1 (3)
-2  u9l487         84         14   62301737,62301738,62301742+   0
-3  u39635         25          2            62184669,62187323    2 (4)
-4  u24074         24         13   62303182,62303183,62303184+   0
----------------------------------------------------------------------
-   Cluster: della
-Partitions: gpu, llm
-     Start: Wed Feb 12, 2025 at 09:50 AM
-       End: Wed Feb 19, 2025 at 09:50 AM
-```
-
-The number in parentheses is the number of days since the last email was sent. For example, `2 (4)` means that the user has received 2 previous emails with the last one being sent 4 days ago.
-
 ## Sending Custom Emails to Users
 
-Each alert requires a text file for the `email_file`:
+To send emails to users, each alert entry requires a text file for `email_file`:
 
 ```yaml
 ##################################
@@ -134,6 +108,32 @@ There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](a
 ```yaml
   do_not_cancel: True
 ```
+
+## When Are Emails Sent?
+
+Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email for the same instance of underutilization. By default, this time period is 7 days.
+
+The emails sent to users either contain the individual jobs or a summary for that week. Note that users can receive multiple emails about the same type of underutilization if there are multiple alerts covering different partitions or different clusters.
+
+The `Email` column in the table below shows the number of emails that each user has received about this particular instance of underutilization:
+
+```
+                         GPU-Hours at 0% Utilization
+---------------------------------------------------------------------
+    User   GPU-Hours-At-0%  Jobs             JobID             Emails
+---------------------------------------------------------------------
+1  u12998        308         39   62285369,62303767,62317153+   1 (3)
+2  u9l487         84         14   62301737,62301738,62301742+   0
+3  u39635         25          2            62184669,62187323    2 (4)
+4  u24074         24         13   62303182,62303183,62303184+   0
+---------------------------------------------------------------------
+   Cluster: della
+Partitions: gpu, llm
+     Start: Wed Feb 12, 2025 at 09:50 AM
+       End: Wed Feb 19, 2025 at 09:50 AM
+```
+
+The number in parentheses is the number of days since the last email was sent. For example, `2 (4)` means that the user has received 2 previous emails with the last one being sent 4 days ago.
 
 ## Hyperlinks
 

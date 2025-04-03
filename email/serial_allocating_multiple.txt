@@ -7,8 +7,9 @@ Below are <CASE> that ran on <CLUSTER> (<PARTITIONS>) in the past <DAYS> days:
 The CPU utilization (CPU-Util) of each of the <NUM-JOBS> jobs is approximately equal to
 100% divided by the number of allocated CPU-cores (100%/CPU-cores). This
 suggests that you may be running a code that can only use 1 CPU-core. If this is
-true then allocating more than 1 CPU-core is wasteful. A good target value for
-CPU utilization is 90% and above.
+true then allocating more than 1 CPU-core is wasteful (these jobs may have
+wasted <CPU-HOURS> CPU-hours). A good target value for CPU utilization is 90%
+and above.
 
 Please consult the documentation of the software to see if it is parallelized.
 For a general overview of parallel computing:

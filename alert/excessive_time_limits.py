@@ -17,10 +17,11 @@ class ExcessiveTimeLimits(Alert):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
 
     def _add_required_fields(self):
+        m = self.mode.upper()
         if not hasattr(self, "email_subject"):
-            self.email_subject = "Requesting Too Much Time for Jobs"
+            self.email_subject = f"Requesting Too Much Time for {m} Jobs"
         if not hasattr(self, "report_title"):
-            self.report_title = "Excessive Run Time Limits"
+            self.report_title = f"Excessive Run Time Limits for {m} Jobs"
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 10
         if not hasattr(self, "num_jobs_display"):

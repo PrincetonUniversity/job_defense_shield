@@ -43,7 +43,7 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `mem_eff_threshld`: (Optional) Ignore jobs where the ratio of used to allocated CPU memory is greater than or equal to this value. Default: 1.0
+- `mem_eff_threshold`: (Optional) Ignore jobs where the ratio of used to allocated CPU memory is greater than or equal to this value. Default: 1.0
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
@@ -82,7 +82,7 @@ Partitions: gpu
 
 ## Email Message to Users
 
-Below is an example email (see email/too_much_cpu_mem_per_gpu.txt):
+Below is an example email (see `email/too_much_cpu_mem_per_gpu.txt`):
 
 ```
 Hello Alan (u12345),
@@ -90,8 +90,8 @@ Hello Alan (u12345),
 Your Della (PLI) jobs appear to be allocating more CPU memory than necessary:
 
      JobID   Hours Mem-Eff CPU-Mem  GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit
-    62733079  1.3    37%    512 GB   2        256 GB             115 GB       
-    62735106  1.4    32%    512 GB   2        256 GB             115 GB       
+    62733079  1.3    17%    512 GB   2        256 GB             115 GB       
+    62735106  1.4    12%    512 GB   2        256 GB             115 GB       
 
 Each node on Della (PLI) has 1000 GB of CPU memory and 8 GPUs. If possible please
 only allocate up to the soft limit of 115 GB of CPU memory per GPU. This will
@@ -103,7 +103,7 @@ A good target value for this quantity is 80% and above. Please use an accurate
 value for the --mem, --mem-per-cpu or --mem-per-gpu Slurm directive. For job
 62733079, one could have used:
 
-    #SBATCH --mem-per-gpu=114G
+    #SBATCH --mem-per-gpu=50G
 
 Replying to this automated email will open a support ticket with Research
 Computing.

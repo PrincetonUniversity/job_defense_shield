@@ -140,10 +140,16 @@ Send emails to the offending users:
 $ python job_defense_shield.py --excessive-time-cpu --email
 ```
 
-## Cron
-
-Below is an exmaple `crontab` entry:
+See which users have received emails and when:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-cpu --email -M della -r cpu > /path/to/log/excessive_time_cpu.log 2>&1
+$ python job_defense_shield.py --excessive-time-cpu --check
+```
+
+## Cron
+
+Below is an example `crontab` entry:
+
+```
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-cpu --email > /path/to/log/excessive_time_cpu.log 2>&1
 ```

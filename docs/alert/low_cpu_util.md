@@ -1,6 +1,6 @@
 # Low CPU Utilization
 
-This alert identifies the users that are consuming the most CPU-hours with low efficiency.
+This alert identifies users with low CPU efficiency.
 
 ## Configuration File
 
@@ -40,8 +40,7 @@ per alert.
 
 - `proportion_thres_pct`: A user must being using this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours.
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
@@ -73,9 +72,9 @@ Partitions: cpu
 The table lists users from the most CPU-hours to the least. The CPU efficiency is
 listed.
 
-## How to Write the Email File
+## Email Message to Users
 
-Below is an example email message (see `low_cpu_efficiency.txt`):
+Below is an example email message (see `email/low_cpu_efficiency.txt`):
 
 ```
 Hello Alan (u12345),
@@ -95,7 +94,9 @@ Replying to this automated email will open a support ticket with Research
 Computing.
 ```
 
-You can modified the file as you like. The tags that can be used in the email message are:
+### Placeholders
+
+The following placeholders can be used in the email file:
 
 - `<GREETING>`: The greeting that will be generated based on the choice of `greeting-method`.
 - `<CLUSTER>`: The name of the cluster in the Slurm database.
@@ -108,7 +109,7 @@ You can modified the file as you like. The tags that can be used in the email me
 
 ## Usage
 
-Generate a report of the top users are their CPU efficiencies:
+Generate a report for this alert:
 
 ```
 $ python job_defense_shield.py --low-cpu-efficiency
@@ -132,15 +133,18 @@ Same as above but only pull data for a specific cluster and partition:
 $ python job_defense_shield.py --low-cpu-efficiency --email -M traverse -r cpu
 ```
 
+See which users have received emails and when:
+
+```
+$ python job_defense_shield.py --low-cpu-efficiency --check
+```
 
 ## cron
 
-```bash
-PY=/home/sysadmin/.conda/envs/jds-env/bin
-JDS=/home/sysadmin/bin/job_defense_shield
-MYLOG=${JDS}/log
+Below is an example `crontab` entry:
 
-0 9 * * * ${PY}/python ${JDS}/job_defense_shield.py --low-cpu-efficiency --email > ${MYLOG}/low_cpu_efficiency.log 2>&1
+```bash
+0 9 * * * /path/to/python /path/to/job_defense_shield.py --low-cpu-efficiency --email > /path/to/log/low_cpu_efficiency.log 2>&1
 ```
 
 ## Related Alerts

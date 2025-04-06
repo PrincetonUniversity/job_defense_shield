@@ -1,6 +1,6 @@
 # Too Much Allocated CPU Memory per GPU
 
-This alert identifies jobs that allocate too much CPU memory per GPU.
+This alert identifies jobs that allocate too much CPU memory per GPU. The goal is to prevent the situation where there are free GPUs on a node but not enough CPU memory to accept new jobs.
 
 ## Configuration File
 
@@ -49,8 +49,7 @@ per alert.
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
 - `email_file`: The text file to be used for the email message.
 
@@ -129,4 +128,18 @@ Email users about allocating too much CPU memory per GPU:
 
 ```
 $ python job_defense_shield.py --too-much-cpu-mem-per-gpu --email
+```
+
+See which users have received emails and when:
+
+```
+$ python job_defense_shield.py --too-much-cpu-mem-per-gpu --check
+```
+
+## cron
+
+Below is an example entry for `crontab`:
+
+```bash
+0 9 * * * /path/to/python /path/to/job_defense_shield.py --too-much-cpu-mem-per-gpu --email > /path/to/log/too_much_cpu_mem_per_gpu.log 2>&1
 ```

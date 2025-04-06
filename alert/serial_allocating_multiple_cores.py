@@ -98,7 +98,7 @@ class SerialAllocatingMultipleCores(Alert):
             vfile = f"{self.vpath}/{self.violation}/{user}.csv"
             if self.has_sufficient_time_passed_since_last_email(vfile):
                 usr = self.df[self.df.User == user].copy()
-                cpu_hours_wasted = usr["CPU-Hours-Wasted"].sum()
+                cpu_hours_wasted = round(usr["CPU-Hours-Wasted"].sum())
                 #cpu_hours_wasted = self.gp[self.gp.User == user]["CPU-Hours-Wasted"].values[0]
                 usr = usr.drop(columns=["User", "cores-minus-1", "CPU-Hours-Wasted"])
                 usr["Hours"] = usr["Hours"].apply(lambda hrs: round(hrs, 1))

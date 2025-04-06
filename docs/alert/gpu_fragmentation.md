@@ -44,13 +44,12 @@ The parameters are explained below:
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of usernames to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of usernames to exclude from receiving emails.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
 
-## Report
+## Report for System Administrators
 
 Below is an example report for system administrators:
 
@@ -81,7 +80,7 @@ Partitions: llm
 
 ## Email
 
-Below is an example email message to a user (see `multinode_gpu_fragmentation.txt`):
+Below is an example email message to a user (see `email/multinode_gpu_fragmentation.txt`):
 
 ```
 Hello Alan (u42994),
@@ -100,9 +99,9 @@ Replying to this automated email will open a support ticket with Research
 Computing.
 ```
 
-### Tags
+### Placeholders
 
-The following tags can be used to construct custom email messages:
+The following placeholders can be used to create a custom email message:
 
 - `<GREETING>`: The greeting that will be generated based on the choice of `greeting_method` in `config.yaml`. An example is "Hello Alan (aturing),".
 - `<CLUSTER>`: The name of the cluster as defined in `config.yaml`.
@@ -113,13 +112,21 @@ The following tags can be used to construct custom email messages:
 
 ## Usage
 
-The command below will send emails to the offending users:
+Send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --multinode-gpu-fragmentation --email
 ```
 
+See which users have received emails and when:
+
+```
+$ python job_defense_shield.py --multinode-gpu-fragmentation --check
+```
+
 ## cron
+
+Below is an example entry for `crontab`:
 
 ```
 0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --multinode-gpu-fragmentation --email -M della -r llm > /path/to/log/gpu_fragmentation.log 2>&1

@@ -56,8 +56,7 @@ per alert. Use multiple `zero-util-gpu-hours` alerts for multiple clusters.
 
 - `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. For example, if `min_run_time: 61` then jobs that ran for an hour or less are ignored. This can be used to exclude test jobs. Default: 0
 
-- `excluded_users`: (Optional) List of users to exclude from receiving emails. These users will still appear
-in reports for system administrators when `--report` is used.
+- `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
 - `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
 when the `--email` option is used.
@@ -105,7 +104,7 @@ The `Min-Nodes` field is calculated based on the hardware specifications and the
 
 ## Email Message to Users
 
-Below is an example:
+Below is an example message (see `email/multinode_cpu_fragmentation.txt`):
 
 ```
 Hello Alan (u45923),
@@ -129,9 +128,10 @@ is the mean CPU memory used per node.
 Replying to this automated email will open a support ticket with Research
 Computing.
 ```
+
 ### Placeholders
 
-The following placeholders can be used to construct custom email messages:
+The following placeholders can be used in the email file:
 
 - `<GREETING>`: The greeting that will be generated based on the choice of `greeting_method` in `config.yaml`. An example is "Hello Alan (aturing),".
 - `<CLUSTER>`: The name of the cluster as defined in `config.yaml`.
@@ -142,10 +142,16 @@ The following placeholders can be used to construct custom email messages:
 
 ## Usage
 
-The command below will send emails to the offending users:
+Send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --multinode-cpu-fragmentation --email
+```
+
+See which users have received emails and when:
+
+```
+$ python job_defense_shield.py --multinode-cpu-fragmentation --check
 ```
 
 ## cron

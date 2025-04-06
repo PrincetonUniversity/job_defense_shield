@@ -101,3 +101,17 @@ Send emails to offending users:
 ```
 $ python job_defense_shield.py --zero-cpu-utilization --email
 ```
+
+See which users have received emails and when:
+
+```
+$ python job_defense_shield.py --zero-cpu-utilization --check
+```
+
+## Cron
+
+Below is an example `crontab` entry:
+
+```
+0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --zero-cpu-utilization --email -M della -r gpu,llm > /path/to/log/zero_cpu_utilization.log 2>&1
+```

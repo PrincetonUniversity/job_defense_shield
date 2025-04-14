@@ -45,8 +45,8 @@ Replying to this automated email will open a support ticket with Research
 Computing.
 ```
 
-There are three "tags" in the text file above: `<GREETING>`, `<TABLE>` and `<JOBSTATS>`.
-Each tag will be replaced by the corresponding value in Python when creating the email. The resulting email will appear as:
+There are three placeholders in the text file above: `<GREETING>`, `<TABLE>` and `<JOBSTATS>`.
+Each placeholder will be replaced by the actual value when creating the email. The resulting email will appear as:
 
 ```
 Hello Alan (u12345),
@@ -69,13 +69,13 @@ Replying to this automated email will open a support ticket with Research
 Computing.
 ```
 
-Tags can be placed anywhere in your `email_file`. For example, one can include a tag in the middle of a sentence:
+Placeholders can be placed anywhere in your `email_file`. For example, one can include a placeholder in the middle of a sentence:
 
 ```
 Below are your jobs on <CLUSTER> that did not use all of the allocated nodes:
 ```
 
-Each alert has a finite set of tags that may be used to generate custom emails. There are
+Each alert has a finite set of placeholders that may be used to generate custom emails. There are
 a set of example email files in the `email` directory of the [GitHub repository](https://github.com/jdh4/job_defense_shield). It is
 recommended that you copy these and modify them as you see fit. It might also be a good
 idea to put them under version control along with `config.yaml` and `holidays.txt`.

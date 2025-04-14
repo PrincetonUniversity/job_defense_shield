@@ -59,6 +59,8 @@ per alert.
 
 - `email_file_cancel`: (Required) File to be used for the cancellation email.
 
+- `email_subject`: (Optional) Subject of the email message to users.
+
 - `jobid_cache_path`: (Optional) Path to a writable directory where a cache file containing the `jobid` of each job known to be using the GPUs is stored. This is a binary file with the name `.jobid_cache.pkl`. Including this setting will eliminate redundant calls to the Prometheus server.
 
 - `max_interactive_hours`: (Optional) An interactive job will only be cancelled if the run time limit is greater than `max_interactive_hours` and the number of allocated GPUs is less than or equal to `max_interactive_gpus`. Remove these lines if interactive jobs should not receive special treatment. An interactive job is one with a `jobname` that starts with either `interactive` or `sys/dashboard`.

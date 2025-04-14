@@ -1,13 +1,13 @@
 # GPU Model Too Powerful
 
-This alert identifies jobs that could have ran on less powerful GPUs.
-For example, it can find jobs that ran on NVIDIA H100 GPUs but could have
-used the less powerful L40S GPUs or [MIG](https://www.nvidia.com/en-us/technologies/multi-instance-gpu/).
+This alert identifies jobs that ran on GPUs that were more powerful than necessary.
+For example, it can find jobs that ran on an NVIDIA H100 GPU but could have
+used the less powerful L40S GPU or [MIG](https://www.nvidia.com/en-us/technologies/multi-instance-gpu/).
 The GPU utilization, CPU/GPU memory usage, and number of allocated CPU-cores
 are taken into account when identifying jobs.
 
 !!! info
-    Currently only jobs that allocated 1 GPU are considered.
+    Currently only jobs that allocate 1 GPU are considered.
 
 ## Configuration File
 
@@ -15,47 +15,43 @@ Here is an example entry for `config.yaml`:
 
 ```yaml
 gpu-model-too-powerful:
-  clusters:
-    - della
+  clusters: della
   partitions:
     - gpu
-  min_run_time: 61         # minutes
-  gpu_hours_threshold: 24  # gpu-hours
-  num_cores_threshold: 1   # count
-  gpu_util_threshold: 15   # percent
-  gpu_mem_threshold: 10    # GB
-  cpu_mem_threshold: 32    # GB
-  gpu_util_target: 50      # percent
+  min_run_time:        61 # minutes
+  gpu_hours_threshold: 24 # gpu-hours
+  num_cores_threshold:  1 # count
+  gpu_util_threshold:  15 # percent
+  gpu_mem_threshold:   10 # GB
+  cpu_mem_threshold:   32 # GB
+  gpu_util_target:     50 # percent
   email_file: "gpu_model_too_powerful.txt"
   admin_emails:
     - admin@institution.edu
 ```
 
-The parameters are explained below:
+The available settings are listed below:
 
-- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
-per alert.
+- `cluster`: Specify the cluster name as it appears in the Slurm database.
 
 - `partitions`: Specify one or more Slurm partitions.
 
-- `min_run_time`: The minimum run time of a job for it to be considered. Jobs that did not run longer
-than this limit will be ignored. Default: 0
+- `gpu_hours_threshold`: Minimum number of GPU-hours (summed over the jobs) for the user to be included.
 
-- `gpu_hours_threshold`: Minimum number of GPU-hours summed over the jobs.`A user must have more than this value to be included.
+- `num_cores_threshold`: Only jobs that allocate a number of CPU-cores that is equal to or less than this value will be included.
 
-- `num_cores_threshold`: Only jobs that allocate a number of CPU-cores that is equal to or less than `num_cores_threshold` will be included.
+- `gpu_util_threshold`:  Jobs with a mean GPU utilization of less than or equal to this value will be included.
 
-- `gpu_util_threshold`:  The GPU utilization as available from `nvidia-smi`. Jobs with a mean GPU utilization of less or equal to this value will be included. The default value is 15%.
+- `gpu_mem_threshold`: Jobs that used less than this value of GPU memory (in units of GB) will be considered.
 
-- `gpu_mem_threshold`: Jobs that used less than this value of GPU memory in units of GB will be considered.
+- `cpu_mem_threshold`: Jobs that used less than this value of CPU memory (in units of GB) will be considered.
 
-- `cpu_mem_threshold`: Jobs that used less than this value of CPU memory in units of GB will be considered.
-
-- `gpu_util_target`: The minimum acceptable mean utilization for the jobs of a user. This is available as a email tag (see Tags below).
+- `gpu_util_target`: The minimum acceptable GPU utilization for a user.
 
 - `email_file`: The text file to be used for the email message.
 
-- `email_subject`: Subject of the email message to users.
+- `min_run_time`: (Optional) The minimum run time of a job for it to be considered. Jobs that did not run longer
+than this limit will be ignored. Default: 0
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
@@ -63,7 +59,14 @@ than this limit will be ignored. Default: 0
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
-- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies when the `--email` option is used.
+- `admin_emails`: (Optional) List of administrator email addresses that should receive copies of the emails that are sent to users.
+
+- `email_subject`: (Optional) Subject of the email message to users.
+
+- `report_title`: (Optional) Title of the report to system administrators.
+
+!!! tip "Nodelist"
+    Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes within a partition.
 
 ## Report for System Administrators
 
@@ -122,17 +125,23 @@ Computing.
 The following placeholders can be used in the email file:
 
 - `<GREETING>`: The greeting generated by `greeting-method`.
-- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
-- `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
-- `<TARGET>`: The GPU utilization (i.e., `gpu_util_target`).
+- `<CLUSTER>`: The cluster specified for the alert.
+- `<PARTITIONS>`: The partitions listed for the alert.
+- `<TARGET>`: The minimum acceptable GPU utilization (i.e., `gpu_util_target`).
 - `<DAYS>`: Number of days in the time window (default is 7).
-- `<NUM-JOBS>`: Total number of jobs that fit the constraints.
+- `<NUM-JOBS>`: Number of jobs that are using GPUs that are too powerful.
 - `<TABLE>`: Table of job data.
-- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+- `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 
 ## Usage
 
-Send emails to users with jobs that could have used a less powerful GPU model:
+Generate a report of the users that are using GPUs that are more powerful than necessary:
+
+```
+$ python job_defense_shield.py --gpu-model-too-powerful
+```
+
+Send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --gpu-model-too-powerful --email
@@ -141,17 +150,14 @@ $ python job_defense_shield.py --gpu-model-too-powerful --email
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --gpu-model-too-powerful --email
+$ python job_defense_shield.py --gpu-model-too-powerful --check
 ```
 
 ## cron
 
 Below is an example entry for `crontab`:
 
-```bash
+```
 0 9 * * * /path/to/python /path/to/job_defense_shield.py --gpu-model-too-powerful --email > /path/to/log/gpu_model_too_powerful.log 2>&1
 ```
 
-## Tip
-
-Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes within a partition. See the [nodelist](../nodelist.md) example.

@@ -20,26 +20,23 @@ too-many-cores-per-gpu-1:
     - admin@institution.edu
 ```
 
-The parameters are explained below:
+The available settings are listed below:
 
-- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
-per alert.
+- `cluster`: Specify the cluster name as it appears in the Slurm database.
 
 - `partitions`: Specify one or more Slurm partitions.
 
+- `gpus_per_node`: Number of GPUs per node.
+
+- `cores_per_gpu_target`: This should be the number of CPU-cores divided by the number of GPUs per node. For instance, for nodes with 96 cores and 8 GPUs, one should use 96/8=12.
+
+- `cores_per_gpu_limit`: Include jobs where the number of CPU-cores per GPU is equal to or greater than this value. One may set this equal to `cores_per_gpu_target` or a value slightly larger.
+
+- `cores_per_node`: Number of CPU-cores per node.
+
+- `email_file`: The text file to be used for the email message to users.
+
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
-
-- `cores_per_node`: (Required) Number of CPU-cores per node.
-
-- `gpus_per_node`: (Required) Number of GPUs per node.
-
-- `cores_per_gpu_target`: (Required) This should be the number of CPU-cores divided by the number of GPUs per node. For instance, for nodes with 96 cores and 8 GPUs, one should use 96/8=12.
-
-- `cores_per_gpu_limit`: (Required) Include jobs where the number of CPU-cores per GPU is equal to or greater than this value. One may set this equal to `cores_per_gpu_target` or a value slightly larger.
-
-- `email_file`: The text file to be used for the email message.
-
-- `email_subject`: Subject of the email message to users.
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
@@ -47,8 +44,11 @@ per alert.
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
-- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
-when the `--email` option is used.
+- `admin_emails`: (Optional) List of administrator email addresses that should receive copies of the emails that are sent to users.
+
+- `email_subject`: (Optional) Subject of the email message to users.
+
+- `report_title`: (Optional) Title of the report to system administrators.
 
 ## Report for System Administrators
 
@@ -61,11 +61,11 @@ $ python job_defense_shield.py --too-many-cores-per-gpu
 -------------------------------------------------------------------------------
  JobID     User  Hours CPU-Eff  GPUs Cores-per-GPU  Cores-per-GPU-Target Emails
 -------------------------------------------------------------------------------
-62675166  u79355  1.8     5%      1         48                12            0   
-62733079  u73812  1.3    15%      2         32                12            0   
-62735106  u73812  1.4    15%      2         32                12            0   
-62950436  u23992  1.2     7%      1         32                12            0   
-62952770  u23992  1.2     1%      1         32                12            0   
+62675166  u79355  1.8     5%      1         48                12          2 (1)
+62733079  u73812  1.3    15%      2         32                12          0   
+62735106  u73812  1.4    15%      2         32                12          0   
+62950436  u23992  1.2     7%      1         32                12          0   
+62952770  u23992  1.2     1%      1         32                12          0   
 -------------------------------------------------------------------------------
    Cluster: della
 Partitions: gpu
@@ -75,7 +75,7 @@ Partitions: gpu
 
 ## Email Message to Users
 
-For an example see `email/too_many_cores_per_gpu.txt`:
+Below is an example email (see `email/too_many_cores_per_gpu.txt`):
 
 ```
 Hello Alan (u12345),
@@ -108,9 +108,15 @@ The following placeholders can be used in the email file:
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<NUM-JOBS>`: Total number of jobs with at least one idle GPU.
 - `<TABLE>`: Table of job data.
-- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+- `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 
 ## Usage
+
+Generate a report of the jobs allocating too many CPU cores per GPU:
+
+```
+$ python job_defense_shield.py --too-many-cores-per-gpu
+```
 
 Send emails to offending users:
 
@@ -128,6 +134,6 @@ $ python job_defense_shield.py --too-many-cores-per-gpu --check
 
 Below is an example entry for `crontab`:
 
-```bash
+```
 0 9 * * * /path/to/python /path/to/job_defense_shield.py --too-many-cores-per-gpu --email > /path/to/log/too_many_cores_per_gpu.log 2>&1
 ```

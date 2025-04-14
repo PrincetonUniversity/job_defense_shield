@@ -22,7 +22,7 @@ class CancelZeroGpuJobs(Alert):
 
     def _add_required_fields(self):
         if not hasattr(self, "email_subject"):
-            self.email_subject = "Jobs with Zero GPU Utilization"
+            self.email_subject = "Jobs with 0% GPU Utilization"
         if not hasattr(self, "gpu_frac_threshold"):
             self.gpu_frac_threshold = 1.0
         if not hasattr(self, "do_not_cancel"):

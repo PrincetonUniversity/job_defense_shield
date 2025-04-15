@@ -29,7 +29,7 @@ class LowEfficiency(Alert):
         if not hasattr(self, "proportion_thres_pct"):
             self.proportion_thres_pct = 0
         if not hasattr(self, "num_top_users"):
-            self.num_top_users = 0
+            self.num_top_users = 15
 
     def _filter_and_add_new_fields(self):
         # compute proportion (self.pr) using as much data as possible; we do not

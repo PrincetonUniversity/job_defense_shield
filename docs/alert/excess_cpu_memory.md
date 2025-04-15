@@ -15,46 +15,47 @@ excess-cpu-memory-1:
   partition:
     - cpu
   min_run_time:             61  # minutes
-  tb_hours_threshold:      100  # terabyte-hours
+  tb_hours_threshold:       50  # terabyte-hours
   ratio_threshold:        0.35  # [0.0, 1.0]
   mean_ratio_threshold:   0.35  # [0.0, 1.0]
   median_ratio_threshold: 0.35  # [0.0, 1.0]
-  num_top_users:             5  # count
+  num_top_users:            10  # count
   admin_emails:
     - admin@institution.edu
 ```
 
 Each configuration parameter is explained below:
 
-- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
-per alert.
+- `cluster`: Specify the cluster name as it appears in the Slurm database.
 
 - `partitions`: Specify one or more Slurm partitions.
       
-- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
-
 - `tb_hours_threshold`: The threshold for TB-hours per day. This value
 is multiplied by `--days` to determine the threshold of TB-hours for
 the user to receive an email message.
 
 - `ratio_threshold`: This quantity is the sum of CPU memory used divded
-by the total memory allocated for all jobs of a given user in the specified
-time window. This quantity varies between 0 and 1.
+by the total memory allocated for all jobs of a given user.
+This quantity varies between 0 and 1.
 
 - `median_ratio_threshold`: This is median value of memory used divided by
-memory allocated for the individual jobs of the user.
+memory allocated for the individual jobs of the user. This quantity varies between 0 and 1.
 
 - `mean_ratio_threshold`: The mean value of the memory used divided by the
 memory allocated per job for a given user. This quantity varies between 0
 and 1.
 
+- `email_file`: The text file to be used for the email message to users.
+
+- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` then jobs that ran for less than 30 minutes are ignored. Default: 0
+
 - `cores_per_node`: (Optional) Number of CPU-cores per node.
 
-- `mem_per_node`: (Optional) CPU memory per node in GB.
+- `mem_per_node`: (Optional) CPU memory per node in units of GB.
 
 - `cores_fraction`: (Optional) Fraction of the cores per node that will cause the job to be ignored. For instance, with `cores_fraction: 0.8` if a node has 32 cores and the job allocates 30 of them then the job will be ignored since 30/32 > 0.8. Default: 1
 
-- `num_top_users`: (Optional) Only consider the number of users equal to `num_top_users` after sorting by "unused TB-hours".
+- `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by "unused TB-hours". Default: 15
 
 - `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
@@ -64,10 +65,11 @@ and 1.
 
 - `excluded_users`: (Optional) List of usernames to exclude from the alert.
 
-- `email_file`: The text file to be used for the email message.
+- `admin_emails`: (Optional) List of administrator email addresses that should receive copies of the emails that are sent to users.
 
-- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
-when the `--email` option is used.
+- `email_subject`: (Optional) Subject of the email message to users.
+
+- `report_title`: (Optional) Title of the report to system administrators.
 
 !!! info
     When `cores_per_node` and `mem_per_node` are defined, only jobs using more memory per core than `mem_per_node` divided by `cores_per_node` are included. For instance, if a node provides 64 cores and 512 GB of memory, only jobs allocating more than 512/64=8 GB/core are considered.
@@ -84,11 +86,11 @@ $ python job_defense_shield.py --excess-cpu-memory
  User   Unused    Used    Ratio  Ratio   Ratio Proportion CPU-Hrs  Jobs Emails
        (TB-Hrs) (TB-Hrs) Overall  Mean  Median                                
 ------------------------------------------------------------------------------
-u34981    164      163     0.50   0.50   0.54     0.19      8370    310    0  
-u76237    135        0     0.00   0.00   0.00     0.08      5628    243    0  
-u63098     90        1     0.02   0.02   0.02     0.05       730     22    0  
-u26174     71      189     0.73   0.72   0.71     0.15      7425    551    0  
-u89812     51       83     0.62   0.61   0.62     0.08      4023   2040    0  
+u34981    164      163     0.50   0.50   0.54     0.19      8370    310  0  
+u76237    135        0     0.00   0.00   0.00     0.08      5628    243  1 (5)
+u63098     90        1     0.02   0.02   0.02     0.05       730     22  3 (1)
+u26174     71      189     0.73   0.72   0.71     0.15      7425    551  0  
+u89812     51       83     0.62   0.61   0.62     0.08      4023   2040  0  
 ------------------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
@@ -98,7 +100,7 @@ Partitions: cpu
 
 ## Email Message to Users
 
-Below is an example email message to a user (see `email/excess_cpu_memory.txt`):
+Below is an example email (see `email/excess_cpu_memory.txt`):
 
 ```
 Hello Alan (u34981),
@@ -127,14 +129,14 @@ The following placeholders can be used in the email file:
 
 - `<GREETING>`: The greeting generated by `greeting-method`.
 - `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
-- `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
+- `<PARTITIONS>`: A comma-separated list of the partitions used by the user.
+- `<DAYS>`: Time window of the alert in days (7 is default).
 - `<CASE>`: The rank of the user (see email file).
-- `<DAYS>`: Time window of the alert in days.
-- `<NUM-JOBS>`: Total number of jobs that are over-allocating memory.
+- `<NUM-JOBS>`: Number of jobs that are over-allocating memory.
 - `<UNUSED>`: Memory-hours that were unused.
-- `<PCT>`: Mean memory efficiency or average ratio of used CPU memory to allocated.
+- `<PERCENT>`: Mean memory efficiency or average ratio of used CPU memory to allocated.
 - `<TABLE>`: Table of job data.
-- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+- `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 
 When `mem_per_node` and `cores_per_node` are used then one more placeholder is available:
 
@@ -142,6 +144,12 @@ When `mem_per_node` and `cores_per_node` are used then one more placeholder is a
 the number of unused TB-hours divided by the product of the CPU memory per node in TB and the number of hours in the time window (default is 168 hours or 7 days).
 
 ## Usage
+
+Generate a report for system administrators:
+
+```
+$ python job_defense_shield.py --excess-cpu-memory
+```
 
 Send emails to the offending users:
 
@@ -155,7 +163,7 @@ See which users have received emails and when:
 $ python job_defense_shield.py --excess-cpu-memory --check
 ```
 
-## Cron
+## cron
 
 Below is an example `crontab` entry:
 

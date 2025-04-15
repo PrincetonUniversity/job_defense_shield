@@ -11,9 +11,10 @@ low-cpu-efficiency-1:
   cluster: della
   partitions:
     - cpu
-  eff_thres_pct: 60          # percent
+  eff_thres_pct:         60  # percent
   absolute_thres_hours: 100  # cpu-hours
-  eff_target_pct: 90         # percent
+  eff_target_pct:        90  # percent
+  num_top_users:         15  # count
   email_file: "low_cpu_efficiency.txt"
   admin_emails:
     - admin@institution.edu
@@ -32,25 +33,28 @@ per alert.
 
 - `eff_target_pct`: The target value for CPU utilization that users should strive for. It is only used in emails. This value can be referenced as the tag `<TARGET>` in email messages (see `low_cpu_efficiency.txt`).
 
-- `email_file`: The file used as a email body. This file must be found in the `email-files-path` setting in `config.yaml`. Learn more about writing custom emails.
+- `email_file`: The text file to be used as the email message to users.
 
-- `num_top_users`: After sorting all users by CPU-hours, only consider the top `num_top_users` for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports.
+- `num_top_users`: (Optional) After sorting all users by CPU-hours, only consider this number of users for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports. Default: 15
 
-- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. The default is 0.
+- `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. Default: 0
 
-- `proportion_thres_pct`: A user must being using this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours.
+- `proportion_thres_pct`: (Optional) Proportional threshold percentage. A user must being using at least this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours. Default: 0
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
-- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
-when the `--email` option is used.
+- `admin_emails`: (Optional) List of administrator email addresses that should receive copies of the emails that are sent to users.
+
+- `email_subject`: (Optional) Subject of the email message to users.
+
+- `report_title`: (Optional) Title of the report to system administrators.
 
 !!! info "How is CPU efficiency calculated?"
     The CPU efficiency is weighted by the number of CPU-cores per job. Jobs with 0% utilization on a node are ignored since they are captured by another alert.
 
 ## Report for System Administrators
 
-Here is an example report:
+Below is an example report:
 
 ```
 $ python job_defense_shield.py --low-cpu-efficiency
@@ -74,7 +78,7 @@ listed.
 
 ## Email Message to Users
 
-Below is an example email message (see `email/low_cpu_efficiency.txt`):
+Below is an example email (see `email/low_cpu_efficiency.txt`):
 
 ```
 Hello Alan (u12345),
@@ -109,28 +113,16 @@ The following placeholders can be used in the email file:
 
 ## Usage
 
-Generate a report for this alert:
+Generate a report for system administrators:
 
 ```
 $ python job_defense_shield.py --low-cpu-efficiency
 ```
 
-Same as above but over the past month:
-
-```
-$ python job_defense_shield.py --low-cpu-efficiency --days=30
-```
-
-Send emails to users with low CPU efficiencies over the past 7 days:
+Send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --low-cpu-efficiency --email
-```
-
-Same as above but only pull data for a specific cluster and partition:
-
-```
-$ python job_defense_shield.py --low-cpu-efficiency --email -M traverse -r cpu
 ```
 
 See which users have received emails and when:
@@ -143,10 +135,6 @@ $ python job_defense_shield.py --low-cpu-efficiency --check
 
 Below is an example `crontab` entry:
 
-```bash
+```
 0 9 * * * /path/to/python /path/to/job_defense_shield.py --low-cpu-efficiency --email > /path/to/log/low_cpu_efficiency.log 2>&1
 ```
-
-## Related Alerts
-
-See [low GPU utilization](low_gpu_util.md)

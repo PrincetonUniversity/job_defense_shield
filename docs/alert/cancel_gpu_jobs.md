@@ -97,8 +97,8 @@ cancel-zero-gpu-jobs-1:
   sampling_period_minutes: 15  # minutes
   first_warning_minutes:   60  # minutes
   cancel_minutes:         120  # minutes
-  email_file_first_warning:  "cancel_gpu_jobs_warning_1.txt"
-  email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
+  email_file_first_warning: "cancel_gpu_jobs_warning_1.txt"
+  email_file_cancel:        "cancel_gpu_jobs_scancel_3.txt"
   jobid_cache_path: /path/to/writable/directory/
   admin_emails:
     - admin@institution.edu
@@ -115,7 +115,7 @@ cancel-zero-gpu-jobs-1:
     - llm
   sampling_period_minutes: 15  # minutes
   cancel_minutes:         120  # minutes
-  email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
+  email_file_cancel: "cancel_gpu_jobs_scancel_3.txt"
   jobid_cache_path: /path/to/writable/directory/
   admin_emails:
     - admin@institution.edu

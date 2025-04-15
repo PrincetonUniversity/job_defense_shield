@@ -109,7 +109,7 @@ The following placeholders can be used in the email file:
 - `<TARGET>`: Minimum target value for the mean efficiency.
 - `<DAYS>`: Number of days in the time window (default is 7 days).
 - `<TABLE>`: A table of jobs for the user.
-- `<JOBSTATS>`: A line showing how to run the `jobstats` command on one of the jobs of the user. An example is `$ jobstats 1234567`.
+- `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 
 ## Usage
 

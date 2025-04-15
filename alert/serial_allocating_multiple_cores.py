@@ -23,6 +23,8 @@ class SerialAllocatingMultipleCores(Alert):
             self.max_num_jobid_admin = 3
         if not hasattr(self, "num_jobs_display"):
             self.num_jobs_display = 10
+        if not hasattr(self, "num_top_users"):
+            self.num_top_users = 5
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
@@ -89,8 +91,7 @@ class SerialAllocatingMultipleCores(Alert):
             self.gp = self.df.groupby("User").agg(d).rename(columns={"User":"Jobs"})
             self.gp.reset_index(drop=False, inplace=True)
             self.gp = self.gp[self.gp["CPU-Hours-Wasted"] > self.cpu_hours_threshold]
-            if self.num_top_users:
-                self.gp = self.gp.head(self.num_top_users)
+            self.gp = self.gp.head(self.num_top_users)
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)
@@ -106,8 +107,9 @@ class SerialAllocatingMultipleCores(Alert):
                 total_jobs = usr.shape[0]
                 case = f"{num_disp} of your {total_jobs} jobs" if total_jobs > num_disp else "your jobs"
                 # CHANGE NEXT
-                hours_per_week = 24 * 7
-                num_wasted_nodes = round(cpu_hours_wasted / self.cores_per_node / hours_per_week)
+                if hasattr(self, "cores_per_node"):
+                    hours_per_week = 24 * self.days_between_emails
+                    num_wasted_nodes = round(cpu_hours_wasted / self.cores_per_node / hours_per_week)
                 # create new tag which is two sentences
                 # if cores_per_node:
                 #Your jobs allocated <CPU-HOURS> CPU-hours that were never used. This is equivalent to
@@ -125,7 +127,8 @@ class SerialAllocatingMultipleCores(Alert):
                 tags["<TABLE>"] = "\n".join([indent + row for row in tbl])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
                 tags["<CPU-HOURS>"] = str(cpu_hours_wasted)
-                tags["<NUM-NODES>"] = str(num_wasted_nodes)
+                if hasattr(self, "cores_per_node"):
+                    tags["<NUM-NODES>"] = str(num_wasted_nodes)
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,
                                              tags)

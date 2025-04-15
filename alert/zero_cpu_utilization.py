@@ -19,6 +19,8 @@ class ZeroCPU(Alert):
             self.email_subject = "Jobs with Zero CPU Utilization"
         if not hasattr(self, "report_title"):
             self.report_title = "Jobs with Zero CPU Utilization"
+        if hasattr(self, "cpu_hours_threshold"):
+            self.cpu_hours_threshold = None
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
@@ -47,9 +49,10 @@ class ZeroCPU(Alert):
                 return False
             self.df["interactive"] = self.df["jobname"].apply(is_interactive)
             self.df["CPU-Util-Unused"] = "0%"
-            if hasattr(self, "cpu_hours_threshold"):
+            if self.cpu_hours_threshold is not None:
                 # remove users within insufficient cpu-hours at 0%
-                self.df["cpu-hours-at-0%"] = (self.df.cores / self.df.nodes) * self.df["nodes-unused"] * self.df["elapsed-hours"]
+                self.df["cpu-hours-at-0%"] = (self.df.cores / self.df.nodes) * \
+                                             self.df["nodes-unused"] * self.df["elapsed-hours"]
                 total_hrs = self.df.groupby("User").agg({"cpu-hours-at-0%":"sum"}).reset_index()
                 total_hrs = total_hrs[total_hrs["cpu-hours-at-0%"] >= self.cpu_hours_threshold]
                 self.df = self.df[self.df.User.isin(total_hrs.User)]

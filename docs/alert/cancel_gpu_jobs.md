@@ -1,4 +1,4 @@
-# Cancel GPU Jobs at 0% Utilization
+# Automatically Cancel GPU Jobs at 0% Utilization
 
 This is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 This alert automatically cancels jobs with GPUs at 0% utilization.

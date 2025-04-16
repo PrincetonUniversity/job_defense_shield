@@ -159,7 +159,7 @@ By having your email address in `report-emails` in `config.yaml`, the `--report`
 $ python job_defense_shield.py --usage-overview --report
 ```
 
-This feature is useful when combined with `cron`. That is, one can receive a daily report showing all of the instances of underutilization across all of the systems. This is shown later.
+This feature is useful when combined with `cron`. That is, one can receive a daily report showing all of the instances of underutilization across all of the systems (see [reports](reports/overview.md)).
 
 ## Troubleshooting the Installation
 

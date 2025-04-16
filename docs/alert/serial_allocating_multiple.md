@@ -11,10 +11,10 @@ serial-allocating-multiple-1:
   cluster: della
   partitions:
     - cpu
-  min_run_time:          61  # minutes
-  cpu_hours_threshold:  100  # cpu-hours
-  lower_ratio:         0.85  # [0.0, 1.0]
-  num_top_users:          5  # count
+  min_run_time:         61  # minutes
+  cpu_hours_threshold: 100  # cpu-hours
+  lower_ratio:        0.85  # [0.0, 1.0]
+  num_top_users:         5  # count
   email_file: "serial_allocating_multiple.txt"
   admin_emails:
     - admin@institution.edu
@@ -32,7 +32,7 @@ The parameters are explained below:
 
 - `email_file`: The text file to be used for the email message to users.
 
-- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` then jobs that ran for less than 30 minutes are ignored. Default: 0
+- `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
 
 - `cores_per_node`: (Optional) Number of CPU-cores per node. If this is defined then the `<NUM-NODES>` placeholder will be available.
 
@@ -57,16 +57,16 @@ Below is an example report:
 ```
 $ python job_defense_shield.py --serial-allocating-multiple
 
-                       Serial Jobs Allocating Multiple CPU-Cores                        
-----------------------------------------------------------------------------------------
-    User   CPU-Hours-Wasted AvgCores  Jobs                JobID                  Emails 
-----------------------------------------------------------------------------------------
-1  u74805        1248           8      36          62777629,62829596,62834509+    6 (33)
-2  u31448         906          30       3          62887368,62887370,62887407     0     
-3  u93676         783           3      20   62904738_0,62904738_1,62904738_10+    1 (10)
-4  u16959         325          15       6          62893341,62896573,62912383+   14 (17)
-5  u36725         164          12      11   62814801_11,62814801_8,62814801_9+    1 (10)
-----------------------------------------------------------------------------------------
+               Serial Jobs Allocating Multiple CPU-Cores                        
+------------------------------------------------------------------------
+    User   CPU-Hours-Wasted AvgCores  Jobs        JobID           Emails
+------------------------------------------------------------------------
+1  u74805       10248           8      96   62829596,62834509+    2 (3)
+2  u31448         906          30       2   62887370,62887407     0     
+3  u93676         783           3      20   62904738,62904739+    1 (10)
+4  u16959         325          15       6   62896573,62912383+    4 (17)
+5  u36725         164          12      11   62814801,62814802+    1 (10)
+------------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
      Start: Sun Mar 09, 2025 at 10:21 PM
@@ -119,9 +119,9 @@ The following placeholders can be used in the email file:
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 
-If `cores_per_node` is defined in the alert entry then one additional placeholder is available:
+If `cores_per_node` is defined in the alert then one additional placeholder is available:
 
-- `<NUM-NODES>`: Number of nodes wasted. To use this one must specify `cores_per_node` in the alert.
+- `<NUM-NODES>`: Number of nodes wasted. This is calculated as the wasted CPU-hours divided by the product of the number of cores per node and the number of hours in the time window. One strategy is to set `cpu_hours_threshold` large enough so that `<NUM-NODES>` is always greater than or equal to 1. Note that the `round` function is applied when computing this quantity.
 
 ## Usage
 

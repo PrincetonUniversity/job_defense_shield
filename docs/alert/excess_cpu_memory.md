@@ -47,7 +47,7 @@ and 1.
 
 - `email_file`: The text file to be used for the email message to users.
 
-- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` then jobs that ran for less than 30 minutes are ignored. Default: 0
+- `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
 
 - `cores_per_node`: (Optional) Number of CPU-cores per node.
 

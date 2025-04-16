@@ -13,7 +13,7 @@ excessive-time-gpu-1:
     - gpu
     - llm
   min_run_time:             61  # minutes
-  absolute_thres_hours:   1000  # used gpu-hours
+  absolute_thres_hours:   1000  # unused gpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]

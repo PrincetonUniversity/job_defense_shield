@@ -14,9 +14,9 @@ excessive-time-cpu-1:
   cluster: della
   partitions:
     - cpu
-  absolute_thres_hours: 0       # unused cpu-hours
+  absolute_thres_hours:      0  # unused cpu-hours
   overall_ratio_threshold: 1.0  # [0.0, 1.0]
-  num_top_users: 10
+  num_top_users:            10  # count
 ```
 
 !!! note
@@ -67,9 +67,9 @@ excessive-time-cpu-1:
   cluster: della
   partitions:
     - cpu
-  absolute_thres_hours: 100000  # cpu-hours
+  absolute_thres_hours: 100000  # unused cpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
-  num_top_users: 10
+  num_top_users:            10  # count
 ```
 
 The settings above will only include users that have more than 100,000 unused (allocated) CPU-hours and a ratio of used to total of 0.2 or less.
@@ -138,7 +138,7 @@ The command above will only send emails to the addresses in `admin_emails`. User
 
 ## Step 4: Send the Emails to Users
 
-When you are happy with the settings in `config.yaml` and the email message, run the alert with only `--email` to send emails to the offending users:
+When you are satisfied with the settings in `config.yaml` and the email message, run the alert with only `--email` to send emails to the offending users:
 
 ```
 $ python job_defense_shield.py --excessive-time-cpu --email
@@ -205,4 +205,4 @@ Take a look at the various alerts and add what you like to your configuration fi
 
 ## How does Job Defense Shield work?
 
-Summary statistics for each completed job are stored in a compressed format in the `AdminComment` field in the Slurm database. The software described here works by calling the Slurm `sacct` command while requesting several fields including `AdminComment`. The `sacct` output is stored in a `pandas` dataframe for processing. For running jobs the Prometheus database must be queried.
+Summary statistics for each completed job are stored in a compressed format in the `AdminComment` field in the Slurm database. The software described here works by calling the Slurm `sacct` command while requesting several fields including `AdminComment`. The `sacct` output is stored in a `pandas` dataframe for processing. To get the data for running jobs, the Prometheus database is queried.

@@ -6,7 +6,7 @@ Any of the previously discussed GPU or CPU alerts can be turned into a report. T
 $ python job_defense_shield.py --excess-cpu-memory --report
 ```
 
-The `--report` flag will cause the report to be sent to the addresses in `report-emails` in `config.yaml`.
+The `--report` flag will cause the report to be sent by email to the addresses in `report-emails` in `config.yaml`.
 
 One can also combine an email alert with the generation of a report:
 

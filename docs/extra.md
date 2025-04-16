@@ -41,4 +41,11 @@ Violation files: /path/to/violations/low_cpu_efficiency/
 
 Time increases from left to right with today being on the far right.
 Each character in each row corresponds to a day. Weekend days are blank.
-An `X` character means that a user was sent an email on that day.
+An `X` character means that a user was sent an email.
+
+
+The time window can be adjusted using the `--days` option:
+
+```
+$ python job_defense_shield.py --low-cpu-efficiency --check --days=100
+```

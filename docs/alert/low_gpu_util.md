@@ -11,12 +11,12 @@ low-gpu-efficiency-1:
   cluster: della
   partitions:
     - gpu
-  min_run_time: 30          # minutes
-  eff_thres_pct: 25         # percent
-  eff_target_pct: 50        # percent
+  min_run_time:         30  # minutes
+  eff_thres_pct:        25  # percent
+  eff_target_pct:       50  # percent
   absolute_thres_hours: 50  # gpu-hours
-  proportion_thres_pct: 2   # percent
-  num_top_users: 15         # count
+  proportion_thres_pct:  2  # percent
+  num_top_users:        15  # count
   email_file: "low_gpu_efficiency.txt"
   admin_emails:
     - admin@institution.edu

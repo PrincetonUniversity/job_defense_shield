@@ -1,4 +1,4 @@
-# Serial Codes Allocating Multiple CPU-Cores
+# Serial Jobs Allocating Multiple CPU-Cores
 
 This alert identifies users that are apparently running serial codes while allocating multiple CPU-cores. A serial code can only use 1 CPU-core so the additional allocated cores are wasted.
 

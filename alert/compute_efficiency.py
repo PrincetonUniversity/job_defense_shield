@@ -54,6 +54,7 @@ class LowEfficiency(Alert):
         # next line prevents (unlikely) failure when creating "{self.xpu}-tuples"
         if self.ce.empty:
             return pd.DataFrame()
+        self.admin = pd.DataFrame()
         self.ce = self.ce.merge(self.pr, how="left", on="user")
         if self.xpu == "cpu":
             self.ce[f"{self.xpu}-tuple"] = self.ce.apply(lambda row:

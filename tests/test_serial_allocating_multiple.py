@@ -1,4 +1,3 @@
-import pytest
 import pandas as pd
 from alert.serial_allocating_multiple_cores import SerialAllocatingMultipleCores
 

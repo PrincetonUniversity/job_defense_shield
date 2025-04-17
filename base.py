@@ -70,8 +70,9 @@ class Alert:
         """
 
     def send_emails_to_users(self) -> None:
-        """Send emails to users and administrators. The value of usr
-           can be None in cancel_zero_gpu_jobs."""
+        """Send emails to users and administrators. Update the violation
+           log file of each user. The value of usr can be None in
+           cancel_zero_gpu_jobs."""
         if not self.no_emails_to_users:
             for user, email, usr in self.emails:
                 if user in self.external_emails:
@@ -86,14 +87,16 @@ class Alert:
                 if usr is not None:
                     vfile = f"{self.vpath}/{self.violation}/{user}.csv"
                     self.update_violation_log(usr, vfile)
-        for user, email, usr in self.emails:
-            for admin_email in self.admin_emails:
-                if usr is not None or (usr is None and self.warnings_to_admin):
-                    send_email(email,
-                               admin_email,
-                               subject=self.email_subject,
-                               sender=self.sender,
-                               reply_to=self.reply_to)
+        if not self.no_emails_to_admins:
+            for user, email, usr in self.emails:
+                for admin_email in self.admin_emails:
+                    if usr is not None or (usr is None and self.warnings_to_admin):
+                        send_email(email,
+                                   admin_email,
+                                   subject=self.email_subject,
+                                   sender=self.sender,
+                                   reply_to=self.reply_to)
+        if not self.no_emails_to_users or not self.no_emails_to_admins:
             print(email)
 
     @abstractmethod

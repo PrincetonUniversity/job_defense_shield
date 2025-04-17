@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from utils import SECONDS_PER_MINUTE as spm
 from utils import SECONDS_PER_HOUR as sph
 from utils import gpus_per_job
 from utils import send_email
@@ -98,6 +97,8 @@ if __name__ == "__main__":
                         help='Send email alerts to users and administrators')
     parser.add_argument('--no-emails-to-users', action='store_true', default=False,
                         help='Do not send emails to users but only to administrators (--email is required)')
+    parser.add_argument('--no-emails-to-admins', action='store_true', default=False,
+                        help='Do not send emails to admins (--email is required)')
     parser.add_argument('--report', action='store_true', default=False,
                         help='Send an email report to administrators')
     parser.add_argument('--check', action='store_true', default=False,
@@ -108,6 +109,10 @@ if __name__ == "__main__":
 
     if not args.email and args.no_emails_to_users:
         print("--no-emails-to-users must appear with --email. Exiting ...")
+        sys.exit()
+
+    if not args.email and args.no_emails_to_admins:
+        print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
     print("\nJob Defense Shield")
@@ -175,6 +180,7 @@ if __name__ == "__main__":
         cfg["partition-renamings"] = {}
 
     sys_cfg = {"no_emails_to_users":   args.no_emails_to_users,
+               "no_emails_to_admins":  args.no_emails_to_admins,
                "jobstats_module_path": cfg["jobstats-module-path"],
                "jobstats_config_path": cfg["jobstats-config-path"],
                "email_files_path":     cfg["email-files-path"],

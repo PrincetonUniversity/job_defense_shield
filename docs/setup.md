@@ -61,6 +61,7 @@ $ cat config.yaml
 ## GLOBAL SETTINGS ##
 #####################
 violation-logs-path: /path/to/writable/directory/
+email-files-path: /path/to/readable/directory/
 email-domain-name: "@institution.edu"
 sender: support@institution.edu
 reply-to: support@institution.edu
@@ -69,7 +70,7 @@ report-emails:
 ```
 
 !!! tip
-    If the path that you use for `violation-logs-path` does not exist then the software will try to make it. You can use anything for now. In the next section, you will choose a path to use for production.
+    If the path that you use for `violation-logs-path` does not exist then the software will try to make it. You can use anything for now. In the next section, you will choose the production paths for `violation-logs-path` and `email-files-path`.
 
 Be sure to replace `email-domain-name`, `sender`, `reply-to` and `report-emails` with your values.
 

@@ -1,36 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "job defense shield"
-version = "0.1.0"
-authors = [
-  { name="Jonathan D. Halverson", email="halverson@princeton.edu" },
-]
-description = "Automated Slurm job alerts for underutilization"
+name = "Job Defense Shield"
+dynamic = ["version"]
+description = "Identify and reduce instances of underutilization by the users of high-performance computing systems"
 readme = "README.md"
+authors = [{name="Jonathan Halverson", email="halverson@princeton.edu"}]
+license = {file = 'LICENSE'}
+keywords = ["alert", "monitoring", "HPC", "Slurm", "underutilization", "Jobstats"]
 requires-python = ">=3.7"
 dependencies = [
-  "pandas",
+  "pandas>=2.1.0",
+  "pyarrow>=15.0.0",
+  "pyyaml>=6.0",
+  "requests>=2.31.0"
 ]
-license = "GPL-2.0"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License v2.0",
-    "Operating System :: OS Independent",
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: System :: Monitoring",
+  "Typing :: Typed",
 ]
-homepage = "https://github.com/PrincetonUniversity/job_defense_shield"
-repository = "https://github.com/PrincetonUniversity/job_defense_shield"
-keywords = ["slurm", "jobstats", "job monitoring", "email alerts"]
-
 
 [project.optional-dependencies]
 test = ["pytest>=6"]
+check = ["ruff>=0.6.0"]
 
+[project.urls]
+"Documentation" = "https://princetonuniversity.github.io/job_defense_shield"
+"Repository" = "https://github.com/PrincetonUniversity/job_defense_shield"
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = ["error"]
-log_cli_level = "info"
-testpaths = [
-  "tests",
-]
+[project.scripts]
+job_defense_shield = "job_defense_shield.job_defense_shield:main"
+
+[tool.hatch]
+version.path = "src/job_defense_shield/__init__.py"

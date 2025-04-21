@@ -19,7 +19,7 @@ class ZeroCPU(Alert):
             self.email_subject = "Jobs with Zero CPU Utilization"
         if not hasattr(self, "report_title"):
             self.report_title = "Jobs with Zero CPU Utilization"
-        if hasattr(self, "cpu_hours_threshold"):
+        if not hasattr(self, "cpu_hours_threshold"):
             self.cpu_hours_threshold = None
 
     def _filter_and_add_new_fields(self):

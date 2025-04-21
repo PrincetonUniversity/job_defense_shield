@@ -94,7 +94,6 @@ def test_zero_cpu_utilization():
                        cluster="della",
                        partitions=["cpu"],
                        min_run_time=0,
-                       cpu_hours_threshold=0,
                        include_running_jobs=False)
     actual = zero_cpu.df[["User", "Nodes", "Nodes-Unused"]]
     expected = pd.DataFrame({"User":["user1", "user1", "user1", "user2"],

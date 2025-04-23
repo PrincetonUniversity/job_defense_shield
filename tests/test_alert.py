@@ -2,6 +2,7 @@ from utils import seconds_to_slurm_time_format
 from utils import add_dividers
 from utils import gpus_per_job
 
+
 def test_seconds_to_slurm_time_format():
     assert seconds_to_slurm_time_format(100) == "00:01:40"
     assert seconds_to_slurm_time_format(1000) == "00:16:40"

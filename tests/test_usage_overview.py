@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.usage_overview import UsageOverview
+from src.job_defense_shield.alert.usage_overview import UsageOverview
 
 def test_jobs_overview():
     df = pd.DataFrame({"user":["user1", "user2", "user3", "user1", "user5", "user4"],

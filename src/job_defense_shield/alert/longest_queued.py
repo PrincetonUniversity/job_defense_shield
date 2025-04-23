@@ -1,9 +1,9 @@
 from time import time
 import pandas as pd
-from utils import SECONDS_PER_HOUR as sph
-from utils import HOURS_PER_DAY as hpd
-from utils import add_dividers
-from base import Alert
+from ..utils import SECONDS_PER_HOUR as sph
+from ..utils import HOURS_PER_DAY as hpd
+from ..utils import add_dividers
+from ..base import Alert
 
 
 class LongestQueuedJobs(Alert):

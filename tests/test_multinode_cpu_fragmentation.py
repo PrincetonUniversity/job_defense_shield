@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.multinode_cpu_fragmentation import MultinodeCpuFragmentation
+from src.job_defense_shield.alert.multinode_cpu_fragmentation import MultinodeCpuFragmentation
 
 def test_zero_cpu_utilization():
     n_jobs = 5

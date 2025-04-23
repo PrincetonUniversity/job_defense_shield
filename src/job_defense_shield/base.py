@@ -4,10 +4,11 @@ from time import time
 from datetime import datetime
 from abc import abstractmethod
 import pandas as pd
-from utils import send_email
-from utils import SECONDS_PER_HOUR as sph
-from utils import HOURS_PER_DAY as hpd
-from efficiency import get_nodelist
+
+from .utils import send_email
+from .utils import SECONDS_PER_HOUR as sph
+from .utils import HOURS_PER_DAY as hpd
+from .efficiency import get_nodelist
 
 
 class Alert:

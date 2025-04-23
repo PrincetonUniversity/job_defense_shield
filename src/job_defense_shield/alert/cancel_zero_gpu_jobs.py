@@ -2,13 +2,13 @@ import os
 import subprocess
 import pickle
 import pandas as pd
-from base import Alert
-from utils import SECONDS_PER_MINUTE as spm
-from utils import SECONDS_PER_HOUR as sph
-from utils import MINUTES_PER_HOUR as mph
-from efficiency import num_gpus_with_zero_util
-from greeting import GreetingFactory
-from email_translator import EmailTranslator
+from ..base import Alert
+from ..utils import SECONDS_PER_MINUTE as spm
+from ..utils import SECONDS_PER_HOUR as sph
+from ..utils import MINUTES_PER_HOUR as mph
+from ..efficiency import num_gpus_with_zero_util
+from ..greeting import GreetingFactory
+from ..email_translator import EmailTranslator
 
 
 class CancelZeroGpuJobs(Alert):

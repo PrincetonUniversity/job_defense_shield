@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.gpu_model_too_powerful import GpuModelTooPowerful
+from src.job_defense_shield.alert.gpu_model_too_powerful import GpuModelTooPowerful
 
 def test_gpu_model_too_powerful():
     n_jobs = 5

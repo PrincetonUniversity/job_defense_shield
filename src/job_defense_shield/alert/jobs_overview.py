@@ -1,6 +1,6 @@
-from base import Alert
-from utils import add_dividers
-from utils import SECONDS_PER_HOUR as sph
+from ..base import Alert
+from ..utils import add_dividers
+from ..utils import SECONDS_PER_HOUR as sph
 
 
 class JobsOverview(Alert):

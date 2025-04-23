@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.too_much_cpu_mem_per_gpu import TooMuchCpuMemPerGpu
+from src.job_defense_shield.alert.too_much_cpu_mem_per_gpu import TooMuchCpuMemPerGpu
 
 def test_too_much_cpu_mem_per_gpu():
     """Job 1 only allocates 100 GB so it is excluded. Job 3 has

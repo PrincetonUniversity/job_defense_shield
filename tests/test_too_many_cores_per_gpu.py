@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.too_many_cores_per_gpu import TooManyCoresPerGpu
+from src.job_defense_shield.alert.too_many_cores_per_gpu import TooManyCoresPerGpu
 
 def test_too_many_cores_per_gpu():
     n_jobs = 5

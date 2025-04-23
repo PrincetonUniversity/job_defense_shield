@@ -1,10 +1,10 @@
 import pandas as pd
-from base import Alert
-from utils import add_dividers
-from utils import MINUTES_PER_HOUR as mph
-from efficiency import num_gpus_with_zero_util
-from greeting import GreetingFactory
-from email_translator import EmailTranslator
+from ..base import Alert
+from ..utils import add_dividers
+from ..utils import MINUTES_PER_HOUR as mph
+from ..efficiency import num_gpus_with_zero_util
+from ..greeting import GreetingFactory
+from ..email_translator import EmailTranslator
 
 
 class ZeroUtilGPUHours(Alert):

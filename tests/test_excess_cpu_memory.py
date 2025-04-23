@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.excess_cpu_memory import ExcessCPUMemory
+from src.job_defense_shield.alert.excess_cpu_memory import ExcessCPUMemory
 
 def test_excess_cpu_memory():
     n_jobs = 5

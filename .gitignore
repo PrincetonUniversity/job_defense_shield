@@ -3,10 +3,10 @@ violations/
 log/
 holidays.txt
 .jobid_cache.pkl
-__pycache__/
 .pytest_cache/
 .ruff_cache/
-.coverage
+jds-env/
+.venv/
 
 ##################################################################
 # Everything below is taken from                                 #

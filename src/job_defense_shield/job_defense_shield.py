@@ -7,38 +7,40 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from utils import SECONDS_PER_HOUR as sph
-from utils import gpus_per_job
-from utils import send_email
-from utils import show_history_of_emails_sent
-from workday import WorkdayFactory
-from efficiency import get_stats_dict
-from raw_job_data import SlurmSacct
-from cleaner import SacctCleaner
+__version__ = "1.0.0"
 
-from alert.cancel_zero_gpu_jobs import CancelZeroGpuJobs
-from alert.gpu_model_too_powerful import GpuModelTooPowerful
-from alert.zero_util_gpu_hours import ZeroUtilGPUHours
-from alert.excess_cpu_memory import ExcessCPUMemory
-from alert.zero_cpu_utilization import ZeroCPU
-from alert.most_gpus import MostGPUs
-from alert.most_cores import MostCores
-from alert.usage_overview import UsageOverview
-from alert.usage_by_slurm_account import UsageBySlurmAccount
-from alert.longest_queued import LongestQueuedJobs
-from alert.jobs_overview import JobsOverview
-from alert.excessive_time_limits import ExcessiveTimeLimitsCPU
-from alert.excessive_time_limits import ExcessiveTimeLimitsGPU
-from alert.serial_allocating_multiple_cores import SerialAllocatingMultipleCores
-from alert.multinode_cpu_fragmentation import MultinodeCpuFragmentation
-from alert.multinode_gpu_fragmentation import MultinodeGpuFragmentation
-from alert.compute_efficiency import LowEfficiencyCPU
-from alert.compute_efficiency import LowEfficiencyGPU
-from alert.too_many_cores_per_gpu import TooManyCoresPerGpu
-from alert.too_much_cpu_mem_per_gpu import TooMuchCpuMemPerGpu
+from .utils import SECONDS_PER_HOUR as sph
+from .utils import gpus_per_job
+from .utils import send_email
+from .utils import show_history_of_emails_sent
+from .workday import WorkdayFactory
+from .efficiency import get_stats_dict
+from .raw_job_data import SlurmSacct
+from .cleaner import SacctCleaner
+
+from .alert.cancel_zero_gpu_jobs import CancelZeroGpuJobs
+from .alert.gpu_model_too_powerful import GpuModelTooPowerful
+from .alert.zero_util_gpu_hours import ZeroUtilGPUHours
+from .alert.excess_cpu_memory import ExcessCPUMemory
+from .alert.zero_cpu_utilization import ZeroCPU
+from .alert.most_gpus import MostGPUs
+from .alert.most_cores import MostCores
+from .alert.usage_overview import UsageOverview
+from .alert.usage_by_slurm_account import UsageBySlurmAccount
+from .alert.longest_queued import LongestQueuedJobs
+from .alert.jobs_overview import JobsOverview
+from .alert.excessive_time_limits import ExcessiveTimeLimitsCPU
+from .alert.excessive_time_limits import ExcessiveTimeLimitsGPU
+from .alert.serial_allocating_multiple_cores import SerialAllocatingMultipleCores
+from .alert.multinode_cpu_fragmentation import MultinodeCpuFragmentation
+from .alert.multinode_gpu_fragmentation import MultinodeGpuFragmentation
+from .alert.compute_efficiency import LowEfficiencyCPU
+from .alert.compute_efficiency import LowEfficiencyGPU
+from .alert.too_many_cores_per_gpu import TooManyCoresPerGpu
+from .alert.too_much_cpu_mem_per_gpu import TooMuchCpuMemPerGpu
 
 
-if __name__ == "__main__":
+def main():
 
     parser = argparse.ArgumentParser(description='Job Defense Shield')
     parser.add_argument('--cancel-zero-gpu-jobs', action='store_true', default=False,
@@ -115,7 +117,7 @@ if __name__ == "__main__":
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    print("\nJob Defense Shield")
+    print(f"\nJob Defense Shield {(__version__)}")
     print("github.com/PrincetonUniversity/job_defense_shield\n")
     print(f"INFO: Python {sys.version}")
     print(f"INFO: Pandas {pd.__version__}")
@@ -760,3 +762,7 @@ if __name__ == "__main__":
 
     print(s, end="\n\n")
     print(datetime.now())
+
+
+if __name__ == "__main__":
+    main()

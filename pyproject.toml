@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "Job Defense Shield"
+name = "job-defense-shield"
 dynamic = ["version"]
 description = "Identify and reduce instances of underutilization by the users of high-performance computing systems"
 readme = "README.md"
@@ -37,7 +37,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=6"]
+test = ["pytest>=7"]
 check = ["ruff>=0.6.0"]
 
 [project.urls]
@@ -49,3 +49,6 @@ job_defense_shield = "job_defense_shield.job_defense_shield:main"
 
 [tool.hatch]
 version.path = "src/job_defense_shield/__init__.py"
+
+[tool.pytest.ini_options]
+pythonpath = ["src/job_defense_shield/"]

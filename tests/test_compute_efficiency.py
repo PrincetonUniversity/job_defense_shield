@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.compute_efficiency import LowEfficiencyCPU
+from src.job_defense_shield.alert.compute_efficiency import LowEfficiencyCPU
 
 def test_low_efficiency():
     n_jobs = 4

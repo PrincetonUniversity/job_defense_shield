@@ -1,12 +1,12 @@
 import pandas as pd
-from base import Alert
-from efficiency import cpu_efficiency
-from efficiency import gpu_efficiency
-from utils import SECONDS_PER_HOUR as sph
-from utils import MINUTES_PER_HOUR as mph
-from utils import add_dividers
-from greeting import GreetingFactory
-from email_translator import EmailTranslator
+from ..base import Alert
+from ..efficiency import cpu_efficiency
+from ..efficiency import gpu_efficiency
+from ..utils import SECONDS_PER_HOUR as sph
+from ..utils import MINUTES_PER_HOUR as mph
+from ..utils import add_dividers
+from ..greeting import GreetingFactory
+from ..email_translator import EmailTranslator
 
 
 class LowEfficiency(Alert):

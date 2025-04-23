@@ -1,11 +1,11 @@
 import pandas as pd
-from base import Alert
-from utils import add_dividers
-from utils import MINUTES_PER_HOUR as mph
-from efficiency import cpu_memory_usage
-from efficiency import gpu_memory_usage_eff_tuples
-from greeting import GreetingFactory
-from email_translator import EmailTranslator
+from ..base import Alert
+from ..utils import add_dividers
+from ..utils import MINUTES_PER_HOUR as mph
+from ..efficiency import cpu_memory_usage
+from ..efficiency import gpu_memory_usage_eff_tuples
+from ..greeting import GreetingFactory
+from ..email_translator import EmailTranslator
 
 
 class GpuModelTooPowerful(Alert):

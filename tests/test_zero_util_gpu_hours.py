@@ -1,5 +1,5 @@
 import pandas as pd
-from alert.zero_util_gpu_hours import ZeroUtilGPUHours
+from src.job_defense_shield.alert.zero_util_gpu_hours import ZeroUtilGPUHours
 
 def test_zero_util_gpu_hours():
     n_jobs = 5

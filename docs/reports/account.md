@@ -7,13 +7,13 @@ This report shows the usage breakdown by cluster, partition, and Slurm account. 
 The command below will generate the report:
 
 ```
-$ python job_defense_shield.py --usage-by-slurm-account
+$ job_defense_shield --usage-by-slurm-account
 ```
 
 One can produce the report for just one cluster:
 
 ```
-$ python job_defense_shield.py --usage-by-slurm-account -M stellar
+$ job_defense_shield --usage-by-slurm-account -M stellar
 ```
 
 ## Configuration File

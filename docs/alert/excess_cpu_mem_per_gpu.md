@@ -63,7 +63,7 @@ The available settings are listed below:
 An example report is shown below:
 
 ```
-$ python job_defense_shield.py --too-much-cpu-mem-per-gpu
+$ job_defense_shield --too-much-cpu-mem-per-gpu
 
                          Too Much CPU Memory Per GPU                          
 -------------------------------------------------------------------------------
@@ -133,19 +133,19 @@ The following placeholders can be used in the email file:
 Generate a report of the jobs allocating too much CPU memory per GPU:
 
 ```
-$ python job_defense_shield.py --too-much-cpu-mem-per-gpu
+$ job_defense_shield --too-much-cpu-mem-per-gpu
 ```
 
 Email users about allocating too much CPU memory per GPU:
 
 ```
-$ python job_defense_shield.py --too-much-cpu-mem-per-gpu --email
+$ job_defense_shield --too-much-cpu-mem-per-gpu --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --too-much-cpu-mem-per-gpu --check
+$ job_defense_shield --too-much-cpu-mem-per-gpu --check
 ```
 
 ## cron
@@ -153,5 +153,5 @@ $ python job_defense_shield.py --too-much-cpu-mem-per-gpu --check
 Below is an example entry for `crontab`:
 
 ```
-0 9 * * * /path/to/python /path/to/job_defense_shield.py --too-much-cpu-mem-per-gpu --email > /path/to/log/too_much_cpu_mem_per_gpu.log 2>&1
+0 9 * * * /path/to/job_defense_shield --too-much-cpu-mem-per-gpu --email > /path/to/log/too_much_cpu_mem_per_gpu.log 2>&1
 ```

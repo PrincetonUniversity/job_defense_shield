@@ -57,7 +57,7 @@ per alert.
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency
+$ job_defense_shield --low-cpu-efficiency
 
                      Low CPU Efficiencies                                  
 -----------------------------------------------------------------
@@ -113,19 +113,19 @@ The following placeholders can be used in the email file:
 Generate a report for system administrators:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency
+$ job_defense_shield --low-cpu-efficiency
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency --email
+$ job_defense_shield --low-cpu-efficiency --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency --check
+$ job_defense_shield --low-cpu-efficiency --check
 ```
 
 ## cron
@@ -133,5 +133,5 @@ $ python job_defense_shield.py --low-cpu-efficiency --check
 Below is an example `crontab` entry:
 
 ```
-0 9 * * * /path/to/python /path/to/job_defense_shield.py --low-cpu-efficiency --email > /path/to/log/low_cpu_efficiency.log 2>&1
+0 9 * * * /path/to/job_defense_shield --low-cpu-efficiency --email > /path/to/log/low_cpu_efficiency.log 2>&1
 ```

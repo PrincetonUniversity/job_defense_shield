@@ -5,7 +5,7 @@ This report shows the usage by cluster as well as by cluster and partition. Two 
 ## Usage
 
 ```
-$ python job_defense_shield.py --usage-overview
+$ job_defense_shield --usage-overview
 
         Usage Overview by Cluster
 -----------------------------------------

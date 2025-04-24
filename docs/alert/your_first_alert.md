@@ -34,7 +34,7 @@ Multiple partitions can be entered as a YAML list:
 Next, run the alert without `--email` so that no emails are sent but the output is displayed in the terminal:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu
+$ job_defense_shield --excessive-time-cpu
 
                          Excessive Time Limits                          
 ------------------------------------------------------------------------
@@ -77,7 +77,7 @@ The settings above will only include users that have more than 100,000 unused (a
 Let's run the alert again to check the filtering:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu
+$ job_defense_shield --excessive-time-cpu
 
                         Excessive Time Limits
 ----------------------------------------------------------------------
@@ -131,7 +131,7 @@ Make sure you set `email-files-path` in the global settings of `config.yaml` to 
 Let's run a test by adding the `--email` flag with the `--no-emails-to-users` modifier:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu --email --no-emails-to-users
+$ job_defense_shield --excessive-time-cpu --email --no-emails-to-users
 ```
 
 The command above will only send emails to the addresses in `admin_emails`. Users will not receive emails. Make changes to your email message and then run the test again to see the new version.
@@ -141,7 +141,7 @@ The command above will only send emails to the addresses in `admin_emails`. User
 When you are satisfied with the settings in `config.yaml` and the email message, run the alert with only `--email` to send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu --email
+$ job_defense_shield --excessive-time-cpu --email
 ```
 
 Once again, those listed in `admin_emails` will receive copies of the emails.
@@ -186,7 +186,7 @@ excessive-time-cpu-2:
 Finally, add the appropriate entry to crontab. Something like:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-cpu --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --excessive-time-cpu --email -M della -r cpu > /path/to/log/excessive_time.log 2>&1
 ```
 
 The `--excessive-time-cpu` flag will trigger all of the alerts of type `excessive-time-cpu`.

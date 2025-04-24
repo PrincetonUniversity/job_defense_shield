@@ -71,7 +71,7 @@ than this limit will be ignored. Default: 0
 ## Report for System Administrators
 
 ```
-$ python job_defense_shield.py --gpu-model-too-powerful
+$ job_defense_shield --gpu-model-too-powerful
 
                        GPU Model Too Powerful                       
 -----------------------------------------------------------
@@ -138,19 +138,19 @@ The following placeholders can be used in the email file:
 Generate a report of the users that are using GPUs that are more powerful than necessary:
 
 ```
-$ python job_defense_shield.py --gpu-model-too-powerful
+$ job_defense_shield --gpu-model-too-powerful
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --gpu-model-too-powerful --email
+$ job_defense_shield --gpu-model-too-powerful --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --gpu-model-too-powerful --check
+$ job_defense_shield --gpu-model-too-powerful --check
 ```
 
 ## cron
@@ -158,6 +158,5 @@ $ python job_defense_shield.py --gpu-model-too-powerful --check
 Below is an example entry for `crontab`:
 
 ```
-0 9 * * * /path/to/python /path/to/job_defense_shield.py --gpu-model-too-powerful --email > /path/to/log/gpu_model_too_powerful.log 2>&1
+0 9 * * * /path/to/job_defense_shield --gpu-model-too-powerful --email > /path/to/log/gpu_model_too_powerful.log 2>&1
 ```
-

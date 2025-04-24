@@ -150,23 +150,23 @@ The following placeholders can be used in the email file:
 Generate a report of the users with the most GPU-hours at 0% utilization:
 
 ```
-$ python job_defense_shield.py --zero-util-gpu-hours
+$ job_defense_shield --zero-util-gpu-hours
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --zero-util-gpu-hours --email
+$ job_defense_shield --zero-util-gpu-hours --email
 ```
 
 See which users have received emails and when they were sent:
 
 ```
-$ python job_defense_shield.py --zero-util-gpu-hours --check
+$ job_defense_shield --zero-util-gpu-hours --check
 ```
 
 ## cron
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --zero-util-gpu-hours --email > /path/to/log/zero_util_gpu_hours.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --zero-util-gpu-hours --email > /path/to/log/zero_util_gpu_hours.log 2>&1
 ```

@@ -4,7 +4,7 @@ Use the `--check` flag to see which users have recevied emails for a given alert
 Here is an example for low CPU efficiencies:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency --check
+$ job_defense_shield --low-cpu-efficiency --check
 
 =====================================================================
                    LOW CPU EFFICIENCY (EMAILS SENT)                  
@@ -47,5 +47,5 @@ An `X` character means that a user was sent an email.
 The time window can be adjusted using the `--days` option:
 
 ```
-$ python job_defense_shield.py --low-cpu-efficiency --check --days=100
+$ job_defense_shield --low-cpu-efficiency --check --days=100
 ```

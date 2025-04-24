@@ -5,7 +5,7 @@ This report shows the jobs with the most allocated GPUs. Only one job per user i
 ## Usage
 
 ```
-$ python job_defense_shield.py --most-gpus
+$ job_defense_shield --most-gpus
 
                  Jobs with the Most GPUs (1 Job per User)                  
 --------------------------------------------------------------------------

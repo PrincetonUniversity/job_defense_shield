@@ -5,7 +5,7 @@ This report shows the users with the most jobs. Pending jobs are ignored.
 ## Usage
 
 ```
-$ python job_defense_shield.py --jobs-overview
+$ job_defense_shield --jobs-overview
 
                   Users with the Most Jobs
 ------------------------------------------------------------

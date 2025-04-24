@@ -132,7 +132,7 @@ For testing, be sure to use:
 Additionally, add the `--no-emails-to-users` flag:
 
 ```
-$ python job_defense_shield.py --cancel-zero-gpu-jobs --email --no-emails-to-users
+$ job_defense_shield --cancel-zero-gpu-jobs --email --no-emails-to-users
 ```
 
 Learn more about [email testing](../emails.md#testing-the-sending-of-emails-to-users).
@@ -252,7 +252,7 @@ The following placeholders can be used in the email file:
 Below is an example crontab for this alert:
 
 ```
-*/15 * * * * /path/to/python /path/to/job_defense_shield.py --cancel-zero-gpu-jobs --email -M della -r gpu > /path/to/log/zero_gpu_utilization.log 2>&1
+*/15 * * * * /path/to/job_defense_shield --cancel-zero-gpu-jobs --email -M della -r gpu > /path/to/log/zero_gpu_utilization.log 2>&1
 ```
 
 Note that the alert is ran every 15 minutes. This must also be the value of `sampling_period_minutes`.

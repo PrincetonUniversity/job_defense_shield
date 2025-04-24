@@ -84,7 +84,7 @@ When `cores_per_node_thres` is used, other settings are ignored and a limited nu
 Below is an example report:
 
 ```
-$ python job_defense_shield --multinode-cpu-fragmentation
+$ job_defense_shield --multinode-cpu-fragmentation
 
                      Multinode CPU Jobs with Fragmentation                         
 -------------------------------------------------------------------------------
@@ -151,23 +151,23 @@ Note that if `cores_per_node_thres` is defined then only a limited number of pla
 Generate a report for system administrators:
 
 ```
-$ python job_defense_shield.py --multinode-cpu-fragmentation --email
+$ job_defense_shield --multinode-cpu-fragmentation --email
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --multinode-cpu-fragmentation --email
+$ job_defense_shield --multinode-cpu-fragmentation --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --multinode-cpu-fragmentation --check
+$ job_defense_shield --multinode-cpu-fragmentation --check
 ```
 
 ## cron
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --multinode-cpu-fragmentation --email -M della -r cpu > /path/to/log/cpu_fragmentation.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --multinode-cpu-fragmentation --email -M della -r cpu > /path/to/log/cpu_fragmentation.log 2>&1
 ```

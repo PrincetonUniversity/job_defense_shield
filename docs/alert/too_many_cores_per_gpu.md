@@ -55,7 +55,7 @@ The available settings are listed below:
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --too-many-cores-per-gpu
+$ job_defense_shield --too-many-cores-per-gpu
 
                                 Too Many CPU-Cores Per GPU                                   
 -------------------------------------------------------------------------------
@@ -115,19 +115,19 @@ The following placeholders can be used in the email file:
 Generate a report of the jobs allocating too many CPU cores per GPU:
 
 ```
-$ python job_defense_shield.py --too-many-cores-per-gpu
+$ job_defense_shield --too-many-cores-per-gpu
 ```
 
 Send emails to offending users:
 
 ```
-$ python job_defense_shield.py --too-many-cores-per-gpu --email
+$ job_defense_shield --too-many-cores-per-gpu --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --too-many-cores-per-gpu --check
+$ job_defense_shield --too-many-cores-per-gpu --check
 ```
 
 ## cron
@@ -135,5 +135,5 @@ $ python job_defense_shield.py --too-many-cores-per-gpu --check
 Below is an example entry for `crontab`:
 
 ```
-0 9 * * * /path/to/python /path/to/job_defense_shield.py --too-many-cores-per-gpu --email > /path/to/log/too_many_cores_per_gpu.log 2>&1
+0 9 * * * /path/to/job_defense_shield --too-many-cores-per-gpu --email > /path/to/log/too_many_cores_per_gpu.log 2>&1
 ```

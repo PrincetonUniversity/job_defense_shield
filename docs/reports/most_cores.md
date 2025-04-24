@@ -5,7 +5,7 @@ This report shows the jobs with the most allocated CPU-cores. Only one job per u
 ## Usage
 
 ```
-$ python job_defense_shield.py --most-cores
+$ job_defense_shield --most-cores
 
               Jobs with the Most CPU-Cores (1 Job per User)              
 --------------------------------------------------------------------------

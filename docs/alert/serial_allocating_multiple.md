@@ -55,7 +55,7 @@ The parameters are explained below:
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --serial-allocating-multiple
+$ job_defense_shield --serial-allocating-multiple
 
                Serial Jobs Allocating Multiple CPU-Cores                        
 ------------------------------------------------------------------------
@@ -128,19 +128,19 @@ If `cores_per_node` is defined in the alert then one additional placeholder is a
 Generate a report for system administrators:
 
 ```
-$ python job_defense_shield.py --serial-allocating-multiple
+$ job_defense_shield --serial-allocating-multiple
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --serial-allocating-multiple --email
+$ job_defense_shield --serial-allocating-multiple --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --serial-allocating-multiple --check
+$ job_defense_shield --serial-allocating-multiple --check
 ```
   
 ## cron
@@ -148,5 +148,5 @@ $ python job_defense_shield.py --serial-allocating-multiple --check
 Below is an example `crontab` entry:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --serial-allocating-multiple --email > /path/to/log/serial_allocating_multiple.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --serial-allocating-multiple --email > /path/to/log/serial_allocating_multiple.log 2>&1
 ```

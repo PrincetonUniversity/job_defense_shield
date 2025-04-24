@@ -5,38 +5,12 @@ We assume that the [Jobstats](https://github.com/PrincetonUniversity/jobstats) p
 !!! info "Cancelling Jobs at 0% GPU Utilization"
     To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software. All of the other alerts can be ran as a regular user.
 
-The installation requirements for Job Defense Shield are `pandas` and `pyyaml`. The `requests` module is needed only if one wants to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
+Python 3.7 is the minimum supported version. The required dependencies for Job Defense Shield are `pandas`, `pyyaml` and `requests`. The `requests` module is needed to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
 
-Python 3.6+ and pandas 1.2+ are the minimum required versions. We recommend using newer versions such as Python 3.10+ and pandas 2.1+.
-
-Here are some ways the requirements can be installed:
-
-=== "Ubuntu"
-
-    ```bash
-    $ apt-get install python3-pandas python3-yaml python3-requests
-    ```
-
-=== "conda"
-
-    ```bash
-    $ conda create --name jds-env pandas pyarrow pyyaml requests -c conda-forge
-    $ conda activate jds-env
-    ```
-
-=== "pip"
-
-    ```bash
-    $ python3 -m venv jds-env
-    $ source jds-env/bin/activate
-    (jds-env) $ pip3 install pandas pyarrow pyyaml requests
-    ``` 
-
-Next, pull down the repository:
+Job Defense Shield can be installed from PyPI:
 
 ```
-$ git clone https://github.com/PrincetonUniversity/job_defense_shield
-$ cd job_defense_shield
+$ pip install job-defense-shield
 ```
 
 ## Testing the Installation
@@ -44,7 +18,7 @@ $ cd job_defense_shield
 The simplest test is to run the help menu:
 
 ```
-$ python job_defense_shield.py --help
+$ job_defense_shield --help
 ```
 
 If the command above failed then see [Troubleshooting the Installation](#troubleshooting-the-installation).
@@ -77,14 +51,14 @@ Be sure to replace `email-domain-name`, `sender`, `reply-to` and `report-emails`
 To test the software, run this command (which does not send any emails):
 
 ```
-$ python job_defense_shield.py --usage-overview
+$ job_defense_shield --usage-overview
 ```
 
 The command above will show an overview of the number of CPU-hours and GPU-hours
 across all clusters and partitions in the Slurm database over the past 7 days. Here is an example:
 
 ```
-$ python job_defense_shield.py --usage-overview
+$ job_defense_shield --usage-overview
 
            Usage Overview          
 -----------------------------------------
@@ -133,7 +107,7 @@ traverse        all    1    189987 (100%) 47497 (100%)
 You can go further back in time by using the `--days` option:
 
 ```
-$ python job_defense_shield.py --usage-overview --days=14
+$ job_defense_shield --usage-overview --days=14
 ```
 
 !!! info
@@ -142,12 +116,12 @@ $ python job_defense_shield.py --usage-overview --days=14
 One can only include data from specific clusters or partitions using the `-M` and `-r` options from `sacct`:
 
 ```
-$ python job_defense_shield.py --usage-overview -M della -r cpu,gpu
+$ job_defense_shield --usage-overview -M della -r cpu,gpu
 ```
 Or equivalently:
 
 ```
-$ python job_defense_shield.py --usage-overview --clusters=della --partition=cpu,gpu
+$ job_defense_shield --usage-overview --clusters=della --partition=cpu,gpu
 ```
 
 The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to `sacct`. See `man sacct` for more information.
@@ -157,7 +131,7 @@ The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to red
 By having your email address in `report-emails` in `config.yaml`, the `--report` flag can be used to send the output to administrators by email:
 
 ```
-$ python job_defense_shield.py --usage-overview --report
+$ job_defense_shield --usage-overview --report
 ```
 
 This feature is useful when combined with `cron`. That is, one can receive a daily report showing all of the instances of underutilization across all of the systems (see [reports](reports/overview.md)).
@@ -175,7 +149,7 @@ $ python -c "import pyyaml; print(pyyaml.__version__)"
 If the configuration file is not found then try specifying the full path:
 
 ```
-$ python job_defense_shield.py --config-file=/path/to/config.yaml --usage-overview --report
+$ job_defense_shield --config-file=/path/to/config.yaml --usage-overview --report
 ```
  
 ## Creating a Configuration File for Production

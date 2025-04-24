@@ -51,7 +51,7 @@ The parameters are explained below:
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --zero-cpu-utilization
+$ job_defense_shield --zero-cpu-utilization
 
                      Jobs with Zero CPU Utilization                          
 ---------------------------------------------------------------------------
@@ -105,19 +105,19 @@ The following placeholders can be used in the email file:
 Generate a report for system adminstrators:
 
 ```
-$ python job_defense_shield.py --zero-cpu-utilization
+$ job_defense_shield --zero-cpu-utilization
 ```
 
 Send emails to offending users:
 
 ```
-$ python job_defense_shield.py --zero-cpu-utilization --email
+$ job_defense_shield --zero-cpu-utilization --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --zero-cpu-utilization --check
+$ job_defense_shield --zero-cpu-utilization --check
 ```
 
 ## cron
@@ -125,5 +125,5 @@ $ python job_defense_shield.py --zero-cpu-utilization --check
 Below is an example `crontab` entry:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --zero-cpu-utilization --email -M della -r gpu,llm > /path/to/log/zero_cpu_utilization.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --zero-cpu-utilization --email -M della -r gpu,llm > /path/to/log/zero_cpu_utilization.log 2>&1
 ```

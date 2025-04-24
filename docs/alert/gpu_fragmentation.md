@@ -57,7 +57,7 @@ The available settings are listed below:
 Below is an example report for system administrators:
 
 ```
-$ python job_defense_shield.py --multinode-gpu-fragmentation
+$ job_defense_shield --multinode-gpu-fragmentation
 
              Multinode GPU Jobs with Fragmentation              
 ----------------------------------------------------------------
@@ -118,19 +118,19 @@ The following placeholders can be used in the email file:
 Generate a report for system administrators:
 
 ```
-$ python job_defense_shield.py --multinode-gpu-fragmentation
+$ job_defense_shield --multinode-gpu-fragmentation
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --multinode-gpu-fragmentation --email
+$ job_defense_shield --multinode-gpu-fragmentation --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --multinode-gpu-fragmentation --check
+$ job_defense_shield --multinode-gpu-fragmentation --check
 ```
 
 ## cron
@@ -138,5 +138,5 @@ $ python job_defense_shield.py --multinode-gpu-fragmentation --check
 Below is an example entry for `crontab`:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --multinode-gpu-fragmentation --email -M della -r llm > /path/to/log/gpu_fragmentation.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --multinode-gpu-fragmentation --email -M della -r llm > /path/to/log/gpu_fragmentation.log 2>&1
 ```

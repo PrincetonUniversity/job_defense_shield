@@ -109,7 +109,7 @@ Computing.
 Send emails to users that are over-allocating CPU memory:
 
 ```
-$ python job_defense_shield.py --excess-cpu-memory --email
+$ job_defense_shield --excess-cpu-memory --email
 ```
 
 If you think that Job Defense Shield is a fit for your institution then continue to the [Installation](setup.md) page.

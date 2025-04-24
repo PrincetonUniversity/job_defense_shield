@@ -85,20 +85,20 @@ idea to put them under version control along with `config.yaml` and `holidays.tx
 If `config.yaml` has an entry for `low-gpu-efficiency` then an administrator can see the output by running the alert:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency
+$ job_defense_shield --low-gpu-efficiency
 ```
 
 One adds the `--email` flag to send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency --email
+$ job_defense_shield --low-gpu-efficiency --email
 
 ```
 
 For testing, one can add a second flag that will only send the emails to `admin_emails` and not the users:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency --email --no-emails-to-users
+$ job_defense_shield --low-gpu-efficiency --email --no-emails-to-users
 ```
 
 The `--no-emails-to-users` flag will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml` without involving users.

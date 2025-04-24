@@ -60,7 +60,7 @@ The parameters are explained below:
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu
+$ job_defense_shield --excessive-time-cpu
 
                          Excessive Time Limits                          
 -------------------------------------------------------------------------
@@ -131,19 +131,19 @@ The following placeholders can be used in the email file:
 Generate a report for system administrators:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu
+$ job_defense_shield --excessive-time-cpu
 ```
 
 Send emails to the offending users:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu --email
+$ job_defense_shield --excessive-time-cpu --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --excessive-time-cpu --check
+$ job_defense_shield --excessive-time-cpu --check
 ```
 
 ## cron
@@ -151,5 +151,5 @@ $ python job_defense_shield.py --excessive-time-cpu --check
 Below is an example `crontab` entry:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-cpu --email > /path/to/log/excessive_time_cpu.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --excessive-time-cpu --email > /path/to/log/excessive_time_cpu.log 2>&1
 ```

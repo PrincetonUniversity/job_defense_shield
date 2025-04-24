@@ -61,7 +61,7 @@ The available settings are listed below:
 Below is an example report:
 
 ```
-$ python job_defense_shield.py --excessive-time-gpu
+$ job_defense_shield --excessive-time-gpu
 
                       Excessive Run Time Limits                        
 -----------------------------------------------------------------------
@@ -132,19 +132,19 @@ The following placeholders can be used in the email file:
 Generate report for system administrators:
 
 ```
-$ python job_defense_shield.py --excessive-time-gpu
+$ job_defense_shield --excessive-time-gpu
 ```
 
 Send emails to offending users:
 
 ```
-$ python job_defense_shield.py --excessive-time-gpu --email
+$ job_defense_shield --excessive-time-gpu --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --excessive-time-gpu --check
+$ job_defense_shield --excessive-time-gpu --check
 ```
 
 ## Cron
@@ -152,5 +152,5 @@ $ python job_defense_shield.py --excessive-time-gpu --check
 Below is an example `crontab` entry:
 
 ```
-0 9 * * 1-5 /path/to/python path/to/job_defense_shield.py --excessive-time-gpu --email -M della -r gpu,llm > /path/to/log/excessive_time_gpu.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --excessive-time-gpu --email -M della -r gpu,llm > /path/to/log/excessive_time_gpu.log 2>&1
 ```

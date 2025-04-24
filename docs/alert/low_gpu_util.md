@@ -55,7 +55,7 @@ The available settings are listed below:
 Here is an example of the report:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency
+$ job_defense_shield --low-gpu-efficiency
 
                     Low GPU Efficiencies                                      
 ------------------------------------------------------------
@@ -110,19 +110,19 @@ The following placeholders can be used in the email file:
 Generate a report of the top users with low GPU efficiencies:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency
+$ job_defense_shield --low-gpu-efficiency
 ```
 
 Send emails to users with low GPU efficiencies over the past 7 days:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency --email
+$ job_defense_shield --low-gpu-efficiency --email
 ```
 
 See which users have received emails and when:
 
 ```
-$ python job_defense_shield.py --low-gpu-efficiency --check
+$ job_defense_shield --low-gpu-efficiency --check
 ```
 
 ## cron
@@ -130,5 +130,5 @@ $ python job_defense_shield.py --low-gpu-efficiency --check
 Below is an example entry for `crontab`:
 
 ```
-0 9 * * * /path/to/python /path/to/job_defense_shield.py --low-gpu-efficiency --email > /path/to/log/low_gpu_efficiency.log 2>&1
+0 9 * * * /path/to/job_defense_shield --low-gpu-efficiency --email > /path/to/log/low_gpu_efficiency.log 2>&1
 ```

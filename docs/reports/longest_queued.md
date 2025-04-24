@@ -5,7 +5,7 @@ This report shows the jobs that have been queued for the longest. Note that some
 ## Usage
 
 ```
-$ python job_defense_shield.py --longest-queued
+$ job_defense_shield --longest-queued
 
      Longest Queue Times (1 job per user, ignoring job arrays)     
 -------------------------------------------------------------------

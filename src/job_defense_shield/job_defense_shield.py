@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 import yaml
 
-__version__ = "1.0.0"
-
 from .utils import SECONDS_PER_HOUR as sph
 from .utils import gpus_per_job
 from .utils import send_email
@@ -117,7 +115,7 @@ def main():
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    print(f"\nJob Defense Shield {(__version__)}")
+    print("\nJob Defense Shield (1.0.0)")
     print("github.com/PrincetonUniversity/job_defense_shield\n")
     print(f"INFO: Python {sys.version}")
     print(f"INFO: Pandas {pd.__version__}")

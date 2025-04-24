@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: Job Defense Shield
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jonathan
+    family-names: Halverson
+    email: halverson@princeton.edu
+    affiliation: Princeton University
+    orcid: 'https://orcid.org/0009-0000-4877-3836'
+identifiers:
+  - type: doi
+    value: 10.1145/3569951.3604396
+repository-code: 'https://github.com/PrincetonUniversity/job_defense_shield'
+url: 'https://princetonuniversity.github.io/job_defense_shield/'
+abstract: >-
+  Job Defense Shield is a software tool for identifying and
+  reducing instances of underutilization by the users of
+  high-performance computing systems.
+keywords:
+  - job monitoring
+  - underutilization
+  - alert
+  - Slurm
+  - HPC
+  - Jobstats
+license: GPL-2.0
+version: 1.0.0
+date-released: '2025-04-24'

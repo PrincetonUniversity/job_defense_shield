@@ -53,6 +53,8 @@ class LongestQueuedJobs(Alert):
 
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.df.empty:
+            cols = [name[0] for name in self.df.columns.tolist()]
+            self.df = pd.DataFrame(columns=cols)
             return add_dividers(self.create_empty_report(self.df),
                                 self.report_title)
         report_str = self.df.to_string(index=keep_index, justify="center")

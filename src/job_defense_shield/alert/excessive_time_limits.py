@@ -144,10 +144,12 @@ class ExcessiveTimeLimits(Alert):
             column_names = ["User",
                             f"{xpu.upper()}-Hours-Unused",
                             f"{xpu.upper()}-Hours",
-                            "Mean(%)",
-                            "Median(%)",
+                            "Ratio-Overall",
+                            "Ratio-Mean",
+                            "Ratio-Median",
                             f"{xpu.upper()}-Rank",
-                            "Jobs"]
+                            "Jobs",
+                            "Emails"]
             self.gp = pd.DataFrame(columns=column_names)
             return add_dividers(self.create_empty_report(self.gp), self.report_title)
         self.gp = self.gp.drop(columns=["cluster", "Partitions"])

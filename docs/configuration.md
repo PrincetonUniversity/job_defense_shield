@@ -78,7 +78,7 @@ The files stored in this directory are read when deciding whether or not suffici
 
 ### Email Settings
 
-Set the path to your email files. A set of example files is found in the `email` directory of the `job_defense_shield` GitHub repository. It is recommended to copy the example email files to another directory outside of `job_defense_shield` and put that under version control. As you will learn, placeholders like `\<GREETING>` are replaced by the actual values as computed in the Python code.
+Set the path to your email files. A set of example files is found in the `email` directory of the `job_defense_shield` GitHub repository. It is recommended to copy the example email files to another directory outside of `job_defense_shield` and put that under version control. As you will learn, placeholders like `<GREETING>` are replaced by the actual values as computed in the Python code.
 
 ```yaml
 email-files-path: /path/to/email/

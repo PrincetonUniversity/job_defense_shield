@@ -194,7 +194,7 @@ class Alert:
     def get_emails_sent_count(self, user: str, violation: str) -> str:
         """Return the number of emails sent to a user for a given violation in the
            last N days."""
-        root_violations = f"{self.vpath}/{violation}"
+        root_violations = os.path.join(self.vpath, violation)
         if not os.path.exists(root_violations):
             print(f"Warning: {root_violations} not found in get_emails_sent_count()")
         user_violations = f"{root_violations}/{user}.csv"

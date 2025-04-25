@@ -20,6 +20,7 @@ excess-cpu-memory-1:
   mean_ratio_threshold:   0.35  # [0.0, 1.0]
   median_ratio_threshold: 0.35  # [0.0, 1.0]
   num_top_users:            10  # count
+  email_file: "excess_cpu_memory.txt"
   admin_emails:
     - admin@institution.edu
 ```
@@ -72,7 +73,7 @@ and 1.
 - `report_title`: (Optional) Title of the report to system administrators.
 
 !!! info
-    When `cores_per_node` and `mem_per_node` are defined, only jobs using more memory per core than `mem_per_node` divided by `cores_per_node` are included. For instance, if a node provides 64 cores and 512 GB of memory, only jobs allocating more than 512/64=8 GB/core are considered.
+    When `cores_per_node` and `mem_per_node` are defined, only jobs using more memory per core than `mem_per_node` divided by `cores_per_node` are included. For instance, if a node provides 64 cores and 512 GB of memory, only jobs allocating more than 8 GB/core are considered.
 
 ## Report for System Administrators
 

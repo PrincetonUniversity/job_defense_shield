@@ -5,13 +5,24 @@ We assume that the [Jobstats](https://github.com/PrincetonUniversity/jobstats) p
 !!! info "Cancelling Jobs at 0% GPU Utilization"
     To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software. All of the other alerts can be ran as a regular user.
 
-Python 3.7 is the minimum supported version. The required dependencies for Job Defense Shield are `pandas`, `pyyaml` and `requests`. The `requests` module is needed to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
+Python 3.7 is the minimum supported version. The required dependencies for Job Defense Shield are `pandas`, `pyarrow`, `pyyaml` and `requests`. The `requests` module is needed to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
 
 Job Defense Shield can be installed from PyPI:
 
 ```
 $ pip install job-defense-shield
 ```
+
+To install the software into an isolated environment:
+
+```
+$ python -m venv jds-env
+$ source jds-env/bin/activate
+(jds-env) $ pip install --upgrade pip
+(jds-env) $ pip install job-defense-shield
+```
+
+One could also use `pipx` to install Job Defense Shield into an isolated software environment.
 
 ## Testing the Installation
 

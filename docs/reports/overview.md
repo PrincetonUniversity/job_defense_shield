@@ -44,5 +44,5 @@ ${JDS}/bin/job_defense_shield --report \
                               --most-gpus \
                               --most-cores \
                               --jobs-overview \
-                              > ${BASE}/log/report.log 2>&1
+                              > ${JDS}/log/report.log 2>&1
 ```

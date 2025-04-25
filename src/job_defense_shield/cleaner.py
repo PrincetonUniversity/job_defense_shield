@@ -234,7 +234,7 @@ class SacctCleaner(BaseCleaner):
         self.raw = self.clean_end()
         self.raw = self.limit_minutes_final()
 
-        print(f"{self.indent}{len(self.raw)} jobs in the cleaned dataframe\n")
+        print(f"{self.indent}{len(self.raw)} jobs in the cleaned dataframe")
         cleaned_cpu_seconds = self.raw["cpu-seconds"].sum()
         if raw_cpu_seconds != cleaned_cpu_seconds:
             print("WARNING: Jobs that consumed CPU-seconds were dropped.")

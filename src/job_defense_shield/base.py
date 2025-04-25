@@ -85,6 +85,7 @@ class Alert:
                            subject=self.email_subject,
                            sender=self.sender,
                            reply_to=self.reply_to)
+                print(email)
                 if usr is not None:
                     vfile = f"{self.vpath}/{self.violation}/{user}.csv"
                     self.update_violation_log(usr, vfile)
@@ -97,8 +98,8 @@ class Alert:
                                    subject=self.email_subject,
                                    sender=self.sender,
                                    reply_to=self.reply_to)
-        if not self.no_emails_to_users or not self.no_emails_to_admins:
-            print(email)
+                if self.no_emails_to_users:
+                    print(email)
 
     @abstractmethod
     def generate_report_for_admins(self, keep_index: bool=False) -> str:

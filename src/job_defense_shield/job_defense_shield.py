@@ -115,7 +115,7 @@ def main():
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    print("\nJob Defense Shield (1.0.0)")
+    print("\nJob Defense Shield (1.0.1)")
     print("github.com/PrincetonUniversity/job_defense_shield\n")
     print(f"INFO: Python {sys.version}")
     print(f"INFO: Pandas {pd.__version__}")
@@ -374,9 +374,7 @@ def main():
     df = add_new_and_derived_fields(df)
     df.reset_index(drop=True, inplace=True)
     
-    fmt = "%a %b %-d"
-    s = f"{start_date.strftime(fmt)} - {end_date.strftime(fmt)}"
-
+    s = ""
     ###########################################
     ## CANCEL JOBS WITH ZERO GPU UTILIZATION ##
     ###########################################
@@ -759,7 +757,6 @@ def main():
             print(msg)
 
     print(s, end="\n\n")
-    print(datetime.now())
 
 
 if __name__ == "__main__":

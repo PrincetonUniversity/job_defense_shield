@@ -136,7 +136,7 @@ class Alert:
         from jobstats import Jobstats
         from config import PROM_SERVER
         num_jobs = len(self.df[self.df.state == "RUNNING"])
-        print(f"\nINFO: Querying server for admincomment on {num_jobs} running jobs ... ",
+        print(f"INFO: Querying server for AdminComment on {num_jobs} running jobs ... ",
               end="",
               flush=True)
         start = time()

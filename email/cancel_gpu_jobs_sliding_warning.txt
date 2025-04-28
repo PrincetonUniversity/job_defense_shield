@@ -1,0 +1,24 @@
+<GREETING>
+
+You have job(s) that have not used the GPU(s) for the last <MINUTES-1ST> minutes:
+
+<TABLE> 
+
+These jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
+GPU(s) for a period of <CANCEL-HRS> hours.
+
+Please consider cancelling the job(s) listed above by using the "scancel" command:'
+
+<SCANCEL>
+
+Run the "jobstats" command to see the GPU utilization:
+
+<JOBSTATS>
+
+See our GPU Computing webpage for three common reasons for encountering zero GPU
+utilization:
+
+    https://your-institution.edu/KB/gpu-computing
+
+Replying to this automated email will open a support ticket with Research
+Computing.

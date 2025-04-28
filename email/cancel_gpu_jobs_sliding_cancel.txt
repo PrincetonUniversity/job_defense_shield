@@ -1,0 +1,13 @@
+<GREETING>
+
+The jobs below have been cancelled because they did not use the GPU(s) for the
+last <CANCEL-HRS> hours:
+
+<TABLE>
+
+For more information about job cancellations see our utilization policies:
+
+    https://your-institution.edu/KB/utilization-policies
+
+Replying to this automated email will open a support ticket with Research
+Computing.

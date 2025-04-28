@@ -115,27 +115,34 @@ def main():
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    print("\nJob Defense Shield (1.0.1)")
-    print("github.com/PrincetonUniversity/job_defense_shield\n")
-    print(f"INFO: Python {sys.version}")
-    print(f"INFO: Pandas {pd.__version__}")
+    head = "\nJob Defense Shield (1.0.1)\n"
+    head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
+    head += f"INFO: Python {sys.version}\n"
+    head += f"INFO: Pandas {pd.__version__}\n"
+    print(head, end="")
 
     # read configuration file
     jds_path = os.path.join(os.path.dirname(__file__), "config.yaml")
     cwd_path = os.path.join(os.getcwd(), "config.yaml")
     if args.config_file and os.path.isfile(args.config_file):
-        print(f"INFO: Configuration file is {args.config_file}")
+        msg = f"INFO: Configuration file is {args.config_file}\n"
+        print(msg, end="")
+        head += msg
         with open(args.config_file, "r", encoding="utf-8") as fp:
             cfg = yaml.safe_load(fp)
     elif args.config_file and not os.path.isfile(args.config_file):
         print(f"ERROR: Configuration file does not exist ({args.config_file}). Exiting ...")
         sys.exit()
     elif args.config_file is None and os.path.isfile(jds_path):
-        print(f"INFO: Configuration file is {jds_path}")
+        msg = f"INFO: Configuration file is {jds_path}\n"
+        print(msg, end="")
+        head += msg
         with open(jds_path, "r", encoding="utf-8") as fp:
             cfg = yaml.safe_load(fp)
     elif args.config_file is None and os.path.isfile(cwd_path):
-        print(f"INFO: Configuration file is {cwd_path}")
+        msg = f"INFO: Configuration file is {cwd_path}\n"
+        print(msg, end="")
+        head += msg
         with open(cwd_path, "r", encoding="utf-8") as fp:
             cfg = yaml.safe_load(fp)
     else:
@@ -196,7 +203,8 @@ def main():
     holidays_file = cfg["holidays-file"] if "holidays-file" in cfg else None
     is_workday = WorkdayFactory(holidays_file).create_workday(workday_method).is_workday()
     if not is_workday:
-        print("INFO: Today is not a workday. Emails to users will not be sent.")
+        print("INFO: Today is not a workday. Emails to users and administrators will not")
+        print("INFO: be sent. Use 'workday-method: always' to send emails today.")
 
     if cfg["verbose"]:
         for key in cfg.keys():
@@ -374,7 +382,8 @@ def main():
     df = add_new_and_derived_fields(df)
     df.reset_index(drop=True, inplace=True)
     
-    s = ""
+
+    s = "\n"
     ###########################################
     ## CANCEL JOBS WITH ZERO GPU UTILIZATION ##
     ###########################################
@@ -746,7 +755,7 @@ def main():
     if args.report:
         if "report-emails" in cfg and "sender" in cfg:
             for report_email in cfg["report-emails"]:
-                send_email(s,
+                send_email(head + s,
                            report_email,
                            subject="Cluster Utilization Report",
                            sender=cfg["sender"],

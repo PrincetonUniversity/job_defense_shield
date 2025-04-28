@@ -1,8 +1,8 @@
 # Automatically Cancel GPU Jobs at 0% Utilization
 
-This is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 This alert automatically cancels jobs with GPUs at 0% utilization.
 Up to two warning emails can be sent before each job is cancelled.
+This is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 
 !!! note "Elevated Privileges"
     This alert is different than the others in that it must be ran as
@@ -14,8 +14,7 @@ Below is an example entry for the configuration file:
 
 ```yaml
 cancel-zero-gpu-jobs-1:
-  cluster:
-    - della
+  cluster: della
   partitions:
     - gpu
     - llm

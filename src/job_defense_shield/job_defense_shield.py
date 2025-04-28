@@ -115,7 +115,7 @@ def main():
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    head = "\nJob Defense Shield (1.0.1)\n"
+    head = "\nJob Defense Shield (1.0.2)\n"
     head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
     head += f"INFO: Python {sys.version}\n"
     head += f"INFO: Pandas {pd.__version__}\n"
@@ -381,7 +381,6 @@ def main():
 
     df = add_new_and_derived_fields(df)
     df.reset_index(drop=True, inplace=True)
-    
 
     s = "\n"
     ###########################################

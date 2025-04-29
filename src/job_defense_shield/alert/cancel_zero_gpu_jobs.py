@@ -3,7 +3,6 @@ import sys
 import subprocess
 import time
 import pickle
-from typing import Tuple
 import pandas as pd
 from ..base import Alert
 from ..utils import SECONDS_PER_MINUTE as spm
@@ -18,7 +17,26 @@ class CancelZeroGpuJobs(Alert):
 
     """Send warnings and automatically cancel jobs with zero GPU utilization.
        Jobs with a limit-minutes that is less than self.cancel_minutes cannot
-       be excluded since real limit may be UNLIMITED."""
+       be excluded since real limit may be UNLIMITED.
+
+       Will we require cancel_minutes to be less than sliding_cancel_minutes?
+       Only jobs that have ran for (cancel_minutes + sliding_warning_minutes
+       + sampling_period_minutes) will be consider when applying the sliding
+       window. This ensures that there will be no overlap between the two
+       methods.
+
+       One can get the mean GPU utilization over the past 2000 seconds with:
+
+       $ curl --data-urlencode \
+         'query=avg_over_time((nvidia_gpu_duty_cycle{cluster="della"} and nvidia_gpu_jobId == 63884791)[2000s:])' \
+         'http://vigilant2:8480/api/v1/query'
+
+       Alternativley, one can use:
+
+       params = {'query': 'avg_over_time((nvidia_gpu_duty_cycle{cluster="della"} and nvidia_gpu_jobId == 63837060)[103140s:])'}
+       response = requests.get('http://vigilant2:8480/api/v1/query', params)
+       response.json()
+    """
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
@@ -30,23 +48,25 @@ class CancelZeroGpuJobs(Alert):
             self.gpu_frac_threshold = 1.0
         if not hasattr(self, "do_not_cancel"):
             self.do_not_cancel = False
+        if not hasattr(self, "fraction_of_sampling_period"):
+            self.fraction_of_period = 0.5
         self.jobids_to_cancel = []
-        
 
     def _filter_and_add_new_fields(self):
-        start_time = time.time()
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes"):
-            lower = self.sliding_warning_minutes * spm
-        self.lg = self.df[(self.df.state == "RUNNING") &
-                          (self.df.gpus > 0) &
-                          (self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
-                          (self.df.elapsedraw >= lower) &
-                          (~self.df.user.isin(self.excluded_users))].copy()
-        if not self.lg.empty and hasattr(self, "nodelist"):
-            self.lg = self.filter_by_nodelist()
-        self.lg.rename(columns={"user":"User"}, inplace=True)
+            start_time = time.time()
+            lower = (self.cancel_minutes +
+                     self.sampling_period_minutes +
+                     self.sliding_warning_minutes) * spm
+            self.lg = self.df[(self.df.state == "RUNNING") &
+                              (self.df.gpus > 0) &
+                              (self.df.cluster == self.cluster) &
+                              (self.df.partition.isin(self.partitions)) &
+                              (self.df.elapsedraw >= lower) &
+                              (~self.df.user.isin(self.excluded_users))].copy()
+            if not self.lg.empty and hasattr(self, "nodelist"):
+                self.lg = self.filter_by_nodelist()
 
         if not hasattr(self, "first_warning_minutes") and \
            not hasattr(self, "second_warning_minutes"):
@@ -148,17 +168,18 @@ class CancelZeroGpuJobs(Alert):
                 jobid_cache_file = os.path.join(self.jobid_cache_path,
                                                 f".sliding_cache_{self.cluster}.csv")
                 if os.path.isfile(jobid_cache_file):
+                    # make jobid str since pandas will do this if array job is found
                     cache = pd.read_csv(jobid_cache_file,
                                         dtype={"jobid":str,
                                                "checked_time":"int64",
                                                "idle_gpus":"int64"})
                 else:
-                    # make jobid str since pandas will do this for array jobs
                     cache = pd.DataFrame(columns=["jobid", "checked_time", "idle_gpus"])
 
-                def num_idle_gpus_sliding_window(jobid: str) -> Tuple[int, int]:
+                def num_idle_gpus_sliding_window(jobid: str,
+                                                 window_seconds: int) -> int:
                     """Calculate the number of idle GPUs during the period of the
-                       sliding window which is the last N minutes."""
+                       sliding window which is the last N seconds from now."""
                     sys.path.append(self.jobstats_module_path)
                     sys.path.append(self.jobstats_config_path)
                     from jobstats import Jobstats
@@ -166,46 +187,69 @@ class CancelZeroGpuJobs(Alert):
                     stats = Jobstats(jobid=jobid,
                                      cluster=self.cluster,
                                      prom_server=PROM_SERVER)
-                    stats.diff = self.sliding_cancel_minutes * spm
+                    stats.diff = window_seconds
                     stats.end = time.time()
                     stats.get_job_stats()
-                    admincomment = eval(stats.report_job_json(False))
-                    print(jobid, admincomment)
-                    return num_gpus_with_zero_util(admincomment,
-                                                   jobid,
-                                                   self.cluster,
-                                                   verbose=True)
+                    admincomment = eval(stats.report_job_json(encode=False))
+                    n, error_code = num_gpus_with_zero_util(admincomment,
+                                                            jobid,
+                                                            self.cluster,
+                                                            verbose=False)
+                    return n if error_code == 0 else 0
                     
-                # ct = 0
-                # while (time < 0.5 * self.sampling_period_minutes * spm and ct < 10000)
-                #self.lg = self.lg[self.lg["limit-minutes"] > (self.lg["elapsedraw"] / spm) + self.sliding_cancel_minutes]
-                #jobids = self.lg.jobid.sample(frac=1).reset_index(drop=True)
+                """
+                If jobid is not in the cache then can only send warning even if GPUs
+                have been idle for sliding_cancel_minutes or longer. This ensures that
+                user gets a warning before the cancellation. This case will be
+                encountered when the code is first ran and the cache does not exists.
+                It can also be encountered when a job runs for long enough to be
+                considered by the sliding cancellation technique.
+
+                To make sure that the code does not run longer than the cron sampling
+                period, the time is checked. The loop is terminated if the time
+                becomes long. Eventually all of the running jobs will be cached and
+                the code will execute quickly.
+                """
+
                 id_time_gpus = []
+                self.sliding_warnings = []
+                self.sliding_cancellations = []
+                warning_seconds = self.sliding_warning_minutes * spm
+                cancel_seconds = self.sliding_cancel_minutes * spm
                 for jobid in self.lg.jobid:
                     jobid = str(jobid)
                     now = round(time.time())
-                    if jobid in cache.jobid.values:
-                        ctime = cache[cache.jobid == jobid]["checked_time"].values[0]
-                        n = cache[cache.jobid == jobid]["idle_gpus"].values[0]
-                        if now - ctime >= self.sliding_cancel_minutes * spm:
-                            n, error_code = num_idle_gpus_sliding_window(jobid)
-                            if error_code > 0:
-                                n = 0
-                            id_time_gpus.append([jobid, now, n])
-                        else:
-                            id_time_gpus.append([jobid, ctime, n])
-                    else:
-                        n, error_code = num_idle_gpus_sliding_window(jobid)
-                        if error_code > 0:
-                            n = 0
+                    if jobid not in cache.jobid.values:
+                        n = num_idle_gpus_sliding_window(jobid, warning_seconds)
+                        if n > 0:
+                            self.sliding_warnings.append(jobid)
                         id_time_gpus.append([jobid, now, n])
+                    else:
+                        time_prev = cache[cache.jobid == jobid]["checked_time"].values[0]
+                        n_prev = cache[cache.jobid == jobid]["idle_gpus"].values[0]
+                        if n_prev == 0:
+                            if now - time_prev >= self.sliding_warning_minutes * spm:
+                                n = num_idle_gpus_sliding_window(jobid, warning_seconds)
+                                if n > 0:
+                                    self.sliding_warnings.append(jobid)
+                                id_time_gpus.append([jobid, now, n])
+                            else:
+                                id_time_gpus.append([jobid, time_prev, n_prev])
+                        else:
+                            if now - time_prev >= (self.sliding_cancel_minutes - self.sliding_warning_minutes) * spm:
+                                n = num_idle_gpus_sliding_window(jobid, cancel_seconds)
+                                if n > 0:
+                                    self.sliding_cancellations.append(jobid)
+                                else:
+                                    id_time_gpus.append([jobid, now, n])
+                            else:
+                                id_time_gpus.append([jobid, time_prev, n_prev])
+                    total_time = time.time() - start_time
+                    if total_time > self.fraction_of_period * self.sampling_period_minutes * spm:
+                        break
                 out = pd.DataFrame(id_time_gpus,
                                    columns=["jobid", "checked_time", "idle_gpus"])
                 out.to_csv(jobid_cache_file, index=False)
-
-        # ignore jobs that will finish before sliding_cancel        
-        print(time.time() - start_time)
-            
 
     def create_emails(self, method):
         """Note that the violation history of a user is not considered here
@@ -300,6 +344,18 @@ class CancelZeroGpuJobs(Alert):
                            "Hours"]]
                 self.emails.append((user, email, usr))
                 self.jobids_to_cancel.extend(usr.JobID.tolist())
+
+        ###################
+        # sliding warning #
+        ###################
+        if hasattr(self, "sliding_warning_minutes") and \
+           hasattr(self, "sliding_cancel_minutes"):
+            for jobid in self.sliding_warnings:
+                user = self.lg[self.lg.jobid == jobid]["user"].values[0]
+                self.emails.append((user, f"Warning about {jobid}.", None))
+            for jobid in self.sliding_cancellations:
+                user = self.lg[self.lg.jobid == jobid]["user"].values[0]
+                self.emails.append((user, f"{jobid} has been cancelled.", None))
 
     def cancel_jobs(self) -> None:
         """Call scancel on each jobid. For this to work, the code must be ran by

@@ -3,7 +3,7 @@
 We assume that the [Jobstats](https://github.com/PrincetonUniversity/jobstats) platform is available and working.
 
 !!! info "Cancelling Jobs at 0% GPU Utilization"
-    To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software. All of the other alerts can be ran as a regular user.
+    To automatically cancel actively running jobs, the software must be ran as a user with sufficient privileges to call `scancel`. This may inform your decision of where to install the software and by which user. All of the other alerts and reports can be ran as a regular user.
 
 Python 3.7 is the minimum supported version. The required dependencies for Job Defense Shield are `pandas`, `pyarrow`, `pyyaml` and `requests`. The `requests` module is needed to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
 
@@ -24,6 +24,14 @@ $ source jds-env/bin/activate
 
 One could also use `pipx` to install Job Defense Shield into an isolated software environment.
 
+At a later time, to upgrade to the latest version:
+
+```
+(jds-env) $ pip install --upgrade job-defense-shield
+```
+
+It is strongly recommended to use the latest version.
+
 ## Testing the Installation
 
 The simplest test is to run the help menu:
@@ -34,7 +42,7 @@ $ job_defense_shield --help
 
 If the command above failed then see [Troubleshooting the Installation](#troubleshooting-the-installation).
 
-Next, try running a simple informational alert. To do this, make a trivial configuration file called `config.yaml` in the same directory as `job_defense_shield.py`:
+Next, try running a simple informational alert. To do this, make a trivial configuration file called `config.yaml` in the current working directory:
 
 ```
 $ cat config.yaml
@@ -55,7 +63,7 @@ report-emails:
 ```
 
 !!! tip
-    If the path that you use for `violation-logs-path` does not exist then the software will try to make it. You can use anything for now. In the next section, you will choose the production paths for `violation-logs-path` and `email-files-path`.
+    If the path that you specified for `violation-logs-path` does not exist then the software will try to make it. You can use any valid path for now. In the next section, you will choose the production paths for `violation-logs-path` and `email-files-path`.
 
 Be sure to replace `email-domain-name`, `sender`, `reply-to` and `report-emails` with your values.
 
@@ -71,9 +79,21 @@ across all clusters and partitions in the Slurm database over the past 7 days. H
 ```
 $ job_defense_shield --usage-overview
 
+Job Defense Shield
+github.com/PrincetonUniversity/job_defense_shield
+
+INFO: Python 3.11.11 (main, Dec 11 2024, 16:28:39) [GCC 11.2.0]
+INFO: Pandas 2.2.3
+INFO: Configuration file is /home/aturing/software/jds/config.yaml
+INFO: Calling sacct ... done (15 seconds).
+INFO: Cleaning sacct data
+        268639 jobs in the raw dataframe
+        258427 jobs in the cleaned dataframe
+
+
            Usage Overview          
 -----------------------------------------
-cluster   users   cpu-hours    gpu-hours 
+Cluster   Users   CPU-Hours    GPU-Hours
 -----------------------------------------
    della  464   1285938 (16%) 91714 (65%)
  stellar  149   6745324 (82%)  1926  (1%)
@@ -84,7 +104,7 @@ traverse    1    189987  (2%) 47497 (34%)
 
           Usage Overview by Partition           
 ------------------------------------------------------
-cluster  partition   users   cpu-hours     gpu-hours  
+Cluster  Partition  Users  CPU-Hours      GPU-Hours
 ------------------------------------------------------
    della        cpu  311    874114  (68%)     0   (0%)
    della      pli-c   28    115406   (9%) 25838  (28%)
@@ -98,10 +118,10 @@ cluster  partition   users   cpu-hours     gpu-hours
    della     pli-lc    5      3107   (0%)  1081   (1%)
    della    gputest   99      1948   (0%)   647   (1%)
    della        all    1      1280   (0%)     0   (0%)
-   della      donia    4      1003   (0%)     0   (0%)
+   della      monia    4      1003   (0%)     0   (0%)
    della     gpu-ee    2       173   (0%)    23   (0%)
    della      grace    1        11   (0%)    11   (0%)
-   della      malik    1         2   (0%)     0   (0%)
+   della      salik    1         2   (0%)     0   (0%)
  stellar      cimes   21   2941001  (44%)     0   (0%)
  stellar         pu   56   2426873  (36%)     0   (0%)
  stellar       pppl   33   1340776  (20%)     0   (0%)

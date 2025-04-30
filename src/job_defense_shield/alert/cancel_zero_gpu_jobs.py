@@ -48,7 +48,7 @@ class CancelZeroGpuJobs(Alert):
             self.gpu_frac_threshold = 1.0
         if not hasattr(self, "do_not_cancel"):
             self.do_not_cancel = False
-        if not hasattr(self, "fraction_of_sampling_period"):
+        if not hasattr(self, "fraction_of_period"):
             self.fraction_of_period = 0.5
         self.jobids_to_cancel = []
 
@@ -207,8 +207,8 @@ class CancelZeroGpuJobs(Alert):
 
                 To make sure that the code does not run longer than the cron sampling
                 period, the time is checked. The loop is terminated if the time
-                becomes long. Eventually all of the running jobs will be cached and
-                the code will execute quickly.
+                becomes long relative to the cron sampling period. Eventually all of
+                the running jobs will be cached and the code will execute quickly.
                 """
 
                 id_time_gpus = []
@@ -216,12 +216,12 @@ class CancelZeroGpuJobs(Alert):
                 self.sliding_cancellations = []
                 warning_seconds = self.sliding_warning_minutes * spm
                 cancel_seconds = self.sliding_cancel_minutes * spm
-                for jobid in self.lg.jobid:
+                for jobid, num_gpus in zip(self.lg.jobid, self.lg.gpus):
                     jobid = str(jobid)
                     now = round(time.time())
                     if jobid not in cache.jobid.values:
                         n = num_idle_gpus_sliding_window(jobid, warning_seconds)
-                        if n > 0:
+                        if 1.0 - n / num_gpus < self.gpu_frac_threshold:
                             self.sliding_warnings.append(jobid)
                         id_time_gpus.append([jobid, now, n])
                     else:
@@ -230,15 +230,15 @@ class CancelZeroGpuJobs(Alert):
                         if n_prev == 0:
                             if now - time_prev >= self.sliding_warning_minutes * spm:
                                 n = num_idle_gpus_sliding_window(jobid, warning_seconds)
-                                if n > 0:
+                                if 1.0 - n / num_gpus < self.gpu_frac_threshold:
                                     self.sliding_warnings.append(jobid)
                                 id_time_gpus.append([jobid, now, n])
                             else:
                                 id_time_gpus.append([jobid, time_prev, n_prev])
                         else:
-                            if now - time_prev >= (self.sliding_cancel_minutes - self.sliding_warning_minutes) * spm:
+                            if now - time_prev >= cancel_seconds - warning_seconds:
                                 n = num_idle_gpus_sliding_window(jobid, cancel_seconds)
-                                if n > 0:
+                                if 1.0 - n / num_gpus < self.gpu_frac_threshold:
                                     self.sliding_cancellations.append(jobid)
                                 else:
                                     id_time_gpus.append([jobid, now, n])
@@ -350,17 +350,59 @@ class CancelZeroGpuJobs(Alert):
         ###################
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes"):
-            for jobid in self.sliding_warnings:
-                user = self.lg[self.lg.jobid == jobid]["user"].values[0]
-                self.emails.append((user, f"Warning about {jobid}.", None))
-            for jobid in self.sliding_cancellations:
-                user = self.lg[self.lg.jobid == jobid]["user"].values[0]
-                self.emails.append((user, f"{jobid} has been cancelled.", None))
+            self.lg["warning"] = self.lg.jobid.apply(lambda j:
+                                                     True if j in self.sliding_warnings
+                                                     else False)
+            wn = self.lg[self.lg["warning"]].copy()
+            wn["GPU-Util"] = "0%"
+            wn["Hours"] = wn.elapsedraw.apply(lambda x: round(x / sph, 1))
+            wn = wn[["jobid",
+                     "user",
+                     "cluster",
+                     "partition",
+                     "state",
+                     "GPU-Util",
+                     "Hours"]]
+            renamings = {"jobid":"JobID",
+                         "user":"User",
+                         "cluster":"Cluster",
+                         "partition":"Partition",
+                         "state":"State"}
+            wn.rename(columns=renamings, inplace=True)
+            for user in wn.User.unique():
+                usr = wn[wn.User == user].copy()
+                usr.drop(columns=["User"], inplace=True)
+                table = usr.to_string(index=False, justify="center").split("\n")
+                indent = 4 * " "
+                tags = {}
+                tags["<GREETING>"] = g.greeting(user)
+                tags["<CLUSTER>"] = self.cluster
+                tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
+                tags["<SAMPLING>"] = str(self.sampling_period_minutes)
+                tags["<WARNING-MIN>"] = str(self.sliding_warning_minutes)
+                tags["<WARNING-HRS>"] = f"{round(self.sliding_warning_minutes / mph)}"
+                tags["<CANCEL-MIN>"] = str(self.sliding_cancel_minutes)
+                tags["<CANCEL-HRS>"] = f"{round(self.sliding_cancel_minutes / mph)}"
+                tags["<TABLE>"] = "\n".join([indent + row for row in table])
+                tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                translator = EmailTranslator(self.email_files_path,
+                                             self.email_file_sliding_warning,
+                                             tags)
+                email = translator.replace_tags()
+                self.emails.append((user, email, None))
+ 
+            #for jobid in self.sliding_cancellations:
+            #    user = self.lg[self.lg.jobid == jobid]["user"].values[0]
+            #    self.emails.append((user, f"{jobid} has been cancelled.", None))
 
     def cancel_jobs(self) -> None:
         """Call scancel on each jobid. For this to work, the code must be ran by
            a user with sufficient privileges."""
         if not self.do_not_cancel:
+            if hasattr(self, "sliding_warning_minutes") and \
+               hasattr(self, "sliding_cancel_minutes"):
+                self.jobids_to_cancel += self.sliding_cancellations
             for jobid in self.jobids_to_cancel:
                 cmd = f"scancel {jobid}"
                 _ = subprocess.run(cmd,

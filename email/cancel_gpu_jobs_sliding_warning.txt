@@ -1,6 +1,6 @@
 <GREETING>
 
-You have job(s) that have not used the GPU(s) for the last <MINUTES-1ST> minutes:
+You have job(s) that have not used the GPU(s) for the last <WARNING-MIN> minutes:
 
 <TABLE> 
 

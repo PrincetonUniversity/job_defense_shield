@@ -32,7 +32,7 @@ class ZeroUtilGPUHours(Alert):
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
         if not self.df.empty and hasattr(self, "nodelist"):
-            self.df = self.filter_by_nodelist()
+            self.df = self.filter_by_nodelist(self.df)
         self.gp = pd.DataFrame({"User":[]})
         self.admin = pd.DataFrame()
         # add new fields

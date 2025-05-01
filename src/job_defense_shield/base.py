@@ -149,7 +149,7 @@ class Alert:
         print(f"done ({round(time() - start)} seconds).", flush=True)
         return adminc
 
-    def filter_by_nodelist(self) -> pd.DataFrame:
+    def filter_by_nodelist(self, jb: pd.DataFrame) -> pd.DataFrame:
         """If the alert contains a nodelist then filter out the jobs
            that ran on nodes that are not in the nodelist. This function
            is useful when the cluster and partition do not provide
@@ -157,23 +157,23 @@ class Alert:
            from the nodes that each job used. If the length of the
            resulting set is zero then the job used only nodes in the
            nodelist."""
-        self.df["node-tuple"] = self.df.apply(lambda row:
-                                        get_nodelist(row["admincomment"],
-                                                     row["jobid"],
-                                                     row["cluster"]),
-                                                     axis="columns")
+        jb["node-tuple"] = jb.apply(lambda row:
+                                    get_nodelist(row["admincomment"],
+                                                 row["jobid"],
+                                                 row["cluster"]),
+                                                 axis="columns")
         cols = ["job_nodes", "error_code"]
-        self.df[cols] = pd.DataFrame(self.df["node-tuple"].tolist(),
-                                     index=self.df.index)
-        self.df = self.df[self.df["error_code"] == 0]
+        jb[cols] = pd.DataFrame(jb["node-tuple"].tolist(),
+                                index=jb.index)
+        jb = jb[jb["error_code"] == 0]
         self.nodelist = set(self.nodelist)
-        self.df["num_other_nodes"] = self.df["job_nodes"].apply(lambda jns:
-                                                          len(jns - self.nodelist))
-        self.df = self.df[self.df["num_other_nodes"] == 0]
+        jb["num_other_nodes"] = jb["job_nodes"].apply(lambda jns:
+                                                      len(jns - self.nodelist))
+        jb = jb[jb["num_other_nodes"] == 0]
         cols = ["node-tuple", "job_nodes", "error_code", "num_other_nodes"]
-        self.df.drop(columns=cols, inplace=True)
+        jb.drop(columns=cols, inplace=True)
         print("INFO: Applied nodelist")
-        return self.df
+        return jb
 
     def has_sufficient_time_passed_since_last_email(self, vfile: str) -> bool:
         """Return boolean specifying whether sufficient time has passed."""

@@ -37,7 +37,7 @@ class SerialAllocatingMultipleCores(Alert):
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
         if not self.df.empty and hasattr(self, "nodelist"):
-            self.df = self.filter_by_nodelist()
+            self.df = self.filter_by_nodelist(self.df)
         self.gp = pd.DataFrame({"User":[]})
         if not self.df.empty:
             # add new fields
@@ -54,7 +54,7 @@ class SerialAllocatingMultipleCores(Alert):
             self.df = self.df[self.df["error-code"] == 0]
             self.df["cpu-eff"] = self.df["cpu-eff-tpl"].apply(lambda tpl: tpl[0])
             # ignore jobs at 0% CPU-eff (also avoids division by zero later)
-            self.df = self.df[self.df["cpu-eff"] >= 1]
+            self.df = self.df[self.df["cpu-eff"] > 0]
             # max efficiency if serial is 100% / cores
             self.df["inverse-cores"] = 100 / self.df["cores"]
             self.df["inverse-cores"] = self.df["inverse-cores"].apply(lambda x: round(x, 1))

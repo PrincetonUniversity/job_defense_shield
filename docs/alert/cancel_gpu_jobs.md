@@ -25,6 +25,10 @@ cancel-zero-gpu-jobs-1:
   email_file_first_warning:  "cancel_gpu_jobs_warning_1.txt"
   email_file_second_warning: "cancel_gpu_jobs_warning_2.txt"
   email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
+  sliding_warning_minutes: 30  # minutes
+  sliding_cancel_minutes:  45  # minutes
+  email_file_sliding_warning: "cancel_gpu_jobs_sliding_warning.txt"
+  email_file_sliding_cancel:  "cancel_gpu_jobs_sliding_cancel.txt"
   jobid_cache_path: /path/to/writable/directory/
   max_interactive_hours: 8
   max_interactive_gpus: 1
@@ -50,23 +54,31 @@ per alert.
 
 - `second_warning_minutes`: (Optional) Number of minutes that the job must run before the second warning email can be sent.
 
-- `cancel_minutes`: (Required) Number of minutes that the job must run before it can be cancelled.
+- `cancel_minutes`: (Optional) Number of minutes that the job must run before it can be cancelled.
 
 - `email_file_first_warning`: (Optional) File to be used for the first warning email.
 
 - `email_file_second_warning`: (Optional) File to be used for the second warning email.
 
-- `email_file_cancel`: (Required) File to be used for the cancellation email.
+- `email_file_cancel`: (Optional) File to be used for the cancellation email.
+
+- `sliding_warning_minutes`: (Optional) Number of minutes that the job must run before the warning email can be sent. If `cancel_minutes` is used then this setting only takes affect after `cancel_minutes` minutes have passed.
+
+- `sliding_cancel_minutes`: (Optional) Number of minutes that the job must run before it can be cancelled.
+
+- `email_file_sliding_warning`: (Optional) File to be used for the warning email.
+
+- `email_file_sliding_cancel`: (Optional) File to be used for the cancellation email.
 
 - `email_subject`: (Optional) Subject of the email message to users.
 
-- `jobid_cache_path`: (Optional) Path to a writable directory where a cache file containing the `jobid` of each job known to be using the GPUs is stored. This is a binary file with the name `.jobid_cache.pkl`. Including this setting will eliminate redundant calls to the Prometheus server.
+- `jobid_cache_path`: (Required/Optional) Path to a writable directory where a cache file containing the `jobid` of each job known to be using the GPUs is stored. This is a binary file with the name `.jobid_cache.pkl`. Including this setting will eliminate redundant calls to the Prometheus server.
 
 - `max_interactive_hours`: (Optional) An interactive job will only be cancelled if the run time limit is greater than `max_interactive_hours` and the number of allocated GPUs is less than or equal to `max_interactive_gpus`. Remove these lines if interactive jobs should not receive special treatment. An interactive job is one with a `jobname` that starts with either `interactive` or `sys/dashboard`.
 
 - `max_interactive_gpus`: (Optional) See line above.
 
-- `gpu_frac_threshold`: For a given job, let `g` be the ratio of the number of GPUs with non-zero utilization to the number of allocated GPUs. Jobs with `g` greater than or equal to  `gpu_frac_threshold` will be excluded. For example, if a job uses 7 of the 8 allocated GPUs and `gpu_frac_threshold` is 0.8 then it will be excluded from cancellation since 7/8 > 0.8. Default: 1.0
+- `gpu_frac_threshold`: (Optional) For a given job, let `g` be the ratio of the number of GPUs with non-zero utilization to the number of allocated GPUs. Jobs with `g` greater than or equal to  `gpu_frac_threshold` will be excluded. For example, if a job uses 7 of the 8 allocated GPUs and `gpu_frac_threshold` is 0.8 then it will be excluded from cancellation since 7/8 > 0.8. Default: 1.0
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -119,6 +131,28 @@ cancel-zero-gpu-jobs-1:
   admin_emails:
     - admin@institution.edu
 ```
+
+The example below will send a warning email if a GPU is found to be idle for 3 hours and it will cancel the jobs if a GPU found to be idle for 4 hours:
+
+```yaml
+cancel-zero-gpu-jobs-1:
+  cluster:
+    - della
+  partitions:
+    - gpu
+    - llm
+  sampling_period_minutes:  15  # minutes
+  sliding_warning_minutes: 180  # minutes
+  sliding_cancel_minutes:  240  # minutes
+  email_file_sliding_warning: "cancel_gpu_jobs_sliding_warning.txt"
+  email_file_sliding_cancel:  "cancel_gpu_jobs_sliding_cancel.txt"
+  jobid_cache_path: /path/to/writable/directory/
+  admin_emails:
+    - admin@institution.edu
+```
+
+The `sliding_cancel_minutes` setting applies to entire lifetime of the job whereas `cancel_minutes` only applies to the beginning of the job.
+
 
 ## Testing
 

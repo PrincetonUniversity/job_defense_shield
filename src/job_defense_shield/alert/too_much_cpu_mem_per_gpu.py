@@ -33,7 +33,7 @@ class TooMuchCpuMemPerGpu(Alert):
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
         if not self.df.empty and hasattr(self, "nodelist"):
-            self.df = self.filter_by_nodelist()
+            self.df = self.filter_by_nodelist(self.df)
         self.df.rename(columns={"user":"User"}, inplace=True)
         if not self.df.empty:
             self.df["memory-tuple"] = self.df.apply(lambda row:

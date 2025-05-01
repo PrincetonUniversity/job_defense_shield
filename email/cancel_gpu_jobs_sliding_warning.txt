@@ -7,7 +7,7 @@ You have job(s) that have not used the GPU(s) for the last <WARNING-MIN> minutes
 These jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
 GPU(s) for a period of <CANCEL-HRS> hours.
 
-Please consider cancelling the job(s) listed above by using the "scancel" command:'
+Please consider cancelling the job(s) listed above by using the "scancel" command:
 
 <SCANCEL>
 

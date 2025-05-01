@@ -37,6 +37,8 @@ class LowEfficiency(Alert):
         self.pr = self.df[(self.df.cluster == self.cluster) &
                           (self.df.partition.isin(self.partitions)) &
                           pd.notna(self.df[f"{self.xpu}-seconds"])].copy()
+        if not self.pr.empty and hasattr(self, "nodelist"):
+            self.pr = self.filter_by_nodelist(self.pr)
         self.pr = self.pr.groupby("user").agg({f"{self.xpu}-seconds":"sum"})
         self.pr = self.pr.reset_index(drop=False)
         total = self.pr[f"{self.xpu}-seconds"].sum()
@@ -44,6 +46,8 @@ class LowEfficiency(Alert):
         self.pr["proportion(%)"] = self.pr[f"{self.xpu}-seconds"].apply(lambda x: round(100 * x / total))
         self.pr = self.pr.rename(columns={f"{self.xpu}-seconds":f"{self.xpu}-seconds-all"})
         self.pr = self.pr.sort_values(by=f"{self.xpu}-seconds-all", ascending=False)
+
+        # how to include running jobs?
 
         # second dataframe (self.ce) based on admincomment
         self.ce = self.df[(self.df.cluster == self.cluster) &
@@ -53,7 +57,9 @@ class LowEfficiency(Alert):
                           (self.df.admincomment != {})].copy()
         # next line prevents (unlikely) failure when creating "{self.xpu}-tuples"
         if self.ce.empty:
-            return pd.DataFrame()
+            return
+        if not self.ce.empty and hasattr(self, "nodelist"):
+            self.ce = self.filter_by_nodelist(self.ce)
         self.admin = pd.DataFrame()
         self.ce = self.ce.merge(self.pr, how="left", on="user")
         if self.xpu == "cpu":

@@ -38,11 +38,9 @@ class ExcessiveTimeLimits(Alert):
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
 
-        # ignore jobs without summary statistics
         self.df = self.df[self.df.admincomment != {}]
-        # filter by nodelist if provided
         if not self.df.empty and hasattr(self, "nodelist"):
-            self.df = self.filter_by_nodelist()
+            self.df = self.filter_by_nodelist(self.df)
         self.gp = pd.DataFrame({"User":[]})
         if not self.df.empty:
             xpu = self.mode

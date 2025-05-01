@@ -41,6 +41,8 @@ per alert.
 
 - `proportion_thres_pct`: (Optional) Proportional threshold percentage. A user must being using at least this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours. Default: 0
 
+- `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
 - `admin_emails`: (Optional) List of administrator email addresses that should receive copies of the emails that are sent to users.

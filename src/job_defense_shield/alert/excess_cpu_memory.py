@@ -37,7 +37,7 @@ class ExcessCPUMemory(Alert):
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
         if not self.df.empty and hasattr(self, "nodelist"):
-            self.df = self.filter_by_nodelist()
+            self.df = self.filter_by_nodelist(self.df)
         if self.combine_partitions:
             self.df.partition = ",".join(sorted(set(self.partitions)))
         if hasattr(self, "cores_fraction") and hasattr(self, "cores_per_node"):

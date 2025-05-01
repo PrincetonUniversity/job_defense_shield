@@ -20,10 +20,9 @@ class CancelZeroGpuJobs(Alert):
        be excluded since real limit may be UNLIMITED.
 
        Will we require cancel_minutes to be less than sliding_cancel_minutes?
-       Only jobs that have ran for (cancel_minutes + sliding_warning_minutes
-       + sampling_period_minutes) will be consider when applying the sliding
-       window. This ensures that there will be no overlap between the two
-       methods.
+       Only jobs that have ran for (cancel_minutes + sliding_warning_minutes)
+       will be considered when applying the sliding window. This ensures that
+       there will be no overlap between the two methods.
 
        One can get the mean GPU utilization over the past 2000 seconds with:
 
@@ -56,9 +55,11 @@ class CancelZeroGpuJobs(Alert):
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes"):
             start_time = time.time()
-            lower = (self.cancel_minutes +
-                     self.sampling_period_minutes +
-                     self.sliding_warning_minutes) * spm
+            if hasattr(self, "cancel_minutes"):
+                lower = (self.cancel_minutes +
+                         self.sliding_warning_minutes) * spm
+            else:
+                lower = self.sliding_warning_minutes * spm
             self.lg = self.df[(self.df.state == "RUNNING") &
                               (self.df.gpus > 0) &
                               (self.df.cluster == self.cluster) &
@@ -66,98 +67,113 @@ class CancelZeroGpuJobs(Alert):
                               (self.df.elapsedraw >= lower) &
                               (~self.df.user.isin(self.excluded_users))].copy()
             if not self.lg.empty and hasattr(self, "nodelist"):
-                self.lg = self.filter_by_nodelist()
+                self.lg = self.filter_by_nodelist(self.lg)
+            self.sliding_warnings = []
+            self.sliding_cancellations = []
 
-        if not hasattr(self, "first_warning_minutes") and \
-           not hasattr(self, "second_warning_minutes"):
-            lower = self.cancel_minutes * spm
-        else:
-            lower = self.first_warning_minutes * spm
-        upper = (self.cancel_minutes + self.sampling_period_minutes) * spm
-        self.df = self.df[(self.df.state == "RUNNING") &
-                          (self.df.gpus > 0) &
-                          (self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
-                          (self.df.elapsedraw >= lower) &
-                          (self.df.elapsedraw <  upper) &
-                          (~self.df.user.isin(self.excluded_users))].copy()
-        if not self.df.empty and hasattr(self, "nodelist"):
-            self.df = self.filter_by_nodelist()
-        self.df.rename(columns={"user":"User"}, inplace=True)
+        if hasattr(self, "cancel_minutes"):
+            if not hasattr(self, "first_warning_minutes") and \
+               not hasattr(self, "second_warning_minutes"):
+                lower = self.cancel_minutes * spm
+            else:
+                lower = self.first_warning_minutes * spm
+            upper = (self.cancel_minutes + self.sampling_period_minutes) * spm
+            self.df = self.df[(self.df.state == "RUNNING") &
+                              (self.df.gpus > 0) &
+                              (self.df.cluster == self.cluster) &
+                              (self.df.partition.isin(self.partitions)) &
+                              (self.df.elapsedraw >= lower) &
+                              (self.df.elapsedraw <  upper) &
+                              (~self.df.user.isin(self.excluded_users))].copy()
+            if not self.df.empty and hasattr(self, "nodelist"):
+                self.df = self.filter_by_nodelist(self.df)
+            self.df.rename(columns={"user":"User"}, inplace=True)
 
-        """
-        On the caching of jobs that are known to using GPUs. First, read pickle
-        file containing the jobid's of jobs that are known to using the GPUs
-        from previous iteration. Create a list called pre_approved that contains
-        these jobid's for the current running jobs. Note then len(pre_approved)
-        will be less than or equal to len(jobs_using_gpus) since jobs_using_gpus
-        includes jobs that have finished since the previous iteration. Filter
-        out the pre_approved jobs.
+            """
+            On the caching of jobs that are known to using GPUs. First, read pickle
+            file containing the jobid's of jobs that are known to using the GPUs
+            from previous iteration. Create a list called pre_approved that contains
+            these jobid's for the current running jobs. Note then len(pre_approved)
+            will be less than or equal to len(jobs_using_gpus) since jobs_using_gpus
+            includes jobs that have finished since the previous iteration. Filter
+            out the pre_approved jobs.
 
-        Calculate the number of "Unused-GPUs" for each running job that was not
-        previously known to be using the GPUs. Create a list called
-        jobs_using_gpus containing the jobid's of the new jobs that are using
-        the GPUs. Add this list to pre_approved and write this to file. Note
-        that the jobs in pre_approved and jobs_using_gpus do not overlap.
-        """
+            Calculate the number of "Unused-GPUs" for each running job that was not
+            previously known to be using the GPUs. Create a list called
+            jobs_using_gpus containing the jobid's of the new jobs that are using
+            the GPUs. Add this list to pre_approved and write this to file. Note
+            that the jobs in pre_approved and jobs_using_gpus do not overlap.
+            """
 
-        # read cache file containing jobid's that are known to be using the gpus
-        pre_approved = []
-        if hasattr(self, "jobid_cache_path") and os.path.isdir(self.jobid_cache_path):
-            jobid_cache_file = os.path.join(self.jobid_cache_path, ".jobid_cache.pkl")
-            if os.path.isfile(jobid_cache_file):
-                with open(jobid_cache_file, "rb") as fp:
-                    jobs_using_gpus = pickle.load(fp)
-                pre_approved = self.df[self.df.jobid.isin(jobs_using_gpus)].jobid.tolist()
-                self.df = self.df[~self.df.jobid.isin(pre_approved)]
-        if not self.df.empty:
-            self.df.admincomment = Alert.get_admincomment_for_running_jobs(self)
-            self.df["zero-tuple"] = self.df.apply(lambda row:
-                                         num_gpus_with_zero_util(row["admincomment"],
-                                                                 row["jobid"],
-                                                                 row["cluster"]),
-                                                                 axis="columns")
-            cols = ["GPUs-Unused", "error_code"]
-            self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
-                                         index=self.df.index)
-            self.df = self.df[self.df["error_code"] == 0]
-            # write cache file of jobid's that are known to be using the gpus
-            if hasattr(self, "jobid_cache_path"):
-                jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
-                jobid_cache_file = os.path.join(self.jobid_cache_path, ".jobid_cache.pkl")
-                with open(jobid_cache_file, "wb") as fp:
-                    pickle.dump(pre_approved + jobs_using_gpus, fp)
-            self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
-            self.df = self.df[self.df["gpu_frac"] < self.gpu_frac_threshold]
-            # filter interactive jobs if such settings are found in config.yaml
-            if hasattr(self, "max_interactive_hours") and \
-               hasattr(self, "max_interactive_gpus"):
-                self.df["interactive"] = self.df["jobname"].apply(lambda x: True
-                                                                  if x.startswith("sys/dashboard") or
-                                                                     x.startswith("interactive")
-                                                                  else False)
-                msk = (self.df["interactive"]) & \
-                      (self.df.gpus <= self.max_interactive_gpus) & \
-                      (self.df["limit-minutes"] <= self.max_interactive_hours * mph)
-                self.df = self.df[~msk]
-            self.df = self.df[["jobid",
-                               "User",
-                               "cluster",
-                               "partition",
-                               "gpus",
-                               "GPUs-Unused",
-                               "elapsedraw"]]
-            renamings = {"gpus":"GPUs-Allocated",
-                         "jobid":"JobID",
-                         "cluster":"Cluster",
-                         "partition":"Partition"}
-            self.df.rename(columns=renamings, inplace=True)
-            self.df["GPU-Util"] = "0%"
-            self.df["Hours"] = self.df.elapsedraw.apply(lambda x: round(x / sph, 1))
+            # read cache file containing jobid's that are known to be using the gpus
+            pre_approved = []
+            if hasattr(self, "jobid_cache_path") and os.path.isdir(self.jobid_cache_path):
+                jobid_cache_file = os.path.join(self.jobid_cache_path,
+                                                f".jobid_cache_{self.cluster}.pkl")
+                if os.path.isfile(jobid_cache_file):
+                    with open(jobid_cache_file, "rb") as fp:
+                        jobs_using_gpus = pickle.load(fp)
+                    pre_approved = self.df[self.df.jobid.isin(jobs_using_gpus)].jobid.tolist()
+                    self.df = self.df[~self.df.jobid.isin(pre_approved)]
+            if not self.df.empty:
+                self.df.admincomment = Alert.get_admincomment_for_running_jobs(self)
+                self.df["zero-tuple"] = self.df.apply(lambda row:
+                                             num_gpus_with_zero_util(row["admincomment"],
+                                                                     row["jobid"],
+                                                                     row["cluster"]),
+                                                                     axis="columns")
+                cols = ["GPUs-Unused", "error_code"]
+                self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
+                                             index=self.df.index)
+                self.df = self.df[self.df["error_code"] == 0]
+                # write cache file of jobid's that are known to be using the gpus
+                if hasattr(self, "jobid_cache_path"):
+                    jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
+                    jobid_cache_file = os.path.join(self.jobid_cache_path,
+                                                    f".jobid_cache_{self.cluster}.pkl")
+                    with open(jobid_cache_file, "wb") as fp:
+                        pickle.dump(pre_approved + jobs_using_gpus, fp)
+                self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
+                self.df = self.df[self.df["gpu_frac"] < self.gpu_frac_threshold]
+                # filter interactive jobs if such settings are found in config.yaml
+                if hasattr(self, "max_interactive_hours") and \
+                   hasattr(self, "max_interactive_gpus"):
+                    self.df["interactive"] = self.df["jobname"].apply(lambda x: True
+                                                                      if x.startswith("sys/dashboard") or
+                                                                         x.startswith("interactive")
+                                                                      else False)
+                    msk = (self.df["interactive"]) & \
+                          (self.df.gpus <= self.max_interactive_gpus) & \
+                          (self.df["limit-minutes"] <= self.max_interactive_hours * mph)
+                    self.df = self.df[~msk]
+                self.df = self.df[["jobid",
+                                   "User",
+                                   "cluster",
+                                   "partition",
+                                   "gpus",
+                                   "GPUs-Unused",
+                                   "elapsedraw"]]
+                renamings = {"gpus":"GPUs-Allocated",
+                             "jobid":"JobID",
+                             "cluster":"Cluster",
+                             "partition":"Partition"}
+                self.df.rename(columns=renamings, inplace=True)
+                self.df["GPU-Util"] = "0%"
+                self.df["Hours"] = self.df.elapsedraw.apply(lambda x: round(x / sph, 1))
 
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes") and \
            not self.lg.empty:
+            if hasattr(self, "max_interactive_hours") and \
+               hasattr(self, "max_interactive_gpus"):
+                self.lg["interactive"] = self.lg["jobname"].apply(lambda x: True
+                                                                  if x.startswith("sys/dashboard") or
+                                                                     x.startswith("interactive")
+                                                                  else False)
+                msk = (self.lg["interactive"]) & \
+                      (self.lg.gpus <= self.max_interactive_gpus) & \
+                      (self.lg["limit-minutes"] <= self.max_interactive_hours * mph)
+                self.lg = self.lg[~msk]
             if not hasattr(self, "jobid_cache_path"):
                 print("ERROR: 'jobid_cache_path' must be defined to use sliding_cancel_minutes.")
                 self.lg = pd.DataFrame(columns=self.lg.columns)
@@ -209,11 +225,18 @@ class CancelZeroGpuJobs(Alert):
                 period, the time is checked. The loop is terminated if the time
                 becomes long relative to the cron sampling period. Eventually all of
                 the running jobs will be cached and the code will execute quickly.
-                """
 
+                If want value of GPUs-Unused in violation files then would need to make
+                self.id_time_gpus and do a join with the usr dataframe. Would also
+                need to add [jobid, now, n] to self.id_time_gpus for each to-be
+                cancelled job.
+                """
+                
+                start_time_sliding = time.time()
+                print(f"INFO: Looking for idle GPUs on {len(self.lg)} running jobs ... ",
+                      end="",
+                      flush=True)
                 id_time_gpus = []
-                self.sliding_warnings = []
-                self.sliding_cancellations = []
                 warning_seconds = self.sliding_warning_minutes * spm
                 cancel_seconds = self.sliding_cancel_minutes * spm
                 for jobid, num_gpus in zip(self.lg.jobid, self.lg.gpus):
@@ -247,6 +270,7 @@ class CancelZeroGpuJobs(Alert):
                     total_time = time.time() - start_time
                     if total_time > self.fraction_of_period * self.sampling_period_minutes * spm:
                         break
+                print(f"done ({round(time.time() - start_time_sliding)} seconds).", flush=True)
                 out = pd.DataFrame(id_time_gpus,
                                    columns=["jobid", "checked_time", "idle_gpus"])
                 out.to_csv(jobid_cache_file, index=False)
@@ -254,102 +278,105 @@ class CancelZeroGpuJobs(Alert):
     def create_emails(self, method):
         """Note that the violation history of a user is not considered here
            since this alert is considered urgent."""
-        g = GreetingFactory().create_greeting(method)
-        for user in self.df.User.unique():
-            indent = 4 * " "
-            tags = {}
-            tags["<GREETING>"] = g.greeting(user)
-            tags["<CLUSTER>"] = self.cluster
-            tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
-            tags["<SAMPLING>"] = str(self.sampling_period_minutes)
-            tags["<CANCEL-MIN>"] = str(self.cancel_minutes)
-            tags["<CANCEL-HRS>"] = f"{round(self.cancel_minutes / mph)}"
-            #################
-            # first warning #
-            #################
-            if hasattr(self, "first_warning_minutes"):
-                upper = (self.first_warning_minutes + self.sampling_period_minutes) * spm
-                usr = self.df[(self.df.elapsedraw < upper) &
-                              (self.df.User == user)].copy()
-                if not usr.empty:
-                    usr.drop(columns=["User", "elapsedraw"], inplace=True)
-                    table = usr.to_string(index=False, justify="center").split("\n")
-                    tags["<MINUTES-1ST>"] = str(self.first_warning_minutes)
-                    tags["<HOURS-1ST>"] = f"{round(self.first_warning_minutes / mph)}"
-                    tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                    tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
-                    tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
-                    translator = EmailTranslator(self.email_files_path,
-                                                 self.email_file_first_warning,
-                                                 tags)
-                    email = translator.replace_tags()
-                    self.emails.append((user, email, None))
+        if hasattr(self, "cancel_minutes") and not self.df.empty:
+            g = GreetingFactory().create_greeting(method)
+            for user in self.df.User.unique():
+                indent = 4 * " "
+                tags = {}
+                tags["<GREETING>"] = g.greeting(user)
+                tags["<CLUSTER>"] = self.cluster
+                tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
+                tags["<SAMPLING>"] = str(self.sampling_period_minutes)
+                tags["<CANCEL-MIN>"] = str(self.cancel_minutes)
+                tags["<CANCEL-HRS>"] = f"{round(self.cancel_minutes / mph)}"
+                #################
+                # first warning #
+                #################
+                if hasattr(self, "first_warning_minutes"):
+                    upper = (self.first_warning_minutes + self.sampling_period_minutes) * spm
+                    usr = self.df[(self.df.elapsedraw < upper) &
+                                  (self.df.User == user)].copy()
+                    if not usr.empty:
+                        usr.drop(columns=["User", "elapsedraw"], inplace=True)
+                        table = usr.to_string(index=False, justify="center").split("\n")
+                        tags["<MINUTES-1ST>"] = str(self.first_warning_minutes)
+                        tags["<HOURS-1ST>"] = f"{round(self.first_warning_minutes / mph)}"
+                        tags["<TABLE>"] = "\n".join([indent + row for row in table])
+                        tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                        tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                        translator = EmailTranslator(self.email_files_path,
+                                                     self.email_file_first_warning,
+                                                     tags)
+                        email = translator.replace_tags()
+                        self.emails.append((user, email, None))
 
-            ##################
-            # second warning #
-            ##################
-            if hasattr(self, "first_warning_minutes") and \
-               hasattr(self, "second_warning_minutes"):
-                lower = self.second_warning_minutes * spm
-                upper = (self.second_warning_minutes + self.sampling_period_minutes) * spm
+                ##################
+                # second warning #
+                ##################
+                if hasattr(self, "first_warning_minutes") and \
+                   hasattr(self, "second_warning_minutes"):
+                    lower = self.second_warning_minutes * spm
+                    upper = (self.second_warning_minutes + self.sampling_period_minutes) * spm
+                    usr = self.df[(self.df.elapsedraw >= lower) &
+                                  (self.df.elapsedraw <  upper) &
+                                  (self.df.User == user)].copy()
+                    if not usr.empty:
+                        usr.drop(columns=["User", "elapsedraw"], inplace=True)
+                        table = usr.to_string(index=False, justify="center").split("\n")
+                        tags["<MINUTES-1ST>"] = str(self.first_warning_minutes)
+                        tags["<MINUTES-2ND>"] = str(self.second_warning_minutes)
+                        tags["<TABLE>"] = "\n".join([indent + row for row in table])
+                        tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                        tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                        translator = EmailTranslator(self.email_files_path,
+                                                     self.email_file_second_warning,
+                                                     tags)
+                        email = translator.replace_tags()
+                        self.emails.append((user, email, None))
+
+                ################
+                # cancellation #
+                ################
+                lower = self.cancel_minutes * spm
                 usr = self.df[(self.df.elapsedraw >= lower) &
-                              (self.df.elapsedraw <  upper) &
                               (self.df.User == user)].copy()
                 if not usr.empty:
-                    usr.drop(columns=["User", "elapsedraw"], inplace=True)
-                    table = usr.to_string(index=False, justify="center").split("\n")
-                    tags["<MINUTES-1ST>"] = str(self.first_warning_minutes)
-                    tags["<MINUTES-2ND>"] = str(self.second_warning_minutes)
+                    usr["State"] = "CANCELLED"
+                    tbl = usr[["JobID",
+                               "Cluster",
+                               "Partition",
+                               "State",
+                               "GPUs-Allocated",
+                               "GPU-Util",
+                               "Hours"]].copy()
+                    table = tbl.to_string(index=False, justify="center").split("\n")
                     tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                    tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
-                    tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                    tags["<JOBSTATS>"] = f"{indent}$ jobstats {tbl.JobID.values[0]}"
+                    tags["<SCANCEL>"] = f"{indent}$ scancel {tbl.JobID.values[0]}"
                     translator = EmailTranslator(self.email_files_path,
-                                                 self.email_file_second_warning,
+                                                 self.email_file_cancel,
                                                  tags)
                     email = translator.replace_tags()
-                    self.emails.append((user, email, None))
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                    usr["User"] = user
+                    usr = usr[["User",
+                               "Cluster",
+                               "Alert-Partitions",
+                               "JobID",
+                               "Partition",
+                               "GPUs-Allocated",
+                               "GPUs-Unused",
+                               "Hours"]]
+                    self.emails.append((user, email, usr))
+                    self.jobids_to_cancel.extend(usr.JobID.tolist())
 
-            ################
-            # cancellation #
-            ################
-            lower = self.cancel_minutes * spm
-            usr = self.df[(self.df.elapsedraw >= lower) &
-                          (self.df.User == user)].copy()
-            if not usr.empty:
-                usr["State"] = "CANCELLED"
-                tbl = usr[["JobID",
-                           "Cluster",
-                           "Partition",
-                           "State",
-                           "GPUs-Allocated",
-                           "GPU-Util",
-                           "Hours"]].copy()
-                table = tbl.to_string(index=False, justify="center").split("\n")
-                tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {tbl.JobID.values[0]}"
-                tags["<SCANCEL>"] = f"{indent}$ scancel {tbl.JobID.values[0]}"
-                translator = EmailTranslator(self.email_files_path,
-                                             self.email_file_cancel,
-                                             tags)
-                email = translator.replace_tags()
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
-                usr["User"] = user
-                usr = usr[["User",
-                           "Cluster",
-                           "Alert-Partitions",
-                           "JobID",
-                           "Partition",
-                           "GPUs-Allocated",
-                           "GPUs-Unused",
-                           "Hours"]]
-                self.emails.append((user, email, usr))
-                self.jobids_to_cancel.extend(usr.JobID.tolist())
-
-        ###################
-        # sliding warning #
-        ###################
         if hasattr(self, "sliding_warning_minutes") and \
-           hasattr(self, "sliding_cancel_minutes"):
+           hasattr(self, "sliding_cancel_minutes") and \
+           not self.lg.empty:
+            g = GreetingFactory().create_greeting(method)
+            ###################
+            # sliding warning #
+            ###################
             self.lg["warning"] = self.lg.jobid.apply(lambda j:
                                                      True if j in self.sliding_warnings
                                                      else False)
@@ -391,10 +418,60 @@ class CancelZeroGpuJobs(Alert):
                                              tags)
                 email = translator.replace_tags()
                 self.emails.append((user, email, None))
- 
-            #for jobid in self.sliding_cancellations:
-            #    user = self.lg[self.lg.jobid == jobid]["user"].values[0]
-            #    self.emails.append((user, f"{jobid} has been cancelled.", None))
+
+            ##################
+            # sliding cancel #
+            ##################
+            self.lg["cancel"] = self.lg.jobid.apply(lambda j:
+                                                    True if j in self.sliding_cancellations
+                                                    else False)
+            cl = self.lg[self.lg["cancel"]].copy()
+            cl["State"] = "CANCELLED"
+            cl["GPU-Util"] = "0%"
+            cl["Hours"] = cl.elapsedraw.apply(lambda x: round(x / sph, 1))
+            cl = cl[["jobid",
+                     "user",
+                     "cluster",
+                     "partition",
+                     "State",
+                     "gpus",
+                     "GPU-Util",
+                     "Hours"]]
+            renamings = {"jobid":"JobID",
+                         "user":"User",
+                         "cluster":"Cluster",
+                         "partition":"Partition",
+                         "gpus":"GPUs-Allocated"}
+            cl.rename(columns=renamings, inplace=True)
+            for user in cl.User.unique():
+                usr = cl[cl.User == user].copy()
+                usr.drop(columns=["User"], inplace=True)
+                table = usr.to_string(index=False, justify="center").split("\n")
+                indent = 4 * " "
+                tags = {}
+                tags["<GREETING>"] = g.greeting(user)
+                tags["<CLUSTER>"] = self.cluster
+                tags["<CANCEL-MIN>"] = str(self.sliding_cancel_minutes)
+                tags["<CANCEL-HRS>"] = f"{round(self.sliding_cancel_minutes / mph)}"
+                tags["<TABLE>"] = "\n".join([indent + row for row in table])
+                tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                translator = EmailTranslator(self.email_files_path,
+                                             self.email_file_sliding_cancel,
+                                             tags)
+                email = translator.replace_tags()
+                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                usr["User"] = user
+                usr["GPUs-Unused"] = "sliding"
+                usr = usr[["User",
+                           "Cluster",
+                           "Alert-Partitions",
+                           "JobID",
+                           "Partition",
+                           "GPUs-Allocated",
+                           "GPUs-Unused",
+                           "Hours"]]
+                self.emails.append((user, email, usr))
 
     def cancel_jobs(self) -> None:
         """Call scancel on each jobid. For this to work, the code must be ran by

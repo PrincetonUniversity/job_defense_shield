@@ -115,7 +115,7 @@ def main():
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    head = "\nJob Defense Shield (1.0.2)\n"
+    head = "\nJob Defense Shield (1.1.0)\n"
     head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
     head += f"INFO: Python {sys.version}\n"
     head += f"INFO: Pandas {pd.__version__}\n"

@@ -1,12 +1,15 @@
 # Automatically Cancel GPU Jobs at 0% Utilization
 
-This alert automatically cancels jobs with GPUs at 0% utilization.
-Up to two warning emails can be sent before each job is cancelled.
-This is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
+This alert automatically cancels GPU jobs at 0% utilization.
 
 !!! note "Elevated Privileges"
     This alert is different than the others in that it must be ran as
     a user with sufficient privileges to call `scancel`.
+
+This alert can be configured to cancel jobs during the first N minutes of a job (see `cancel_minutes`) and/or
+during the last N minutes (see `sliding_cancel_minutes`).
+
+The ability to automatically cancel GPU jobs is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 
 ## Configuration File
 
@@ -25,8 +28,8 @@ cancel-zero-gpu-jobs-1:
   email_file_first_warning:  "cancel_gpu_jobs_warning_1.txt"
   email_file_second_warning: "cancel_gpu_jobs_warning_2.txt"
   email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
-  sliding_warning_minutes: 30  # minutes
-  sliding_cancel_minutes:  45  # minutes
+  sliding_warning_minutes: 240  # minutes
+  sliding_cancel_minutes:  300  # minutes
   email_file_sliding_warning: "cancel_gpu_jobs_sliding_warning.txt"
   email_file_sliding_cancel:  "cancel_gpu_jobs_sliding_cancel.txt"
   jobid_cache_path: /path/to/writable/directory/
@@ -54,29 +57,29 @@ per alert.
 
 - `second_warning_minutes`: (Optional) Number of minutes that the job must run before the second warning email can be sent.
 
-- `cancel_minutes`: (Optional) Number of minutes that the job must run before it can be cancelled.
+- `cancel_minutes`: (Optional/Required) This setting computes the GPU utilization over the first this number of minutes of each job. Jobs with GPUs that are found to be idle over this time period will be cancelled. Either `cancel_minutes` or `sliding_cancel_minutes` must be set.
 
 - `email_file_first_warning`: (Optional) File to be used for the first warning email.
 
 - `email_file_second_warning`: (Optional) File to be used for the second warning email.
 
-- `email_file_cancel`: (Optional) File to be used for the cancellation email.
+- `email_file_cancel`: (Optional/Required) File to be used for the cancellation email. If `cancel_minutes` is set then this file must be specified.
 
-- `sliding_warning_minutes`: (Optional) Number of minutes that the job must run before the warning email can be sent. If `cancel_minutes` is used then this setting only takes affect after `cancel_minutes` minutes have passed.
+- `sliding_warning_minutes`: (Optional/Required) Number of minutes that the job must run before the warning email can be sent. This setting must be specified if `sliding_cancel_minutes` is set. If `cancel_minutes` is used then this setting only takes affect after `cancel_minutes` minutes have passed.
 
-- `sliding_cancel_minutes`: (Optional) Number of minutes that the job must run before it can be cancelled.
+- `sliding_cancel_minutes`: (Optional/Required) This setting computes the GPU utilization over a sliding time window which corresponds to the last N minutes of the job. Jobs with an idle GPU for this number of minutes will be cancelled. If `cancel_minutes` is also set then a job must run for `cancel_minutes` plus `sliding_cancel_minutes` before it can be cancelled by the sliding window approach. Users are guaranteed to receive a warning email before cancellation. Either `cancel_minutes` or `sliding_cancel_minutes` must be set.
 
-- `email_file_sliding_warning`: (Optional) File to be used for the warning email.
+- `email_file_sliding_warning`: (Optional/Required) File to be used for the warning email. This setting is required if `sliding_cancel_minutes` is set.
 
-- `email_file_sliding_cancel`: (Optional) File to be used for the cancellation email.
+- `email_file_sliding_cancel`: (Optional/Required) File to be used for the cancellation email. This setting is required if `sliding_cancel_minutes` is set.
 
 - `email_subject`: (Optional) Subject of the email message to users.
 
-- `jobid_cache_path`: (Required/Optional) Path to a writable directory where a cache file containing the `jobid` of each job known to be using the GPUs is stored. This is a binary file with the name `.jobid_cache.pkl`. Including this setting will eliminate redundant calls to the Prometheus server.
+- `jobid_cache_path`: (Optional/Required) Path to a writable directory to store cache files which decrease the load on the Prometheus server. This setting is required if `sliding_warning_minutes` is set.
 
-- `max_interactive_hours`: (Optional) An interactive job will only be cancelled if the run time limit is greater than `max_interactive_hours` and the number of allocated GPUs is less than or equal to `max_interactive_gpus`. Remove these lines if interactive jobs should not receive special treatment. An interactive job is one with a `jobname` that starts with either `interactive` or `sys/dashboard`.
+- `max_interactive_hours`: (Optional) An interactive job will only be cancelled if the run time limit is greater than `max_interactive_hours` and the number of allocated GPUs is less than or equal to `max_interactive_gpus`. Remove these lines if interactive jobs should not receive special treatment. An interactive job is one with a `jobname` that starts with either `interactive` or `sys/dashboard`. If `max_interactive_hours` is specified then `max_interactive_gpus` is required.
 
-- `max_interactive_gpus`: (Optional) See line above.
+- `max_interactive_gpus`: (Optional) See `max_interactive_hours` above.
 
 - `gpu_frac_threshold`: (Optional) For a given job, let `g` be the ratio of the number of GPUs with non-zero utilization to the number of allocated GPUs. Jobs with `g` greater than or equal to  `gpu_frac_threshold` will be excluded. For example, if a job uses 7 of the 8 allocated GPUs and `gpu_frac_threshold` is 0.8 then it will be excluded from cancellation since 7/8 > 0.8. Default: 1.0
 
@@ -132,7 +135,7 @@ cancel-zero-gpu-jobs-1:
     - admin@institution.edu
 ```
 
-The example below will send a warning email if a GPU is found to be idle for 3 hours and it will cancel the jobs if a GPU found to be idle for 4 hours:
+The example below will send a warning email if a GPU is found to be idle for 3 hours and it will cancel the job if a GPU is still idle afer 4 hours:
 
 ```yaml
 cancel-zero-gpu-jobs-1:
@@ -151,8 +154,29 @@ cancel-zero-gpu-jobs-1:
     - admin@institution.edu
 ```
 
-The `sliding_cancel_minutes` setting applies to entire lifetime of the job whereas `cancel_minutes` only applies to the beginning of the job.
+The example that follows uses both cancellation methods. Jobs with GPUs that are idle for the first 2 hours (120 minutes) will be cancelled. After this period, jobs with an idle GPU for 5 hours (300 minutes) will be cancelled.
 
+```yaml
+cancel-zero-gpu-jobs-1:
+  cluster: della
+  partitions:
+    - gpu
+    - llm
+  sampling_period_minutes: 15  # minutes
+  first_warning_minutes:   60  # minutes
+  second_warning_minutes: 105  # minutes
+  cancel_minutes:         120  # minutes
+  email_file_first_warning:  "cancel_gpu_jobs_warning_1.txt"
+  email_file_second_warning: "cancel_gpu_jobs_warning_2.txt"
+  email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
+  sliding_warning_minutes: 240  # minutes
+  sliding_cancel_minutes:  300  # minutes
+  email_file_sliding_warning: "cancel_gpu_jobs_sliding_warning.txt"
+  email_file_sliding_cancel:  "cancel_gpu_jobs_sliding_cancel.txt"
+  jobid_cache_path: /path/to/writable/directory/
+  admin_emails:
+    - admin@institution.edu
+```
 
 ## Testing
 
@@ -170,7 +194,7 @@ $ job_defense_shield --cancel-zero-gpu-jobs --email --no-emails-to-users
 
 Learn more about [email testing](../emails.md#testing-the-sending-of-emails-to-users).
 
-## First Warning Email
+## First Warning Email (Fixed Window at Start of Job)
 
 Below is an example email for the first warning (see `email/cancel_gpu_jobs_warning_1.txt`):
 
@@ -211,7 +235,7 @@ The following placeholders can be used in the email file:
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
 
-## Second Warning Email
+## Second Warning Email (Fixed Window at Start of Job)
 
 Below is an example email for the second warning (see `email/cancel_gpu_jobs_warning_2.txt`):
 
@@ -244,7 +268,7 @@ The following placeholders can be used in the email file:
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
 
-## Cancellation Email
+## Cancellation Email (Fixed Window at Start of Job)
 
 Below is an example email (see `email/cancel_gpu_jobs_scancel_3.txt`):
 
@@ -276,6 +300,81 @@ The following placeholders can be used in the email file:
 - `<SAMPLING>`: The sampling period in minutes (`sampling_period_minutes`).
 - `<CANCEL-MIN>`: Number of minutes a job must run for before being cancelled (`cancel_minutes`).
 - `<CANCEL-HRS>`: Number of hours a job must run for before being cancelled.
+- `<TABLE>`: Table of job data.
+- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+- `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+
+## First Warning Email (Sliding Window Over Last N Minutes)
+
+Below is an example email for the first warning (see `email/cancel_gpu_sliding_warning.txt`):
+
+```
+Hi Alan (aturing),
+
+You have job(s) that have not used the GPU(s) for the last 180 minutes:
+
+     JobID    Cluster Partition  GPUs-Allocated  GPUs-Unused GPU-Util  Hours
+   60131148    della     gpu            4             4         0%       3
+
+Your jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
+GPUs for a period of 4 hours.
+
+Please consider cancelling the job(s) listed above by using the "scancel"
+command:
+
+   $ scancel 60131148
+
+Replying to this automated email will open a support ticket with Research
+Computing.
+```
+
+### Placeholders
+
+The following placeholders can be used in the email file:
+
+- `<GREETING>`: The greeting generated by `greeting-method`.
+- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
+- `<PARTITIONS>`: The partitions listed for the alert (i.e., `partitions`).
+- `<SAMPLING>`: The sampling period in minutes (`sampling_period_minutes`).
+- `<WARNING-MIN>`: Number of minutes before the first warning is sent (`sliding_warning_minutes`).
+- `<WARNING-HRS>`: Number of hours before the first warning is sent (`first_warning_minutes`/60).
+- `<CANCEL-MIN>`: Time period in minutes with 0% GPU utilization for a job to be cancelled (`cancel_minutes`).
+- `<CANCEL-HRS>`: Time period in hours with 0% GPU utilization for a job to be cancelled (`cancel_minutes`/60).
+- `<TABLE>`: Table of job data.
+- `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
+- `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+
+## Cancellation Email (Sliding Window Over Last N Minutes)
+
+Below is an example email (see `email/cancel_gpu_jobs_sliding_cancel.txt`):
+
+```
+Hi Alan (aturing),
+
+The jobs below have been cancelled because they did not use the GPU(s) for the
+last 4 hours:
+0% GPU utilization:
+
+     JobID   Cluster  Partition    State    GPUs-Allocated GPU-Util  Hours
+   60131148   della      gpu     CANCELLED         4          0%       4
+
+See our GPU Computing webpage for three common reasons for encountering zero GPU
+utilization:
+
+    https://your-institution.edu/knowledge-base/gpu-computing
+
+Replying to this automated email will open a support ticket with Research
+Computing.
+```
+
+### Placeholders
+
+The following placeholders can be used in the email file:
+
+- `<GREETING>`: The greeting generated by `greeting-method`.
+- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
+- `<CANCEL-MIN>`: Time period in minutes with 0% GPU utilization for a job to be cancelled (`cancel_minutes`).
+- `<CANCEL-HRS>`: Time period in hours with 0% GPU utilization for a job to be cancelled (`cancel_minutes`/60).
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).

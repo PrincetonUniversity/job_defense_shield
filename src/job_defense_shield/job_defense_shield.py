@@ -204,7 +204,8 @@ def main():
     is_workday = WorkdayFactory(holidays_file).create_workday(workday_method).is_workday()
     if not is_workday:
         print("INFO: Today is not a workday. Emails to users and administrators will not")
-        print("INFO: be sent. Use 'workday-method: always' to send emails today.")
+        print("      be sent except for GPU jobs at 0% utilization. To force emails,")
+        print("      modify config.yaml with 'workday-method: always'")
 
     if cfg["verbose"]:
         for key in cfg.keys():

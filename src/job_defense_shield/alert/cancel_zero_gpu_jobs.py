@@ -41,6 +41,8 @@ class CancelZeroGpuJobs(Alert):
             self.do_not_cancel = False
         if not hasattr(self, "fraction_of_period"):
             self.fraction_of_period = 0.5
+        if not hasattr(self, "warning_frac"):
+            self.warning_frac = 0.5
 
     def _filter_and_add_new_fields(self):
         start_time = time.time()
@@ -98,7 +100,8 @@ class CancelZeroGpuJobs(Alert):
                 self.df["zero-tuple"] = self.df.apply(lambda row:
                                              num_gpus_with_zero_util(row["admincomment"],
                                                                      row["jobid"],
-                                                                     row["cluster"]),
+                                                                     row["cluster"],
+                                                                     verbose=False),
                                                                      axis="columns")
                 cols = ["GPUs-Unused", "error_code"]
                 self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
@@ -221,59 +224,64 @@ class CancelZeroGpuJobs(Alert):
                     time of the loop approaches the cron sampling period. Eventually all of
                     the running jobs will be cached and the code will execute quickly.
 
-                    If want value of GPUs-Unused in violation files then would need to make
-                    self.id_time_gpus and do a join with the "usr" dataframe. Would also
-                    need to add [jobid, now, n] to self.id_time_gpus for each to-be
-                    cancelled job.
-
                     Note that n is set to 0 if the fraction of active GPUs was greater than
                     or equal to gpu_frac_threshold. This allows us to use n_prev == 0 later.
                     """
                     
                     start_time_sliding = time.time()
-                    print(f"INFO: Looking for idle GPUs on {len(self.lg)} running jobs ... ",
+                    prom_query = 0
+                    print(f"INFO: Looking for idle GPUs on {len(self.lg)} jobs ... ",
                           end="",
                           flush=True)
-                    id_time_gpus = []
+                    self.id_time_gpus = []
                     warning_seconds = self.sliding_warning_minutes * spm
                     cancel_seconds = self.sliding_cancel_minutes * spm
+                    early_break = False
                     for jobid, num_gpus in zip(self.lg.jobid, self.lg.gpus):
                         jobid = str(jobid)
                         now = round(time.time())
                         if jobid not in cache.jobid.values:
                             n = num_idle_gpus_sliding_window(jobid, warning_seconds)
+                            prom_query += 1
                             if 1.0 - n / num_gpus >= self.gpu_frac_threshold:
-                                id_time_gpus.append([jobid, now, 0])
+                                self.id_time_gpus.append([jobid, now, 0])
                             else:
                                 self.sliding_warnings.append(jobid)
-                                id_time_gpus.append([jobid, now, n])
+                                self.id_time_gpus.append([jobid, now, n])
                         else:
                             time_prev = cache[cache.jobid == jobid]["checked_time"].values[0]
                             n_prev = cache[cache.jobid == jobid]["idle_gpus"].values[0]
                             if n_prev == 0:
-                                if now - time_prev >= self.sliding_warning_minutes * spm:
+                                if now - time_prev >= self.warning_frac * warning_seconds:
                                     n = num_idle_gpus_sliding_window(jobid, warning_seconds)
+                                    prom_query += 1
                                     if 1.0 - n / num_gpus >= self.gpu_frac_threshold:
-                                        id_time_gpus.append([jobid, now, 0])
+                                        self.id_time_gpus.append([jobid, now, 0])
                                     else:
                                         self.sliding_warnings.append(jobid)
-                                        id_time_gpus.append([jobid, now, n])
+                                        self.id_time_gpus.append([jobid, now, n])
                                 else:
-                                    id_time_gpus.append([jobid, time_prev, n_prev])
+                                    self.id_time_gpus.append([jobid, time_prev, n_prev])
                             else:
                                 if now - time_prev >= cancel_seconds - warning_seconds:
                                     n = num_idle_gpus_sliding_window(jobid, cancel_seconds)
+                                    prom_query += 1
                                     if 1.0 - n / num_gpus >= self.gpu_frac_threshold:
-                                        id_time_gpus.append([jobid, now, 0])
+                                        self.id_time_gpus.append([jobid, now, 0])
                                     else:
                                         self.sliding_cancellations.append(jobid)
+                                        self.id_time_gpus.append([jobid, now, n])
                                 else:
-                                    id_time_gpus.append([jobid, time_prev, n_prev])
+                                    self.id_time_gpus.append([jobid, time_prev, n_prev])
                         total_time = time.time() - start_time
                         if total_time > self.fraction_of_period * self.sampling_period_minutes * spm:
+                            early_break = True
                             break
-                    print(f"done ({round(time.time() - start_time_sliding)} seconds).", flush=True)
-                    out = pd.DataFrame(id_time_gpus,
+                    p = f"done ({round(time.time() - start_time_sliding)} seconds, {prom_query} queries)."
+                    print(p, flush=True)
+                    if early_break:
+                        print("INFO: Did not cache all jobs. Will try again on next call.")
+                    out = pd.DataFrame(self.id_time_gpus,
                                        columns=["jobid", "checked_time", "idle_gpus"])
                     out.to_csv(jobid_cache_file, index=False)
 
@@ -376,6 +384,11 @@ class CancelZeroGpuJobs(Alert):
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes") and \
            not self.lg.empty:
+            idle = pd.DataFrame(self.id_time_gpus, columns=["jobid",
+                                                            "checked_time",
+                                                            "GPUs-Unused"])
+            idle.jobid = idle.jobid.astype("str")
+            self.lg = pd.merge(self.lg, idle, how="left", on="jobid")
             g = GreetingFactory().create_greeting(method)
             ###################
             # sliding warning #
@@ -384,6 +397,7 @@ class CancelZeroGpuJobs(Alert):
                                                      True if j in self.sliding_warnings
                                                      else False)
             wn = self.lg[self.lg["warning"]].copy()
+            wn["GPUs-Unused"] = wn["GPUs-Unused"].astype(int)
             wn["GPU-Util"] = "0%"
             wn["Hours"] = wn.elapsedraw.apply(lambda x: round(x / sph, 1))
             wn = wn[["jobid",
@@ -391,11 +405,14 @@ class CancelZeroGpuJobs(Alert):
                      "cluster",
                      "partition",
                      "state",
+                     "gpus",
+                     "GPUs-Unused",
                      "GPU-Util",
                      "Hours"]]
             renamings = {"jobid":"JobID",
                          "user":"User",
                          "cluster":"Cluster",
+                         "gpus":"GPUs",
                          "partition":"Partition",
                          "state":"State"}
             wn.rename(columns=renamings, inplace=True)
@@ -429,6 +446,7 @@ class CancelZeroGpuJobs(Alert):
                                                     True if j in self.sliding_cancellations
                                                     else False)
             cl = self.lg[self.lg["cancel"]].copy()
+            cl["GPUs-Unused"] = cl["GPUs-Unused"].astype(int)
             cl["State"] = "CANCELLED"
             cl["GPU-Util"] = "0%"
             cl["Hours"] = cl.elapsedraw.apply(lambda x: round(x / sph, 1))
@@ -438,6 +456,7 @@ class CancelZeroGpuJobs(Alert):
                      "partition",
                      "State",
                      "gpus",
+                     "GPUs-Unused",
                      "GPU-Util",
                      "Hours"]]
             renamings = {"jobid":"JobID",
@@ -449,6 +468,7 @@ class CancelZeroGpuJobs(Alert):
             for user in cl.User.unique():
                 usr = cl[cl.User == user].copy()
                 usr.drop(columns=["User"], inplace=True)
+                usr.rename(columns={"GPUs-Allocated":"GPUs"}, inplace=True)
                 table = usr.to_string(index=False, justify="center").split("\n")
                 indent = 4 * " "
                 tags = {}
@@ -463,9 +483,8 @@ class CancelZeroGpuJobs(Alert):
                                              self.email_file_sliding_cancel,
                                              tags)
                 email = translator.replace_tags()
+                usr = cl[cl.User == user].copy()
                 usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
-                usr["User"] = user
-                usr["GPUs-Unused"] = "sliding"
                 usr = usr[["User",
                            "Cluster",
                            "Alert-Partitions",
@@ -494,4 +513,4 @@ class CancelZeroGpuJobs(Alert):
                                    timeout=10,
                                    text=True,
                                    check=True)
-                print(f"INFO: Cancelled job {jobid} due to zero GPU utilization.")
+                print(f"INFO: Cancelled job {jobid} on {self.cluster} due to 0% GPU utilization.")

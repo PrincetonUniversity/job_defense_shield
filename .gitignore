@@ -2,7 +2,6 @@
 violations/
 log/
 holidays.txt
-.jobid_cache.pkl
 .pytest_cache/
 .ruff_cache/
 jds-env/

@@ -230,6 +230,7 @@ class CancelZeroGpuJobs(Alert):
                     
                     start_time_sliding = time.time()
                     prom_query = 0
+                    num_cached_jobs = 0
                     print(f"INFO: Looking for idle GPUs on {len(self.lg)} jobs ... ",
                           end="",
                           flush=True)
@@ -277,10 +278,12 @@ class CancelZeroGpuJobs(Alert):
                         if total_time > self.fraction_of_period * self.sampling_period_minutes * spm:
                             early_break = True
                             break
+                        num_cached_jobs += 1
                     p = f"done ({round(time.time() - start_time_sliding)} seconds, {prom_query} queries)."
                     print(p, flush=True)
                     if early_break:
-                        print("INFO: Did not cache all jobs. Will try again on next call.")
+                        p = f"INFO: Only cached {num_cached_jobs} of {len(self.lg)} jobs. Will try again on next call."
+                        print(p)
                     out = pd.DataFrame(self.id_time_gpus,
                                        columns=["jobid", "checked_time", "idle_gpus"])
                     out.to_csv(jobid_cache_file, index=False)

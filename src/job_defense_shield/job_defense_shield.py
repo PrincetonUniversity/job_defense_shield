@@ -117,6 +117,8 @@ def main():
 
     head = "\nJob Defense Shield (1.1.0)\n"
     head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
+    fmt = "%a %b %-d, %Y at %-I:%M %p"
+    head += f"INFO: {datetime.now().strftime(fmt)}\n"
     head += f"INFO: Python {sys.version}\n"
     head += f"INFO: Pandas {pd.__version__}\n"
     print(head, end="")

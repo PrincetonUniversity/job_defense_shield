@@ -56,6 +56,8 @@ when the `--email` option is used.
 
 - `report_title`: (Optional) Title of the report to system administrators.
 
+For this alert, a GPU is said to have 0% utilization if all of the measurements made by the NVIDIA exporter over the entire job are zero. Measurements are typically made every 30 seconds or so.
+
 !!! info "Multi-GPU Jobs"
     For jobs that allocate multiple GPUs, only the GPU-hours for the GPUs at 0% utilization are included.
 

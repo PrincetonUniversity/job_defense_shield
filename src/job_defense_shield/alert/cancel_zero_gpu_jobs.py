@@ -42,7 +42,7 @@ class CancelZeroGpuJobs(Alert):
         if not hasattr(self, "fraction_of_period"):
             self.fraction_of_period = 0.5
         if not hasattr(self, "warning_frac"):
-            self.warning_frac = 0.5
+            self.warning_frac = 1.0
 
     def _filter_and_add_new_fields(self):
         start_time = time.time()
@@ -226,6 +226,11 @@ class CancelZeroGpuJobs(Alert):
 
                     Note that n is set to 0 if the fraction of active GPUs was greater than
                     or equal to gpu_frac_threshold. This allows us to use n_prev == 0 later.
+
+                    Would be better to process jobs that are cached first and then work on
+                    uncached jobs since could lose cache data if code does not finish before
+                    break is reached. Note that self.lg is sorted by jobid which should
+                    offset this to some extent.
                     """
                     
                     start_time_sliding = time.time()

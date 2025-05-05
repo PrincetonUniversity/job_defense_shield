@@ -49,7 +49,7 @@ The settings are explained below:
 
 - `partitions`: Specify one or more Slurm partitions.
 
-- `sampling_period_minutes`: Number of minutes between executions for this alert. This number must be equal to the time between `cron` jobs for this alert (see [cron](#cron) section below). A reasonable value for this setting is around 15 minutes or so.
+- `sampling_period_minutes`: Number of minutes between executions of this alert. This number must be equal to the time between `cron` jobs for this alert (see [cron](#cron) section below). One reasonable choice for this setting is 15 minutes.
 
 - `first_warning_minutes`: (Optional) Send a warning email for 0% GPU utilization after this number of minutes from the start of the job.
 

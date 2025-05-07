@@ -15,18 +15,22 @@ from ..email_translator import EmailTranslator
 
 class CancelZeroGpuJobs(Alert):
 
-    """Send warnings and automatically cancel jobs with 0% GPU utilization.
-       Jobs with a limit-minutes that is less than self.cancel_minutes cannot
-       be excluded since real limit may be UNLIMITED.
+    """
+    Send warnings and automatically cancel jobs with 0% GPU utilization.
+    There are two approaches: cancelling based on utilization during the
+    first N hours of the job (fixed window) and cancelling based on the
+    the last N hours of the job (sliding window).
 
-       There are two approaches: cancelling based on utilization during the
-       first N hours of the job and cancelling based on the the last N
-       hours of the job.
+    When both approaches are used, only jobs that have ran for cancel_minutes
+    plus sliding_warning_minutes will be considered when applying the latter.
+    This ensures that there will be no overlap between the two. Each approach
+    can be used on its own without the other if desired.
 
-       Only jobs that have ran for cancel_minutes + sliding_warning_minutes
-       will be considered when applying the latter. This ensures that
-       there will be no overlap between the two. Each approach can be used on
-       its on without the other if desired.
+    Jobs with an elapsed time plus (sliding cancel - slide warning) that
+    are less than limit-minutes cannot be excluded since real limit may
+    be UNLIMITED. Would need to add new column to track UNLIMITED jobs.
+    Users still receive warnings in these cases. Such jobs are also not
+    excluded using the fixed window approach.
     """
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
@@ -39,12 +43,18 @@ class CancelZeroGpuJobs(Alert):
             self.gpu_frac_threshold = 1.0
         if not hasattr(self, "do_not_cancel"):
             self.do_not_cancel = False
-        if not hasattr(self, "fraction_of_period"):
-            self.fraction_of_period = 0.5
         if not hasattr(self, "warning_frac"):
             self.warning_frac = 1.0
+        if not hasattr(self, "fraction_of_period"):
+            self.fraction_of_period = 0.5
+        if (self.num_cancel_alerts > 1) and \
+           (self.fraction_of_period >= 0.9 / self.num_cancel_alerts):
+            self.fraction_of_period = 0.75 / self.num_cancel_alerts
+            print(f"INFO: Forcing fraction_of_period to {self.fraction_of_period}")
 
     def _filter_and_add_new_fields(self):
+        clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
+        print(f"INFO: Cancellation of GPU jobs at 0% utilization on {clus_part} is enabled.")
         start_time = time.time()
         self.lg = self.df.copy()
         #########################################
@@ -88,8 +98,9 @@ class CancelZeroGpuJobs(Alert):
             # read cache file containing jobid's that are known to be using the gpus
             pre_approved = []
             if hasattr(self, "jobid_cache_path") and os.path.isdir(self.jobid_cache_path):
+                prts = "_".join(sorted(set(self.partitions)))
                 jobid_cache_file = os.path.join(self.jobid_cache_path,
-                                                f".jobid_cache_{self.cluster}.pkl")
+                                                f".jobid_cache_{self.cluster}_{prts}.pkl")
                 if os.path.isfile(jobid_cache_file):
                     with open(jobid_cache_file, "rb") as fp:
                         jobs_using_gpus = pickle.load(fp)
@@ -110,8 +121,9 @@ class CancelZeroGpuJobs(Alert):
                 # write cache file of jobid's that are known to be using the gpus
                 if hasattr(self, "jobid_cache_path"):
                     jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
+                    prts = "_".join(sorted(set(self.partitions)))
                     jobid_cache_file = os.path.join(self.jobid_cache_path,
-                                                    f".jobid_cache_{self.cluster}.pkl")
+                                                    f".jobid_cache_{self.cluster}_{prts}.pkl")
                     with open(jobid_cache_file, "wb") as fp:
                         pickle.dump(pre_approved + jobs_using_gpus, fp)
                 self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
@@ -180,10 +192,11 @@ class CancelZeroGpuJobs(Alert):
                     print("ERROR: 'jobid_cache_path' must exist to use sliding_cancel_minutes.")
                     self.lg = pd.DataFrame(columns=self.lg.columns)
                 else:
+                    prts = "_".join(sorted(set(self.partitions)))
                     jobid_cache_file = os.path.join(self.jobid_cache_path,
-                                                    f".sliding_cache_{self.cluster}.csv")
+                                                    f".sliding_cache_{self.cluster}_{prts}.csv")
                     if os.path.isfile(jobid_cache_file):
-                        # make jobid str since pandas will do this if array job is found
+                        # make jobid string since pandas will do this if array job is found
                         cache = pd.read_csv(jobid_cache_file,
                                             dtype={"jobid":str,
                                                    "checked_time":"int64",
@@ -194,7 +207,10 @@ class CancelZeroGpuJobs(Alert):
                     def num_idle_gpus_sliding_window(jobid: str,
                                                      window_seconds: int) -> int:
                         """Calculate the number of idle GPUs during the period of the
-                           sliding window which is the last N seconds from now."""
+                           sliding window which is the last N seconds from now. Current
+                           version of call to get_job_stats() updates seven properties
+                           when only one is needed. Would be nice to pass list of
+                           properties that are needed."""
                         sys.path.append(self.jobstats_module_path)
                         sys.path.append(self.jobstats_config_path)
                         from jobstats import Jobstats
@@ -227,16 +243,16 @@ class CancelZeroGpuJobs(Alert):
                     Note that n is set to 0 if the fraction of active GPUs was greater than
                     or equal to gpu_frac_threshold. This allows us to use n_prev == 0 later.
 
-                    Would be better to process jobs that are cached first and then work on
-                    uncached jobs since could lose cache data if code does not finish before
-                    break is reached. Note that self.lg is sorted by jobid which should
-                    offset this to some extent.
+                    The loop below runs on jobs from lowest jobid to highest. This is good
+                    because the oldest jobs (lowest jobid) have already been cached. Do not
+                    want to lose cache data in rare cases when code does not finish before
+                    break is reached.
                     """
-                    
+
                     start_time_sliding = time.time()
                     prom_query = 0
                     num_cached_jobs = 0
-                    print(f"INFO: Looking for idle GPUs on {len(self.lg)} jobs ... ",
+                    print(f"INFO: Looking for idle GPUs for {len(self.lg)} jobs ... ",
                           end="",
                           flush=True)
                     self.id_time_gpus = []

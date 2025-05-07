@@ -115,7 +115,7 @@ def main():
         print("--no-emails-to-admins must appear with --email. Exiting ...")
         sys.exit()
 
-    head = "\nJob Defense Shield (1.1.0)\n"
+    head = "\nJob Defense Shield (1.1.1)\n"
     head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
     fmt = "%a %b %-d, %Y at %-I:%M %p"
     head += f"INFO: {datetime.now().strftime(fmt)}\n"
@@ -394,6 +394,7 @@ def main():
         for alert in alerts:
             params = cfg[alert]
             params.update(sys_cfg)
+            params.update({"num_cancel_alerts":len(alerts)})
             cancel_gpu = CancelZeroGpuJobs(df,
                                            days_between_emails=1,
                                            violation="cancel_zero_gpu_jobs",

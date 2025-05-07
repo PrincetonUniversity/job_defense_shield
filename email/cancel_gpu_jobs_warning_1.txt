@@ -10,7 +10,7 @@ GPUs for <CANCEL-HRS> hours. For more information see the the utilization polici
 
     https://your-institution.edu/KB/utilization-policies
 
-Please consider cancelling the job(s) listed above by using the "scancel" command:'
+Please consider cancelling the job(s) listed above by using the "scancel" command:
 
 <SCANCEL>
 

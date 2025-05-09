@@ -160,7 +160,8 @@ class CancelZeroGpuJobs(Alert):
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes"):
             if hasattr(self, "cancel_minutes"):
-                lower = (self.cancel_minutes + self.sliding_warning_minutes) * spm
+                lower = max(self.cancel_minutes + self.sampling_period_minutes,
+                            self.sliding_warning_minutes) * spm
             else:
                 lower = self.sliding_warning_minutes * spm
             self.lg = self.lg[(self.lg.state == "RUNNING") &

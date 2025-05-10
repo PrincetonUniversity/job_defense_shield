@@ -165,7 +165,7 @@ u18587,della,cpu,497596,644,03/17/2025 18:35:58
 The violation file of a user is read when determining whether or not sufficient time has passed to send another email. This is the purpose of the `Email-Sent` column. The software is written so that users receive at most one email about any given job.
 
 !!! warning "Changing partitions"
-    When deciding if a user should receive an email, the software first filters the violation file by `Cluster` and `Alert-Partitions`. `Alert-Partitions` is a comma-seperated string of the list of partitions. If you add or remove a partition to an alert this will change `Alert-Partitions` which may cause the user to receive a second email in less than seven days. After adding or removing a partition, it is best to turn the alert off for a week to avoid this.
+    When deciding if a user should receive an email, the software first filters the violation file by `Cluster` and `Alert-Partitions`. `Alert-Partitions` is a comma-seperated string of the list of partitions. If you add or remove a partition to an alert this will change `Alert-Partitions` which may cause the user to receive a second email in less than seven days.
 
 ## Step 6: Add Additional Alerts
 

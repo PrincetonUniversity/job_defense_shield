@@ -6,7 +6,7 @@ not be using the GPU(s):
 <TABLE> 
 
 Your jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
-GPUs for <CANCEL-HRS> hours. For more information see the the utilization policies:
+GPUs for <CANCEL-HRS> hours. For more information see the utilization policies:
 
     https://your-institution.edu/KB/utilization-policies
 

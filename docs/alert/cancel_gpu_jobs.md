@@ -32,10 +32,6 @@ cancel-zero-gpu-jobs-1:
   email_file_sliding_warning: "cancel_gpu_jobs_sliding_warning.txt"
   email_file_sliding_cancel:  "cancel_gpu_jobs_sliding_cancel.txt"
   jobid_cache_path: /path/to/writable/directory/
-  max_interactive_hours: 8
-  max_interactive_gpus: 1
-  do_not_cancel: False
-  warnings_to_admin: True
   admin_emails:
     - admin@institution.edu
   excluded_users:
@@ -57,13 +53,13 @@ The settings are explained below:
 
 - `cancel_minutes`: (Optional/Required) Cancel jobs with 0% GPU utilization after this number of minutes from the start of the job. One must set `cancel_minutes` and/or `sliding_cancel_minutes`.
 
-- `email_file_first_warning`: (Optional) File to be used for the first warning email.
+- `email_file_first_warning`: (Optional) File to be used for the first warning email when `cancel_minutes` is set.
 
-- `email_file_second_warning`: (Optional) File to be used for the second warning email.
+- `email_file_second_warning`: (Optional) File to be used for the second warning email when `cancel_minutes` is set.
 
 - `email_file_cancel`: (Optional/Required) File to be used for the cancellation email. If `cancel_minutes` is set then this file is required.
 
-- `sliding_warning_minutes`: (Optional/Required) Send a warning email for jobs found with 0% GPU utilization during a sliding time window of this number of minutes. This setting is required if `sliding_cancel_minutes` is used. If `cancel_minutes` and `sliding_cancel_minutes` are both used then a job must run for max(`cancel_minutes` + `sampling_period_minutes`, `sliding_warning_minutes`) before a warning can be sent using the sliding window approach.
+- `sliding_warning_minutes`: (Optional/Required) Send a warning email for jobs found with 0% GPU utilization during a sliding time window of this number of minutes. This setting is required if `sliding_cancel_minutes` is used. If `cancel_minutes` and `sliding_cancel_minutes` are both used then a job must run for max(`cancel_minutes` + `sampling_period_minutes`, `sliding_warning_minutes`) before a warning can be sent using the sliding window approach. After the warning is sent, the job can be cancelled `sliding_cancel_minutes` minus `sliding_warning_minutes` later. See `warning_frac` to learn how to send warnings and cancel jobs as soon as possible.
 
 - `sliding_cancel_minutes`: (Optional/Required) Cancel jobs found with 0% GPU utilization during a sliding time window of this number of minutes. This setting uses a sliding time window whereas `cancel_minutes` uses a fixed time window over the start of job. If `cancel_minutes` is also set then a job must run for at least `cancel_minutes` plus `sampling_period_minutes` plus the difference between `sliding_cancel_minutes` and `sliding_cancel_warning` before it can be cancelled by the sliding window approach. Users are guaranteed to receive a warning email before cancellation. One must set `cancel_minutes` and/or `sliding_cancel_minutes`.
 
@@ -81,9 +77,9 @@ The settings are explained below:
 
 - `gpu_frac_threshold`: (Optional) For a given job, let `g` be the ratio of the number of GPUs with non-zero utilization to the number of allocated GPUs. Jobs with `g` greater than or equal to  `gpu_frac_threshold` will be excluded. For example, if a job uses 7 of the 8 allocated GPUs and `gpu_frac_threshold` is 0.8 then it will be excluded from cancellation since 7/8 > 0.8. This quantity varies between 0 and 1. Default: 1.0
 
-- `fraction_of_period`: (Optional) Fraction of the sampling period that can be used for querying the Prometheus server. The sampling period or `sampling_period_minutes` is the time between `cron` jobs for this alert. This setting imposes a limit on the amount of time spent on querying the server so that the code finishes before the next `cron` job. This quantity varies between 0 and 1 with the default being 0.5. If output such as `INFO: Only cached 42 of 100 jobs. Will try again on next call.` is repeatedly seen (ignore starting period) then consider increasing `fraction_of_period` and/or `sampling_period_minutes`. If there are multiple entries for this alert then use a maximum value for this setting of 0.75 divided by the number of entries. Default: 0.5
+- `fraction_of_period`: (Optional) Fraction of the sampling period that can be used for querying the Prometheus server. The sampling period or `sampling_period_minutes` is the time between `cron` jobs for this alert. This setting imposes a limit on the amount of time spent on querying the server so that the code finishes before the next `cron` job. This quantity varies between 0 and 1 with the default being 0.5. If output such as `INFO: Only cached 42 of 100 jobs. Will try again on next call.` is repeatedly seen (ignore starting period) then consider increasing `fraction_of_period` and/or `sampling_period_minutes`. If there are multiple entries for this alert then use a maximum value for this setting of less than 0.75 divided by the number of entries. Default: 0.5
 
-- `warning_frac`: (Optional) Fraction of `sliding_warning_minutes` that must pass before a job that was previously found to be using the GPUs will be re-examined for idle GPUs. This quantity varies between 0 and 1. The default value of 1.0 minimizes the load on the Prometheus server but it can allow jobs with idle GPUs to run for longer than necessary. To cancel jobs sooner, at the expense of more calls to Prometheus, use a smaller value such as 0.5. Default: 1.0
+- `warning_frac`: (Optional) Fraction of `sliding_warning_minutes` that must pass before a job that was previously found to be using the GPUs will be re-examined for idle GPUs. This quantity varies between 0 and 1. The default value of 1.0 minimizes the load on the Prometheus server but it can allow jobs with idle GPUs to run for longer than necessary. To cancel jobs sooner, at the expense of more calls to Prometheus, use a smaller value such as 0.25 or 0.5. If `warning_frac: 0.5`and `sliding_warning_minutes: 240` then jobs that have found to be using the GPU(s) will be checked again 120 minutes later. The product of `warning_frac` and `sliding_warning_minutes` should be much greater than `sampling_period_minutes`. Default: 1.0
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -91,12 +87,12 @@ The settings are explained below:
 
 - `do_not_cancel`: (Optional) If `True` then `scancel` will not be called. This is useful for testing only. In this case, one should call the alert with `--email --no-emails-to-users`. Default: `False`
 
-- `warnings_to_admin`: (Optional) If `False` then warning emails will not be sent to `admin_emails`. Only cancellation emails will be sent. Default: `True`
+- `warnings_to_admin`: (Optional) If `True` then warning emails (in addition to cancellation emails) will be sent to `admin_emails`. This is useful for testing. Default: `False`
 
 - `admin_emails`: (Optional) List of administrator email addresses that should receive the warning and cancellation emails that are sent to users.
 
 !!! note "Times are Not Exact"
-    Jobs are not cancelled after exactly `cancel_minutes` or `sliding_cancel_minutes` since Slurm jobs can start at any time and the alert is only called every N minutes via cron or another scheduler. The same is true for warning emails.
+    Jobs are not cancelled after exactly `cancel_minutes` or `sliding_cancel_minutes` since Slurm jobs can start at any time and the alert is only called every N minutes via `cron` or another scheduler. The same is true for warning emails.
 
 In Jobstats, a GPU is said to have 0% utilization if all of the measurements made by the NVIDIA exporter over a given time window are zero. Measurements are typically made every 30 seconds or so. For the actual value at your institution see `SAMPLING_PERIOD` in `config.py` for [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 
@@ -165,7 +161,7 @@ cancel-zero-gpu-jobs-1:
 
 For the entry above, the user would receive a warning email after 4 hours (240 minutes).
 
-The example that follows uses both cancellation methods. Jobs with GPUs that are idle for the first 2 hours (120 minutes) will be cancelled. After this period, jobs with an idle GPU for 5 hours (300 minutes) will be cancelled.
+The example that follows uses both cancellation methods. Jobs with GPUs that are idle for the first 2 hours (120 minutes) will be cancelled. Jobs with idle GPU(s) for 5 hours (300 minutes) during any period will be cancelled.
 
 ```yaml
 cancel-zero-gpu-jobs-1:
@@ -195,6 +191,7 @@ For testing, be sure to use:
 
 ```yaml
   do_not_cancel: True
+  warnings_to_admin: True
 ```
 
 Additionally, add the `--no-emails-to-users` flag:
@@ -391,7 +388,7 @@ The following placeholders can be used in the email file:
 
 ## `cron`
 
-Below is an example crontab for this alert:
+Below is an example entry for `crontab`:
 
 ```
 */15 * * * * /path/to/job_defense_shield --cancel-zero-gpu-jobs --email -M della -r gpu > /path/to/log/zero_gpu_utilization.log 2>&1

@@ -36,7 +36,7 @@ class Alert:
         self.min_run_time = 0
         self.include_running_jobs = False
         # next line needed for send_emails_to_users
-        self.warnings_to_admin = True
+        self.warnings_to_admin = False
         for key in props:
             setattr(self, key, props[key])
         if hasattr(self, "partitions") and isinstance(self.partitions, str):

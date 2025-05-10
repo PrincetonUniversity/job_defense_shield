@@ -22,8 +22,6 @@ $ source jds-env/bin/activate
 (jds-env) $ pip install job-defense-shield
 ```
 
-One could also use `pipx` to install Job Defense Shield into an isolated software environment.
-
 At a later time, to upgrade to the latest version:
 
 ```
@@ -79,9 +77,10 @@ across all clusters and partitions in the Slurm database over the past 7 days. H
 ```
 $ job_defense_shield --usage-overview
 
-Job Defense Shield
+Job Defense Shield (1.x.y)
 github.com/PrincetonUniversity/job_defense_shield
 
+INFO: Fri May 9, 2025 at 5:00 PM
 INFO: Python 3.11.11 (main, Dec 11 2024, 16:28:39) [GCC 11.2.0]
 INFO: Pandas 2.2.3
 INFO: Configuration file is /home/aturing/software/jds/config.yaml
@@ -131,8 +130,8 @@ Cluster  Partition  Users  CPU-Hours      GPU-Hours
  stellar     bigmem    1        66   (0%)     0   (0%)
 traverse        all    1    189987 (100%) 47497 (100%)
 ------------------------------------------------------
-     Start: Fri Mar 07, 2025 at 11:27 AM
-       End: Fri Mar 14, 2025 at 11:27 AM
+     Start: Fri May 02, 2025 at 05:00 PM
+       End: Fri Mar 09, 2025 at 05:00 PM
 ```
 
 You can go further back in time by using the `--days` option:
@@ -169,10 +168,10 @@ This feature is useful when combined with `cron`. That is, one can receive a dai
 
 ## Troubleshooting the Installation
 
-Make sure you are using the right `python`. All three commands below should run successfully:
+Make sure you are using the `python` in the isolated environment. All three commands below should run successfully:
 
 ```
-$ python -c "import sys; print(sys.version)"
+$ python --version
 $ python -c "import pandas; print(pandas.__version__)"
 $ python -c "import pyyaml; print(pyyaml.__version__)"
 ```

@@ -103,10 +103,11 @@ $ job_defense_shield --low-gpu-efficiency --email --no-emails-to-users
 
 The `--no-emails-to-users` flag will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml` without involving users.
 
-There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](alert/cancel_gpu_jobs.md). In this case, one should add the following to the alert definition:
+There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](alert/cancel_gpu_jobs.md). In this case, one should add the following settings to the alert entry:
 
 ```yaml
   do_not_cancel: True
+  warnings_to_admin: True
 ```
 
 ## When Are Emails Sent?
@@ -133,7 +134,7 @@ Partitions: gpu, llm
        End: Wed Feb 19, 2025 at 09:50 AM
 ```
 
-The number in parentheses is the number of days since the last email was sent. For example, `2 (4)` means that the user has received 2 previous emails with the last one being sent 4 days ago.
+The number in parentheses is the number of days since the last email was sent. For example, `2 (4)` means that the user has received 2 previous emails with the last one being sent 4 days ago. To see when the emails were sent, see [check mode](extra.md).
 
 ## Hyperlinks
 

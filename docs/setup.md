@@ -131,7 +131,7 @@ Cluster  Partition  Users  CPU-Hours      GPU-Hours
 traverse        all    1    189987 (100%) 47497 (100%)
 ------------------------------------------------------
      Start: Fri May 02, 2025 at 05:00 PM
-       End: Fri Mar 09, 2025 at 05:00 PM
+       End: Fri May 09, 2025 at 05:00 PM
 ```
 
 You can go further back in time by using the `--days` option:

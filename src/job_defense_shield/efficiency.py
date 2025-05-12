@@ -250,7 +250,7 @@ def get_nodelist(ss, jobid, cluster, verbose=True) -> Set[str]:
     """Return a Python set of the node names used by the job."""
     if 'nodes' not in ss:
         if verbose:
-            msg = "Warning: nodes not found ss for get_nodelist."
+            msg = "Warning: nodes not found in ss for get_nodelist."
             print(msg, jobid, cluster)
         error_code = 1
         return (set(), error_code)

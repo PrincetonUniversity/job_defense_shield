@@ -31,6 +31,12 @@ class CancelZeroGpuJobs(Alert):
     be UNLIMITED. Would need to add new column to track UNLIMITED jobs.
     Users still receive warnings in these cases. Such jobs are also not
     excluded using the fixed window approach.
+
+    For fixed window approach or the first N minutes of the jobs,
+    right now take jobs with run times of greater than warning and less than
+    cancel but could only take those within the three time regions. Also,
+    if no first or second warning then could make window even smaller.
+    Although cache helps a lot.
     """
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
@@ -74,8 +80,6 @@ class CancelZeroGpuJobs(Alert):
                               (self.df.elapsedraw >= lower) &
                               (self.df.elapsedraw <  upper) &
                               (~self.df.user.isin(self.excluded_users))].copy()
-            if not self.df.empty and hasattr(self, "nodelist"):
-                self.df = self.filter_by_nodelist(self.df)
             self.df.rename(columns={"user":"User"}, inplace=True)
             self.cancellations = []
 
@@ -108,6 +112,8 @@ class CancelZeroGpuJobs(Alert):
                     self.df = self.df[~self.df.jobid.isin(pre_approved)]
             if not self.df.empty:
                 self.df.admincomment = Alert.get_admincomment_for_running_jobs(self)
+                if hasattr(self, "nodelist"):
+                    self.df = self.filter_by_nodelist(self.df)
                 self.df["zero-tuple"] = self.df.apply(lambda row:
                                              num_gpus_with_zero_util(row["admincomment"],
                                                                      row["jobid"],
@@ -248,6 +254,13 @@ class CancelZeroGpuJobs(Alert):
                     because the oldest jobs (lowest jobid) have already been cached. Do not
                     want to lose cache data in rare cases when code does not finish before
                     break is reached.
+
+                    A different approach not implemented here would be to get the individual
+                    utilization measurements from the NVIDIA exporter. Figure out how long
+                    there has been 0% utilization and then schedule the job to be checked
+                    again based on that. If the last 60 minutes of a 120-minute interval
+                    was at 0% then set checked_time to time() - 60 minutes. This makes the
+                    parameter warning_frac unnecessary.
                     """
 
                     start_time_sliding = time.time()

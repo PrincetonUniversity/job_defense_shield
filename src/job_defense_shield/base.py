@@ -157,6 +157,9 @@ class Alert:
            from the nodes that each job used. If the length of the
            resulting set is zero then the job used only nodes in the
            nodelist."""
+        if jb.empty:
+            return jb
+        num_jobs = len(jb)
         jb["node-tuple"] = jb.apply(lambda row:
                                     get_nodelist(row["admincomment"],
                                                  row["jobid"],
@@ -172,7 +175,7 @@ class Alert:
         jb = jb[jb["num_other_nodes"] == 0]
         cols = ["node-tuple", "job_nodes", "error_code", "num_other_nodes"]
         jb.drop(columns=cols, inplace=True)
-        print("INFO: Applied nodelist")
+        print(f"INFO: Applied nodelist (removed {num_jobs - len(jb)} of {num_jobs} jobs)")
         return jb
 
     def has_sufficient_time_passed_since_last_email(self, vfile: str) -> bool:

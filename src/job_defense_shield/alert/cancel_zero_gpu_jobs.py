@@ -114,51 +114,52 @@ class CancelZeroGpuJobs(Alert):
                 self.df.admincomment = Alert.get_admincomment_for_running_jobs(self)
                 if hasattr(self, "nodelist"):
                     self.df = self.filter_by_nodelist(self.df)
-                self.df["zero-tuple"] = self.df.apply(lambda row:
-                                             num_gpus_with_zero_util(row["admincomment"],
-                                                                     row["jobid"],
-                                                                     row["cluster"],
-                                                                     verbose=False),
-                                                                     axis="columns")
-                cols = ["GPUs-Unused", "error_code"]
-                self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
-                                             index=self.df.index)
-                self.df = self.df[self.df["error_code"] == 0]
-                # write cache file of jobid's that are known to be using the gpus
-                if hasattr(self, "jobid_cache_path"):
-                    jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
-                    prts = "_".join(sorted(set(self.partitions)))
-                    jobid_cache_file = os.path.join(self.jobid_cache_path,
-                                                    f".jobid_cache_{self.cluster}_{prts}.pkl")
-                    with open(jobid_cache_file, "wb") as fp:
-                        pickle.dump(pre_approved + jobs_using_gpus, fp)
-                self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
-                self.df = self.df[self.df["gpu_frac"] < self.gpu_frac_threshold]
-                # filter interactive jobs if such settings are found in config.yaml
-                if hasattr(self, "max_interactive_hours") and \
-                   hasattr(self, "max_interactive_gpus"):
-                    self.df["interactive"] = self.df["jobname"].apply(lambda x: True
-                                                                      if x.startswith("sys/dashboard") or
-                                                                         x.startswith("interactive")
-                                                                      else False)
-                    msk = (self.df["interactive"]) & \
-                          (self.df.gpus <= self.max_interactive_gpus) & \
-                          (self.df["limit-minutes"] <= self.max_interactive_hours * mph)
-                    self.df = self.df[~msk]
-                self.df = self.df[["jobid",
-                                   "User",
-                                   "cluster",
-                                   "partition",
-                                   "gpus",
-                                   "GPUs-Unused",
-                                   "elapsedraw"]]
-                renamings = {"gpus":"GPUs-Allocated",
-                             "jobid":"JobID",
-                             "cluster":"Cluster",
-                             "partition":"Partition"}
-                self.df.rename(columns=renamings, inplace=True)
-                self.df["GPU-Util"] = "0%"
-                self.df["Hours"] = self.df.elapsedraw.apply(lambda x: round(x / sph, 1))
+                if not self.df.empty:
+                    self.df["zero-tuple"] = self.df.apply(lambda row:
+                                                 num_gpus_with_zero_util(row["admincomment"],
+                                                                         row["jobid"],
+                                                                         row["cluster"],
+                                                                         verbose=False),
+                                                                         axis="columns")
+                    cols = ["GPUs-Unused", "error_code"]
+                    self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
+                                                 index=self.df.index)
+                    self.df = self.df[self.df["error_code"] == 0]
+                    # write cache file of jobid's that are known to be using the gpus
+                    if hasattr(self, "jobid_cache_path"):
+                        jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
+                        prts = "_".join(sorted(set(self.partitions)))
+                        jobid_cache_file = os.path.join(self.jobid_cache_path,
+                                                        f".jobid_cache_{self.cluster}_{prts}.pkl")
+                        with open(jobid_cache_file, "wb") as fp:
+                            pickle.dump(pre_approved + jobs_using_gpus, fp)
+                    self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
+                    self.df = self.df[self.df["gpu_frac"] < self.gpu_frac_threshold]
+                    # filter interactive jobs if such settings are found in config.yaml
+                    if hasattr(self, "max_interactive_hours") and \
+                       hasattr(self, "max_interactive_gpus"):
+                        self.df["interactive"] = self.df["jobname"].apply(lambda x: True
+                                                                          if x.startswith("sys/dashboard") or
+                                                                             x.startswith("interactive")
+                                                                          else False)
+                        msk = (self.df["interactive"]) & \
+                              (self.df.gpus <= self.max_interactive_gpus) & \
+                              (self.df["limit-minutes"] <= self.max_interactive_hours * mph)
+                        self.df = self.df[~msk]
+                    self.df = self.df[["jobid",
+                                       "User",
+                                       "cluster",
+                                       "partition",
+                                       "gpus",
+                                       "GPUs-Unused",
+                                       "elapsedraw"]]
+                    renamings = {"gpus":"GPUs-Allocated",
+                                 "jobid":"JobID",
+                                 "cluster":"Cluster",
+                                 "partition":"Partition"}
+                    self.df.rename(columns=renamings, inplace=True)
+                    self.df["GPU-Util"] = "0%"
+                    self.df["Hours"] = self.df.elapsedraw.apply(lambda x: round(x / sph, 1))
 
         ##########################################
         ## SLIDING WINDOW OVER THE LAST N HOURS ##
@@ -176,11 +177,9 @@ class CancelZeroGpuJobs(Alert):
                               (self.lg.partition.isin(self.partitions)) &
                               (self.lg.elapsedraw >= lower) &
                               (~self.lg.user.isin(self.excluded_users))].copy()
-            if not self.lg.empty and hasattr(self, "nodelist"):
-                self.lg = self.filter_by_nodelist(self.lg)
+
             self.sliding_warnings = []
             self.sliding_cancellations = []
-
             if not self.lg.empty:
                 if hasattr(self, "max_interactive_hours") and \
                    hasattr(self, "max_interactive_gpus"):

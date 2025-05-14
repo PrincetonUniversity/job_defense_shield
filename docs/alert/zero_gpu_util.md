@@ -169,6 +169,8 @@ $ job_defense_shield --zero-util-gpu-hours --check
 
 ## cron
 
+Below is an example entry for `crontab`:
+
 ```
 0 9 * * 1-5 /path/to/job_defense_shield --zero-util-gpu-hours --email > /path/to/log/zero_util_gpu_hours.log 2>&1
 ```

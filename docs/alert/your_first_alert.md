@@ -4,7 +4,7 @@ Here we demonstrate how to set up an alert that sends emails to users for excess
 
 ## Step 1: Add the Alert to the Configuration File
 
-Add the following to your `config.yaml` with the appropriate changes to `cluster` and `partitions`:
+Add the following to your `config.yaml` (below the "Global Settings") with the appropriate changes to `cluster` and `partitions`:
 
 ```yaml
 ###############################
@@ -103,7 +103,7 @@ Next, look at your email file for this alert:
 $ cat /path/to/email/excessive_time.txt
 ```
 
-As you learned in the [Emails](../emails.md) section, you can modify this file just as you would any text file. Special tags can be used for each alert.
+As you learned in the [Emails](../emails.md) section, you can modify this file just as you would any text file. Special placeholders can be used for each alert.
 
 Next, let's add the `email_file` to the alert entry:
 
@@ -138,7 +138,7 @@ The command above will only send emails to the addresses in `admin_emails`. User
 
 ## Step 4: Send the Emails to Users
 
-When you are satisfied with the settings in `config.yaml` and the email message, run the alert with only `--email` to send emails to the offending users:
+When you are satisfied with the email message, run the alert with only `--email` to send emails to the offending users:
 
 ```
 $ job_defense_shield --excessive-time-cpu --email

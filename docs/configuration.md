@@ -78,7 +78,7 @@ The files stored in this directory are read when deciding whether or not suffici
 
 ### Email Settings
 
-Set the path to your email files. A set of example files is found in the `email` directory of the `job_defense_shield` GitHub repository. It is recommended to copy the example email files to another directory outside of `job_defense_shield` and put that under version control. As you will learn, placeholders like `<GREETING>` are replaced by the actual values as computed in the Python code.
+Set the path to your email files. A set of example files is found in the `email` directory of the Job Defense Shield [GitHub repository](https://github.com/PrincetonUniversity/job_defense_shield). It is recommended to copy the example email files to another directory outside of `job_defense_shield` and put that under version control. As you will learn, placeholders like `<GREETING>` are replaced by the actual values as computed in the Python code.
 
 ```yaml
 email-files-path: /path/to/email/
@@ -183,7 +183,7 @@ external-emails:
 
 ## Specifying a Custom Configuration File
 
-By default the software will look for `config.yaml` in the same directory as `job_defense_shield.py`. One can override this behavior by using the `--config-file` option:
+By default the software will look for `config.yaml` in the same directory as `job_defense_shield.py` and then in the current working directory. One can explicitly specify the full path using the `--config-file` option:
 
 ```
 $ job_defense_shield --config-file=/path/to/myconfig.yaml --low-gpu-efficiency

@@ -19,6 +19,8 @@ class TooManyCoresPerGpu(Alert):
             self.email_subject = "Consider Using Fewer CPU-Cores per GPU"
         if not hasattr(self, "report_title"):
             self.report_title = "Too Many CPU-Cores Per GPU"
+        if not hasattr(self, "cluster_name"):
+            self.cluster_name = ""
 
     def _filter_and_add_new_fields(self):
         # filter the dataframe

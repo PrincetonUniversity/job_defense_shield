@@ -21,6 +21,8 @@ class TooMuchCpuMemPerGpu(Alert):
             self.report_title = "Too Much CPU Memory Per GPU"
         if not hasattr(self, "mem_eff_thres"):
             self.mem_eff_thres = 1.0
+        if not hasattr(self, "cluster_name"):
+            self.cluster_name = ""
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &

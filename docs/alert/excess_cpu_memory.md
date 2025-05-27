@@ -31,9 +31,7 @@ Each configuration parameter is explained below:
 
 - `partitions`: Specify one or more Slurm partitions.
       
-- `tb_hours_threshold`: The threshold for TB-hours per day. This value
-is multiplied by `--days` to determine the threshold of TB-hours for
-the user to receive an email message.
+- `tb_hours_threshold`: The threshold value for (unused) memory-hours in units of TB-hours. A user must have this number or above to receive an email message. This quantity is the unused CPU memory of a job multiplied by the elapsed time (summed over all jobs).
 
 - `ratio_threshold`: This quantity is the sum of CPU memory used divded
 by the total memory allocated for all jobs of a given user.

@@ -11,8 +11,8 @@ Below is an example entry for `config.yaml`:
 
 ```yaml
 excess-cpu-memory-1:
-  clusters: della
-  partition:
+  cluster: della
+  partitions:
     - cpu
   min_run_time:             61  # minutes
   tb_hours_threshold:       50  # terabyte-hours

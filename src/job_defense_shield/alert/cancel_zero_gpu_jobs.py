@@ -57,6 +57,8 @@ class CancelZeroGpuJobs(Alert):
            (self.fraction_of_period >= 0.9 / self.num_cancel_alerts):
             self.fraction_of_period = 0.75 / self.num_cancel_alerts
             print(f"INFO: Forcing fraction_of_period to {self.fraction_of_period}")
+        if not hasattr(self, "excluded_qos"):
+            self.excluded_qos = []
 
     def _filter_and_add_new_fields(self):
         clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
@@ -79,6 +81,7 @@ class CancelZeroGpuJobs(Alert):
                               (self.df.partition.isin(self.partitions)) &
                               (self.df.elapsedraw >= lower) &
                               (self.df.elapsedraw <  upper) &
+                              (~self.df.qos.isin(self.excluded_qos)) &
                               (~self.df.user.isin(self.excluded_users))].copy()
             self.df.rename(columns={"user":"User"}, inplace=True)
             self.cancellations = []
@@ -176,6 +179,7 @@ class CancelZeroGpuJobs(Alert):
                               (self.lg.cluster == self.cluster) &
                               (self.lg.partition.isin(self.partitions)) &
                               (self.lg.elapsedraw >= lower) &
+                              (~self.lg.qos.isin(self.excluded_qos)) &
                               (~self.lg.user.isin(self.excluded_users))].copy()
 
             self.sliding_warnings = []

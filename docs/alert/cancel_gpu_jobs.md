@@ -85,6 +85,8 @@ The settings are explained below:
 
 - `excluded_users`: (Optional) List of usernames to exclude from this alert.
 
+- `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
 - `do_not_cancel`: (Optional) If `True` then `scancel` will not be called. This is useful for testing only. In this case, one should call the alert with `--email --no-emails-to-users`. Default: `False`
 
 - `warnings_to_admin`: (Optional) If `True` then warning emails (in addition to cancellation emails) will be sent to `admin_emails`. This is useful for testing. Default: `False`

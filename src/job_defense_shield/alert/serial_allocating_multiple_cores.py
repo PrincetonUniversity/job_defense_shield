@@ -25,6 +25,8 @@ class SerialAllocatingMultipleCores(Alert):
             self.num_jobs_display = 10
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 5
+        if not hasattr(self, "ignore_job_arrays"):
+            self.ignore_job_arrays = False
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
@@ -33,6 +35,10 @@ class SerialAllocatingMultipleCores(Alert):
                           (self.df.cores > 1) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
+        if self.ignore_job_arrays:
+            print("INFO: ignoring job arrays for --serial-allocating-multiple")
+            self.df = self.df[pd.notna(self.df.jobid)]
+            self.df = self.df[~self.df.jobid.str.contains("_")]
         if not self.df.empty and self.include_running_jobs:
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]

@@ -38,6 +38,8 @@ The parameters are explained below:
 
 - `num_top_users`: (Optional) Only consider up to this number of users after sorting by "wasted CPU-hours".
 
+- `ignore_job_arrays`: (Optional) Ignore jobs in a job array. Default: False
+
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).

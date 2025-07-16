@@ -30,6 +30,7 @@ def test_too_many_cores_per_gpu():
                              cores_per_gpu_limit=16,
                              min_run_time=30,
                              include_running_jobs=False,
+                             verbose=True,
                              excluded_users=["aturing", "einstein"])
     actual = cpg.df[["User",
                      "Cores-per-GPU",

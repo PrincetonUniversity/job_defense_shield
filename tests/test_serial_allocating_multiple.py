@@ -75,6 +75,7 @@ def test_serial_allocating_multiple_cores():
                                            num_jobs_display=3,
                                            include_running_jobs=False,
                                            email_file="",
+                                           verbose=True,
                                            max_num_jobid_admin=3)
     actual = serial.df[["User", "CPU-Cores", "100%/CPU-Cores", "CPU-Util", "Hours"]]
     expected = pd.DataFrame({"User":["user1", "user1", "user1", "user2"],

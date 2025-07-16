@@ -38,7 +38,8 @@ class ZeroCPU(Alert):
             self.df["nodes-tuple"] = self.df.apply(lambda row:
                                      cpu_nodes_with_zero_util(row["admincomment"],
                                                               row["jobid"],
-                                                              row["cluster"]),
+                                                              row["cluster"],
+                                                              verbose=self.verbose),
                                                               axis="columns")
             cols = ["nodes-unused", "error_code"]
             self.df[cols] = pd.DataFrame(self.df["nodes-tuple"].tolist(), index=self.df.index)

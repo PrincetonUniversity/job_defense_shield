@@ -122,7 +122,7 @@ class CancelZeroGpuJobs(Alert):
                                                  num_gpus_with_zero_util(row["admincomment"],
                                                                          row["jobid"],
                                                                          row["cluster"],
-                                                                         verbose=False),
+                                                                         verbose=self.verbose),
                                                                          axis="columns")
                     cols = ["GPUs-Unused", "error_code"]
                     self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
@@ -235,7 +235,7 @@ class CancelZeroGpuJobs(Alert):
                         n, error_code = num_gpus_with_zero_util(admincomment,
                                                                 jobid,
                                                                 self.cluster,
-                                                                verbose=False)
+                                                                verbose=self.verbose)
                         return n if error_code == 0 else 0
                         
                     """

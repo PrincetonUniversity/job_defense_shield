@@ -67,14 +67,16 @@ class LowEfficiency(Alert):
                                                          cpu_efficiency(row["admincomment"],
                                                                         row["elapsedraw"],
                                                                         row["jobid"],
-                                                                        row["cluster"]),
+                                                                        row["cluster"],
+                                                                        verbose=self.verbose),
                                                                         axis="columns")
         else:
             self.ce[f"{self.xpu}-tuple"] = self.ce.apply(lambda row:
                                                          gpu_efficiency(row["admincomment"],
                                                                         row["elapsedraw"],
                                                                         row["jobid"],
-                                                                        row["cluster"]),
+                                                                        row["cluster"],
+                                                                        verbose=self.verbose),
                                                                         axis="columns")
         cols = [f"{self.xpu}-seconds-used",
                 f"{self.xpu}-seconds-total",

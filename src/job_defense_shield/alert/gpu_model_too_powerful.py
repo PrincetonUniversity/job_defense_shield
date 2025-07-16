@@ -44,7 +44,8 @@ class GpuModelTooPowerful(Alert):
             self.df["gpu-tuple"] = self.df.apply(lambda row:
                                    gpu_memory_usage_eff_tuples(row["admincomment"],
                                                                row["jobid"],
-                                                               row["cluster"]),
+                                                               row["cluster"],
+                                                               verbose=self.verbose),
                                                                axis="columns")
             self.df["error_code"] = self.df["gpu-tuple"].apply(lambda x: x[1])
             self.df = self.df[self.df["error_code"] == 0]
@@ -56,7 +57,8 @@ class GpuModelTooPowerful(Alert):
                 self.df["memory-tuple"] = self.df.apply(lambda row:
                                           cpu_memory_usage(row["admincomment"],
                                                            row["jobid"],
-                                                           row["cluster"]),
+                                                           row["cluster"],
+                                                           verbose=self.verbose),
                                                            axis="columns")
                 cols = ["CPU-Mem-Used", "mem-alloc", "error_code"]
                 self.df[cols] = pd.DataFrame(self.df["memory-tuple"].tolist(), index=self.df.index)

@@ -42,7 +42,8 @@ class MultinodeGpuFragmentation(Alert):
                                                                   row["elapsedraw"],
                                                                   row["jobid"],
                                                                   row["cluster"],
-                                                                  single=True),
+                                                                  single=True,
+                                                                  verbose=self.verbose),
                                                                   axis="columns")
             self.df["error-code"] = self.df["GPU-Eff-tpl"].apply(lambda tpl: tpl[1])
             # drop jobs with non-zero error code

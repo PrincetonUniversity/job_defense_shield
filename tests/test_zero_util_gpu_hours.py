@@ -97,6 +97,7 @@ def test_zero_util_gpu_hours():
                             gpu_hours_threshold_user=0,
                             gpu_hours_threshold_admin=0,
                             include_running_jobs=False,
+                            verbose=True,
                             max_num_jobid_admin=3)
     actual = zero.gp[["User", "GPU-Hours-At-0%", "Jobs", "JobID"]]
     expected = pd.DataFrame({"User":["user1", "user2"],

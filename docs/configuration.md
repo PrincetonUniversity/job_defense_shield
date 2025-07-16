@@ -23,6 +23,7 @@ holidays-file: /path/to/holidays.txt
 report-emails:
   - admin1@institution.edu
   - admin2@institution.edu
+verbose: False
 
 
 ##################################
@@ -179,6 +180,12 @@ For users that do not use their institutional email address, one can specify ext
 external-emails:
   u12345: alan.turing@gmail.com
   u23456: einstein@yahoo.com
+```
+
+Additional information is available by turning on the `verbose` setting. This will show the jobs that are beening ignored (e.g., due to missing metrics). The recommendation is to keep this turned off:
+
+```yaml
+verbose: False
 ```
 
 ## Specifying a Custom Configuration File

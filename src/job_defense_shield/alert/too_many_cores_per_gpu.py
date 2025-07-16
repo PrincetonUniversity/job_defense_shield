@@ -42,7 +42,8 @@ class TooManyCoresPerGpu(Alert):
                                                                 row["elapsedraw"],
                                                                 row["jobid"],
                                                                 row["cluster"],
-                                                                single=True),
+                                                                single=True,
+                                                                verbose=self.verbose),
                                                                 axis="columns")
             cols = ["CPU-Eff", "error-code"]
             self.df[cols] = pd.DataFrame(self.df["cpu-tuple"].tolist(), index=self.df.index)

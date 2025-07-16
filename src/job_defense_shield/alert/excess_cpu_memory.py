@@ -52,7 +52,8 @@ class ExcessCPUMemory(Alert):
             self.df["memory-tuple"] = self.df.apply(lambda row:
                                                     cpu_memory_usage(row["admincomment"],
                                                                      row["jobid"],
-                                                                     row["cluster"]),
+                                                                     row["cluster"],
+                                                                     verbose=self.verbose),
                                                                      axis="columns")
             self.df["mem-used"]   = self.df["memory-tuple"].apply(lambda x: x[0])
             self.df["mem-alloc"]  = self.df["memory-tuple"].apply(lambda x: x[1])

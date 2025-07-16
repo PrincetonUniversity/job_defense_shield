@@ -41,7 +41,8 @@ class TooMuchCpuMemPerGpu(Alert):
             self.df["memory-tuple"] = self.df.apply(lambda row:
                                            cpu_memory_usage(row["admincomment"],
                                                             row["jobid"],
-                                                            row["cluster"]),
+                                                            row["cluster"],
+                                                            verbose=self.verbose),
                                                             axis="columns")
             cols = ["CPU-Mem-Used", "mem-alloc", "error_code"]
             self.df[cols] = pd.DataFrame(self.df["memory-tuple"].tolist(), index=self.df.index)

@@ -40,7 +40,8 @@ class ZeroUtilGPUHours(Alert):
             self.df["zero-tuple"] = self.df.apply(lambda row:
                                     num_gpus_with_zero_util(row["admincomment"],
                                                             row["jobid"],
-                                                            row["cluster"]),
+                                                            row["cluster"],
+                                                            verbose=self.verbose),
                                                             axis="columns")
             cols = ["GPUs-Unused", "error_code"]
             self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(), index=self.df.index)

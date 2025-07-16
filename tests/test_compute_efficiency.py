@@ -74,6 +74,7 @@ def test_low_efficiency():
                                absolute_thres_hours=1,
                                num_top_users=15,
                                min_run_time=0,
+                               verbose=True,
                                excluded_users=["aturing"])
     actual = low_eff.ce[["user", "partition", "cpu-hours", "proportion(%)", "eff(%)", "jobs"]]
     expected = pd.DataFrame({"user":["user1"],

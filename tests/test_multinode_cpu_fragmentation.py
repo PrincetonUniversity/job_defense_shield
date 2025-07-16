@@ -219,6 +219,7 @@ def test_zero_cpu_utilization():
                                          cores_per_node=32,
                                          cores_fraction=0.8,
                                          mem_per_node=190,
+                                         verbose=True,
                                          safety_fraction=0.2)
     actual = cpu_frag.df[["user", "cluster", "nodes", "min-nodes"]]
     expected = pd.DataFrame({"user":["user1", "user1", "user2"],

@@ -53,7 +53,8 @@ class SerialAllocatingMultipleCores(Alert):
                                                                   row["jobid"],
                                                                   row["cluster"],
                                                                   single=True,
-                                                                  precision=1),
+                                                                  precision=1,
+                                                                  verbose=self.verbose),
                                                                   axis="columns")
             self.df["error-code"] = self.df["cpu-eff-tpl"].apply(lambda tpl: tpl[1])
             # drop jobs with non-zero error codes

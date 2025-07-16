@@ -16,6 +16,7 @@ holidays-file: /usr/local/job_defense_shield/holidays.txt
 report-emails:
   - admin1@institution.edu
   - admin2@institution.edu
+verbose: False
 
 
 #################################################

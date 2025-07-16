@@ -169,6 +169,7 @@ def test_too_much_cpu_mem_per_gpu():
                               cpu_mem_per_gpu_limit=128,
                               mem_eff_thres=0.8,
                               nodelist=nodelist,
+                              verbose=True,
                               email_file="too_much_cpu_mem_per_gpu.txt")
     actual = cpg.df[["User",
                      "Mem-Eff",

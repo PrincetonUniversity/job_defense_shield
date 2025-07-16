@@ -43,6 +43,8 @@ The parameters are explained below:
 
 - `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by unused CPU-hours. Default: 10
 
+- `show_all_offenders`: (Optional) Flag to show all of the top users in the report instead of only the top users with low time efficiency. Default: False
+
 - `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).

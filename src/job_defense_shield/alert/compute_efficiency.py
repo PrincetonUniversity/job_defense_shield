@@ -126,7 +126,10 @@ class LowEfficiency(Alert):
                 "interactive",
                 "cores",
                 "coverage"]
-        self.admin = self.ce[cols][filters].copy()
+        if self.show_all_offenders:
+            self.admin = self.ce[cols].copy()
+        else:
+            self.admin = self.ce[cols][filters].copy()
         self.ce = self.ce[cols][filters]
 
     def create_emails(self, method):

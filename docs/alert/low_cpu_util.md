@@ -37,6 +37,8 @@ per alert.
 
 - `num_top_users`: (Optional) After sorting all users by CPU-hours, only consider this number of users for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports. Default: 15
 
+- `show_all_offenders`: (Optional) Flag to show all of the top users in the report instead of only the top users with low efficiency. Default: False
+
 - `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
 
 - `proportion_thres_pct`: (Optional) Proportional threshold percentage. A user must being using at least this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours. Default: 0

@@ -35,6 +35,7 @@ class Alert:
         self.admin_emails = []
         self.min_run_time = 0
         self.include_running_jobs = False
+        self.show_all_offenders = False
         # next line needed for send_emails_to_users
         self.warnings_to_admin = False
         for key in props:

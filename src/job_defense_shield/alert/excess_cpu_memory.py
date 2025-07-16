@@ -121,11 +121,15 @@ class ExcessCPUMemory(Alert):
             self.gp.reset_index(drop=True, inplace=True)
             self.gp.index += 1
             self.gp = self.gp.head(self.num_top_users)
-            self.admin = self.gp.copy()
-            self.gp = self.gp[(self.gp["Mem-Hrs-Unused"] > self.tb_hours_threshold) &
-                              (self.gp["Ratio"] <= self.ratio_threshold) &
-                              (self.gp["mean-ratio"] <= self.mean_ratio_threshold) &
-                              (self.gp["median-ratio"] <= self.median_ratio_threshold)]
+            filters = (self.gp["Mem-Hrs-Unused"] > self.tb_hours_threshold) & \
+                      (self.gp["Ratio"] <= self.ratio_threshold) & \
+                      (self.gp["mean-ratio"] <= self.mean_ratio_threshold) & \
+                      (self.gp["median-ratio"] <= self.median_ratio_threshold)
+            if self.show_all_offenders:
+                self.admin = self.gp.copy()
+            else:
+                self.admin = self.gp[filters].copy()
+            self.gp = self.gp[filters]
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)

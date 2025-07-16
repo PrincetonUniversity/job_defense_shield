@@ -42,6 +42,7 @@ class ExcessiveTimeLimits(Alert):
         if not self.df.empty and hasattr(self, "nodelist"):
             self.df = self.filter_by_nodelist(self.df)
         self.gp = pd.DataFrame({"User":[]})
+        self.admin = pd.DataFrame()
         if not self.df.empty:
             xpu = self.mode
             if xpu == "cpu":
@@ -65,10 +66,6 @@ class ExcessiveTimeLimits(Alert):
             self.gp = self.gp.sort_values(by=f"{xpu}-waste-hours", ascending=False).reset_index(drop=False)
             self.gp.index += 1
             self.gp["overall-ratio"] = self.gp[f"{xpu}-hours"] / self.gp[f"{xpu}-alloc-hours"]
-            self.gp = self.gp[(self.gp[f"{xpu}-waste-hours"] > self.absolute_thres_hours) &
-                              (self.gp["overall-ratio"] < self.overall_ratio_threshold) &
-                              (self.gp["mean-ratio"] < self.mean_ratio_threshold) &
-                              (self.gp["median-ratio"] < self.median_ratio_threshold)]
             if self.num_top_users:
                 self.gp = self.gp[self.gp.index <= self.num_top_users]
             cols = ["user",
@@ -86,6 +83,15 @@ class ExcessiveTimeLimits(Alert):
                          "partition":"Partitions",
                          f"{xpu}-waste-hours":f"{xpu.upper()}-Hours-Unused"}
             self.gp = self.gp.rename(columns=renamings)
+            filters = (self.gp[f"{xpu.upper()}-Hours-Unused"] > self.absolute_thres_hours) & \
+                      (self.gp["overall-ratio"] < self.overall_ratio_threshold) & \
+                      (self.gp["mean-ratio"] < self.mean_ratio_threshold) & \
+                      (self.gp["median-ratio"] < self.median_ratio_threshold)
+            if self.show_all_offenders:
+                self.admin = self.gp.copy()
+            else:
+                self.admin = self.gp[filters].copy()
+            self.gp = self.gp[filters]
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)
@@ -138,7 +144,7 @@ class ExcessiveTimeLimits(Alert):
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         """Generate a table for system administrators."""
         xpu = self.mode
-        if self.gp.empty:
+        if self.admin.empty:
             column_names = ["User",
                             f"{xpu.upper()}-Hours-Unused",
                             f"{xpu.upper()}-Hours",
@@ -148,16 +154,17 @@ class ExcessiveTimeLimits(Alert):
                             f"{xpu.upper()}-Rank",
                             "Jobs",
                             "Emails"]
-            self.gp = pd.DataFrame(columns=column_names)
-            return add_dividers(self.create_empty_report(self.gp), self.report_title)
-        self.gp = self.gp.drop(columns=["cluster", "Partitions"])
-        self.gp["Emails"] = self.gp.User.apply(lambda user:
-                                 self.get_emails_sent_count(user, self.violation))
-        self.gp.Emails = self.format_email_counts(self.gp.Emails)
+            self.admin = pd.DataFrame(columns=column_names)
+            return add_dividers(self.create_empty_report(self.admin),
+                                self.report_title)
+        self.admin = self.admin.drop(columns=["cluster", "Partitions"])
+        self.admin["Emails"] = self.admin.User.apply(lambda user:
+                                    self.get_emails_sent_count(user, self.violation))
+        self.admin.Emails = self.format_email_counts(self.admin.Emails)
         cols = [f"{xpu.upper()}-Hours-Unused", f"{xpu}-hours"]
-        self.gp[cols] = self.gp[cols].apply(round).astype("int64")
+        self.admin[cols] = self.admin[cols].apply(round).astype("int64")
         cols = ["overall-ratio", "mean-ratio", "median-ratio"]
-        self.gp[cols] = self.gp[cols].apply(lambda x: round(x, 2))
+        self.admin[cols] = self.admin[cols].apply(lambda x: round(x, 2))
         column_names = pd.MultiIndex.from_tuples([('User', ''),
                                                   (f'{xpu.upper()}-Hours ', '(Unused)'),
                                                   (f'{xpu.upper()}-Hours', '(Used)'),
@@ -167,8 +174,8 @@ class ExcessiveTimeLimits(Alert):
                                                   (f'{xpu.upper()}-Rank', ''),
                                                   ('Jobs', ''),
                                                   ('Emails', '')])
-        self.gp.columns = column_names
-        report_str = self.gp.to_string(index=keep_index, justify="center")
+        self.admin.columns = column_names
+        report_str = self.admin.to_string(index=keep_index, justify="center")
         return add_dividers(report_str, self.report_title, units_row=True)
 
 class ExcessiveTimeLimitsCPU(ExcessiveTimeLimits):

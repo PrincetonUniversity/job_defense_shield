@@ -56,6 +56,8 @@ and 1.
 
 - `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by "unused TB-hours". Default: 15
 
+- `show_all_offenders`: (Optional) Flag to show all of the top users in the report instead of only the top users with low memory usage. Default: False
+
 - `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False

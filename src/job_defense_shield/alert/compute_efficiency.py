@@ -128,7 +128,7 @@ class LowEfficiency(Alert):
                 "interactive",
                 "cores",
                 "coverage"]
-        if self.show_all_offenders:
+        if self.show_all_users:
             self.admin = self.ce[cols].copy()
         else:
             self.admin = self.ce[cols][filters].copy()

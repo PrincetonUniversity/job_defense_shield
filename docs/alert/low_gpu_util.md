@@ -38,7 +38,7 @@ The available settings are listed below:
 
 - `num_top_users`: (Optional) After sorting all users by GPU-hours, only consider the top `num_top_users` for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports. Default: 15
 
-- `show_all_offenders`: (Optional) Flag to show all of the top users in the report instead of only the top users with low efficiency. Default: False
+- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low efficiency. Default: False
 
 - `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. Default: 0
 

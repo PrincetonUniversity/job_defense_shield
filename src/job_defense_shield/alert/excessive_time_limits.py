@@ -87,7 +87,7 @@ class ExcessiveTimeLimits(Alert):
                       (self.gp["overall-ratio"] < self.overall_ratio_threshold) & \
                       (self.gp["mean-ratio"] < self.mean_ratio_threshold) & \
                       (self.gp["median-ratio"] < self.median_ratio_threshold)
-            if self.show_all_offenders:
+            if self.show_all_users:
                 self.admin = self.gp.copy()
             else:
                 self.admin = self.gp[filters].copy()

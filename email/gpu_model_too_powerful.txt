@@ -4,20 +4,24 @@ Below are jobs that ran on an A100 GPU on Della in the past <DAYS> days:
 
 <TABLE>
 
+GPU-Mem-Used-Max is the maximum GPU memory usage of the individual allocated
+GPUs while CPU-Mem-Used/GPU is the total CPU memory usage of the job divided by
+the number of allocated GPUs.
+
 The jobs above have a low GPU utilization and they use less than 10 GB of GPU
 memory and less than 32 GB of CPU memory. Such jobs could be run on the MIG
 GPUs. A MIG GPU has 1/7th the performance and memory of an A100. To run on a
 MIG GPU, add the "partition" directive to your Slurm script:
 
-    #SBATCH --nodes=1
-    #SBATCH --ntasks=1
-    #SBATCH --cpus-per-task=1
-    #SBATCH --gres=gpu:1
-    #SBATCH --partition=mig
+   #SBATCH --nodes=1
+   #SBATCH --ntasks=1
+   #SBATCH --cpus-per-task=1
+   #SBATCH --gres=gpu:1
+   #SBATCH --partition=mig
 
 For interactive sessions use, for example:
 
-    $ salloc --nodes=1 --ntasks=1 --time=1:00:00 --gres=gpu:1 --partition=mig
+   $ salloc --nodes=1 --ntasks=1 --time=1:00:00 --gres=gpu:1 --partition=mig
 
 If you are using Jupyter OnDemand then set the "Node type" to "mig" when
 creating the session.
@@ -27,11 +31,11 @@ utilization of your code. A good target value is greater than <TARGET>%. Conside
 writing to the mailing list of the software that you are using or attend
 an in-person Research Computing help session:
 
-    https://your-institution.edu/support/help-sessions
+   https://your-institution.edu/support/help-sessions
 
 For general information about GPU computing:
 
-    https://your-institution.edu/KB/gpu-computing
+   https://your-institution.edu/KB/gpu-computing
 
 Replying to this automated email will open a support ticket with Research
 Computing.

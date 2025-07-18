@@ -1,13 +1,10 @@
 # GPU Model Too Powerful
 
 This alert identifies jobs that ran on GPUs that were more powerful than necessary.
-For example, it can find jobs that ran on an NVIDIA H100 GPU but could have
-used the less powerful L40S GPU or [MIG](https://www.nvidia.com/en-us/technologies/multi-instance-gpu/).
-The GPU utilization, CPU/GPU memory usage, and number of allocated CPU-cores
-are taken into account when identifying jobs.
-
-!!! info
-    Currently only jobs that allocate 1 GPU are considered.
+For example, it can find jobs that ran on an NVIDIA B200 GPU but could have
+used a less powerful GPU (e.g., A100 or [MIG](https://www.nvidia.com/en-us/technologies/multi-instance-gpu/)).
+Jobs can be identified based on GPU utilization, CPU/GPU memory usage, and the
+number of allocated CPU-cores.
 
 ## Configuration File
 
@@ -18,13 +15,13 @@ gpu-model-too-powerful:
   clusters: della
   partitions:
     - gpu
-  min_run_time:        61 # minutes
-  gpu_hours_threshold: 24 # gpu-hours
-  num_cores_threshold:  1 # count
-  gpu_util_threshold:  15 # percent
-  gpu_mem_threshold:   10 # GB
-  cpu_mem_threshold:   32 # GB
-  gpu_util_target:     50 # percent
+  min_run_time:          61  # minutes
+  gpu_util_threshold:    20  # percent
+  gpu_mem_usage_max:     10  # GB
+  num_cores_per_gpu:     12  # count
+  cpu_mem_usage_per_gpu: 32  # GB
+  gpu_hours_threshold:   24  # gpu-hours
+  gpu_util_target:       50  # percent
   email_file: "gpu_model_too_powerful.txt"
   admin_emails:
     - admin@institution.edu
@@ -36,17 +33,17 @@ The available settings are listed below:
 
 - `partitions`: Specify one or more Slurm partitions.
 
-- `gpu_hours_threshold`: Minimum number of GPU-hours (summed over the jobs) for the user to be included.
+- `gpu_util_threshold`: Jobs with a mean GPU utilization of less than or equal to this value will be included.
 
-- `num_cores_threshold`: Only jobs that allocate a number of CPU-cores that is equal to or less than this value will be included.
+- `num_cores_per_gpu`: (Optional) Only jobs that allocate a number of CPU-cores that is equal to or less than this value will be included.
 
-- `gpu_util_threshold`:  Jobs with a mean GPU utilization of less than or equal to this value will be included.
+- `gpu_mem_usage_max`: (Optional) Threshold for GPU memory usage in units of GB. Jobs with a GPU memory usage of less than or equal to `gpu_mem_usage_max` will be selected. For multi-GPU jobs, this is the maximum of the individual GPU memory usage values.
 
-- `gpu_mem_threshold`: Jobs that used less than this value of GPU memory (in units of GB) will be considered.
+- `cpu_mem_usage_per_gpu`: (Optional) Threshold for CPU memory usage per GPU in units of GB. Jobs with a CPU memory usage per GPU of less than or equal to `cpu_mem_usage_per_gpu` will be selected. For multi-GPU jobs, this is calculated as total CPU memory usage of the job divided by the total number of allocated GPUs.
 
-- `cpu_mem_threshold`: Jobs that used less than this value of CPU memory (in units of GB) will be considered.
+- `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be included. This setting makes it possible to ignore users that are not using many resources. Default: 0
 
-- `gpu_util_target`: The minimum acceptable GPU utilization for a user.
+- `gpu_util_target`: (Optional) The minimum acceptable GPU utilization. This must be specified for the `<TARGET>` placeholder to be available.
 
 - `email_file`: The text file to be used for the email message.
 
@@ -68,19 +65,22 @@ than this limit will be ignored. Default: 0
 !!! tip "Nodelist"
     Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes within a partition.
 
+!!! note "0% GPU Utilization"
+    Jobs with 0% GPU utilization are ignored. To capture these jobs, use a different alert.
+
 ## Report for System Administrators
 
 ```
 $ job_defense_shield --gpu-model-too-powerful
 
                        GPU Model Too Powerful                       
------------------------------------------------------------
-  User   GPU-Hours  Jobs            JobID            Emails
------------------------------------------------------------
- u23157    321      5    2567707,62567708,62567709+   0   
- u55404    108      5   62520246,62520247,62861050+   1 (2)
- u89790     55      2            62560705,62669923    0   
------------------------------------------------------------
+------------------------------------------------------------
+  User   GPU-Hours  Jobs            JobID             Emails
+------------------------------------------------------------
+ u23157     321      5    2567707,62567708,62567709+   0   
+ u55404     108      5   62520246,62520247,62861050+   1 (2)
+ u89790      55      2            62560705,62669923    0   
+------------------------------------------------------------
    Cluster: della
 Partitions: gpu
      Start: Tue Mar 11, 2025 at 10:50 PM
@@ -96,25 +96,27 @@ Hello Alan (u23157),
 
 Below are jobs that ran on an A100 GPU on Della in the past 7 days:
 
-   JobID    GPU-Util GPU-Mem-Used CPU-Mem-Used  Hours
-  60984405     9%       2 GB         3 GB        3.4  
-  60984542     8%       2 GB         3 GB        3.0  
-  60989559     8%       2 GB         3 GB        2.8  
+   JobID   Cores  GPUs GPU-Util GPU-Mem-Used-Max CPU-Mem-Used/GPU  Hours
+  65698718   4     1      8%          4 GB             8 GB         120 
+  65698719   4     1     14%          1 GB             3 GB          30 
+  65698720   4     1      9%          2 GB             8 GB          90 
 
-The jobs above have a low GPU utilization and they use less than 10 GB of GPU
-memory and less than 32 GB of CPU memory. Such jobs could be run on the MIG
-GPUs. A MIG GPU has 1/7th the performance and memory of an A100. To run on a
-MIG GPU, add the "partition" directive to your Slurm script:
+GPU-Mem-Used-Max is the maximum GPU memory usage of the individual allocated
+GPUs while CPU-Mem-Used/GPU is the total CPU memory usage of the job divided by
+the number of allocated GPUs.
 
-  #SBATCH --nodes=1
-  #SBATCH --ntasks=1
-  #SBATCH --cpus-per-task=1
+The jobs above have (1) a low GPU utilization, (2) use less than 10 GB of GPU
+memory, (3) use less than 32 GB of CPU memory, and (4) use 4 CPU-cores or less.
+Such jobs could be run on the MIG GPUs. A MIG GPU has 1/7th the performance and
+memory of an A100. To run on a MIG GPU, add the "partition" directive to your
+Slurm script:
+
   #SBATCH --gres=gpu:1
   #SBATCH --partition=mig
 
 For interactive sessions use, for example:
 
-  $ salloc --nodes=1 --ntasks=1 --time=1:00:00 --gres=gpu:1 --partition=mig
+  $ salloc --nodes=1 --ntasks=<N> --time=1:00:00 --gres=gpu:1 --partition=mig
 
 Replying to this automated email will open a support ticket with Research
 Computing.

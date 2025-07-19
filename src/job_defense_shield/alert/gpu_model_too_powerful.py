@@ -22,6 +22,10 @@ class GpuModelTooPowerful(Alert):
             self.report_title = "GPU Model Too Powerful"
         if not hasattr(self, "max_num_jobid_admin"):
             self.max_num_jobid_admin = 3
+        if not hasattr(self, "gpu_util_target"):
+            self.gpu_util_target = 50
+        if not hasattr(self, "gpu_hours_threshold"):
+            self.gpu_hours_threshold = 0
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
@@ -50,15 +54,14 @@ class GpuModelTooPowerful(Alert):
                                                                axis="columns")
             self.df["error_code"] = self.df["gpu-tuple"].apply(lambda x: x[1])
             self.df = self.df[self.df["error_code"] == 0]
-            def max_gpu_quantity(tpl, index):
-                """index=0 is GPU memory usage
-                   index=2 is GPU utilization"""
+            def max_gpu_mem(tpl):
                 items, error_code = tpl
-                return max([item[index] for item in items])
-            self.df["GPU-Mem-Used"] = self.df["gpu-tuple"].apply(lambda tpl:
-                                                                 max_gpu_quantity(tpl, index=0))
-            self.df["GPU-Util"]     = self.df["gpu-tuple"].apply(lambda tpl:
-                                                                 max_gpu_quantity(tpl, index=2))
+                return max([item[0] for item in items])
+            self.df["GPU-Mem-Used"] = self.df["gpu-tuple"].apply(max_gpu_mem)
+            def mean_gpu_util(tpl):
+                items, error_code = tpl
+                return sum([item[2] for item in items]) / len(items)
+            self.df["GPU-Util"] = self.df["gpu-tuple"].apply(mean_gpu_util)
             if not self.df.empty:
                 # add CPU memory usage
                 self.df["memory-tuple"] = self.df.apply(lambda row:
@@ -106,7 +109,6 @@ class GpuModelTooPowerful(Alert):
                 self.gp = self.df.groupby("User").agg({"GPU-Hours":"sum"}).reset_index()
                 self.gp = self.gp[self.gp["GPU-Hours"] > self.gpu_hours_threshold]
                 self.df = self.df[self.df.User.isin(self.gp.User)]
-                print(self.df.to_string())
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)
@@ -125,6 +127,13 @@ class GpuModelTooPowerful(Alert):
                 tags["<CLUSTER>"] = self.cluster
                 tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
                 tags["<TARGET>"] = str(self.gpu_util_target)
+                tags["<GPU-UTIL>"] = str(self.gpu_util_threshold)
+                if hasattr(self, "num_cores_per_gpu"):
+                    tags["<CORES-PER-GPU>"] = str(self.num_cores_per_gpu)
+                if hasattr(self, "gpu_mem_usage_max"):
+                    tags["<GPU-MEM>"] = str(self.gpu_mem_usage_max)
+                if hasattr(self, "cpu_mem_usage_per_gpu"):
+                    tags["<CPU-MEM>"] = str(self.cpu_mem_usage_per_gpu)
                 tags["<NUM-JOBS>"] = str(len(usr))
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"

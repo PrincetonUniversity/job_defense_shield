@@ -132,7 +132,7 @@ def test_gpu_model_too_powerful():
                            "CPU-Mem-Used/GPU ",
                            "Hours"]]
     expected = pd.DataFrame({"User":["user1", "user2", "user1", "user3"],
-                             "GPU-Util":["9%", "6%", "9%", "9%"],
+                             "GPU-Util":["9%", "6%", "9%", "6%"],
                              "GPU-Mem-Used-Max":["7 GB", "5 GB", "7 GB", "6 GB"],
                              "CPU-Mem-Used/GPU ":["4 GB", "4 GB", "4 GB", "5 GB"],
                              "Hours":[100, 100, 100, 100]})

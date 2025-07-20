@@ -36,6 +36,8 @@ class GpuModelTooPowerful(Alert):
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
         self.df["GPU-Hours"] = self.df.gpus * self.df["elapsed-hours"]
         self.df["Cores/GPU"] = self.df.cores / self.df.gpus
+        if hasattr(self, "num_gpus"):
+            self.df = self.df[self.df.gpus <= self.num_gpus]
         if hasattr(self, "num_cores_per_gpu"):
             self.df = self.df[self.df["Cores/GPU"] <= self.num_cores_per_gpu]
         if not self.df.empty and self.include_running_jobs:
@@ -134,6 +136,8 @@ class GpuModelTooPowerful(Alert):
                     tags["<GPU-MEM>"] = str(self.gpu_mem_usage_max)
                 if hasattr(self, "cpu_mem_usage_per_gpu"):
                     tags["<CPU-MEM>"] = str(self.cpu_mem_usage_per_gpu)
+                if hasattr(self, "num_gpus"):
+                    tags["<NUM-GPUS>"] = str(self.num_gpus)
                 tags["<NUM-JOBS>"] = str(len(usr))
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"

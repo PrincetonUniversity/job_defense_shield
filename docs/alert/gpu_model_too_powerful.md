@@ -44,9 +44,12 @@ The available settings are listed below:
 
 - `cpu_mem_usage_per_gpu`: (Optional) Threshold for CPU memory usage per GPU in units of GB. Jobs with a CPU memory usage per GPU of less than or equal to `cpu_mem_usage_per_gpu` will be selected. For multi-GPU jobs, this is calculated as total CPU memory usage of the job divided by the total number of allocated GPUs.
 
+- `num_gpus`: (Optional) Jobs with a number of allocated GPUs of less than or equal to `num_gpus` will be selected.
+
 - `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be included. This setting makes it possible to ignore users that are not using many resources. Default: 0
 
 - `gpu_util_target`: (Optional) The minimum acceptable GPU utilization. This must be specified for the `<TARGET>` placeholder to be available. Default: 50
+
 
 - `min_run_time`: (Optional) The minimum run time of a job for it to be considered. Jobs that did not run longer
 than this limit will be ignored. Default: 0
@@ -136,6 +139,7 @@ The following placeholders can be used in the email file:
 - `<CORES-PER-GPU>`: Number of CPU-cores per GPU (i.e., `num_cores_per_gpu`).
 - `<GPU-MEM>`: Maximum GPU memory usage (i.e., `gpu_mem_usage_max`).
 - `<CPU-MEM>`: CPU memory usage per GPU (i.e., `cpu_mem_usage_per_gpu`).
+- `<NUM-GPUS>`: Threshold value for the number of allocated GPUs per job (i.e., `num_gpus`).
 - `<NUM-JOBS>`: Number of jobs that are using GPUs that are too powerful.
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: The `jobstats` command for the first job of the user.

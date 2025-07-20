@@ -105,6 +105,8 @@ def main():
                         help='Show the history of emails sent to users')
     parser.add_argument('-s', '--strict-start', action='store_true', default=False,
                         help='Only include usage during time window and not before')
+    parser.add_argument('--debug', action='store_true', default=False,
+                        help='Write a CSV file containing the raw job data')
     args = parser.parse_args()
 
     if not args.email and args.no_emails_to_users:
@@ -349,6 +351,8 @@ def main():
                      args.clusters,
                      args.partition)
     raw = raw.get_job_data()
+    if args.debug:
+        raw.to_csv("DEBUG_RAW.csv", index=False)
 
     # clean the raw data
     field_renamings = {"cputimeraw":"cpu-seconds",

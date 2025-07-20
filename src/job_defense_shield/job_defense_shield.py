@@ -103,10 +103,10 @@ def main():
                         help='Send an email report to administrators')
     parser.add_argument('--check', action='store_true', default=False,
                         help='Show the history of emails sent to users')
+    parser.add_argument('--dump-files', action='store_true', default=False,
+                        help='Write CSV files of job data for debugging')
     parser.add_argument('-s', '--strict-start', action='store_true', default=False,
-                        help='Only include usage during time window and not before')
-    parser.add_argument('--debug', action='store_true', default=False,
-                        help='Write a CSV file containing the raw job data')
+                        help='Only include usage during the time window and not before')
     args = parser.parse_args()
 
     if not args.email and args.no_emails_to_users:
@@ -351,7 +351,7 @@ def main():
                      args.clusters,
                      args.partition)
     raw = raw.get_job_data()
-    if args.debug:
+    if args.dump_files:
         raw.to_csv("DEBUG_RAW.csv", index=False)
 
     # clean the raw data
@@ -388,6 +388,8 @@ def main():
 
     df = add_new_and_derived_fields(df)
     df.reset_index(drop=True, inplace=True)
+    if args.dump_files:
+        df.to_csv("DEBUG_DF.csv", index=False)
 
     s = "\n"
     ###########################################

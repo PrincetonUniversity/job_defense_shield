@@ -11,6 +11,7 @@ from .utils import SECONDS_PER_HOUR as sph
 from .utils import gpus_per_job
 from .utils import send_email
 from .utils import show_history_of_emails_sent
+from .utils import prepare_datetimes
 from .workday import WorkdayFactory
 from .efficiency import get_stats_dict
 from .raw_job_data import SlurmSacct
@@ -84,9 +85,9 @@ def main():
     parser.add_argument('-d', '--days', type=int, default=7, metavar='N',
                         help='Use job data over N previous days from now (default: 7)')
     parser.add_argument('-S', '--starttime', type=str, default=None,
-                        help='Start date/time of window (e.g., 2025-01-01T09:00:00)')
+                        help='Start date/time of window (format is 2025-01-01T00:00:00)')
     parser.add_argument('-E', '--endtime', type=str, default=None,
-                        help='End date/time of window (e.g., 2025-01-31T22:00:00)')
+                        help='End date/time of window (format is 2025-01-31T23:59:59)')
     parser.add_argument('-M', '--clusters', type=str, default="all",
                         help='Specify cluster(s) (e.g., --clusters=frontier,summit)')
     parser.add_argument('-r', '--partition', type=str, default="",
@@ -313,12 +314,9 @@ def main():
     pd.set_option("display.max_columns", None)
     pd.set_option("display.width", 1000)
 
-    if args.starttime is None or args.endtime is None:
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=args.days)
-    else:
-        # check format
-        pass
+    start_date, end_date = prepare_datetimes(args.starttime,
+                                             args.endtime,
+                                             args.days)
 
     fields = ["jobid",
               "user",
@@ -344,9 +342,8 @@ def main():
     fields = ",".join(fields)
 
     use_cache = False if (args.email or args.report) else True
-    raw = SlurmSacct(args.days,
-                     args.starttime,
-                     args.endtime,
+    raw = SlurmSacct(start_date,
+                     end_date,
                      fields,
                      args.clusters,
                      args.partition)

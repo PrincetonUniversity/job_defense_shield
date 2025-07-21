@@ -3,6 +3,8 @@ import glob
 import smtplib
 from datetime import datetime
 from datetime import timedelta
+from typing import Tuple
+from typing import Optional
 import pandas as pd
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -159,3 +161,27 @@ def send_email_enhanced(email_body, addressee, subject, sender, reply_to):
     msg.set_content(html, subtype="html")
     with smtplib.SMTP('localhost') as s:
         s.send_message(msg)
+
+def prepare_datetimes(starttime: Optional[str],
+                      endtime: Optional[str],
+                      days: int) -> Tuple[datetime, datetime]:
+    """If user only supplies --days then calculate start and end based
+       on current time. Otherwise calculate start and end based on what
+       is provided."""
+    fmt = "%Y-%m-%dT%H:%M:%S"
+    if starttime is not None and endtime is None:
+        start_date = datetime.strptime(starttime, fmt)
+        end_date = start_date + timedelta(days=days)
+        return start_date, end_date
+    elif starttime is None and endtime is not None:
+        end_date = datetime.strptime(endtime, fmt)
+        start_date = end_date - timedelta(days=days)
+        return start_date, end_date
+    elif starttime is not None and endtime is not None:
+        start_date = datetime.strptime(starttime, fmt)
+        end_date = datetime.strptime(endtime, fmt)
+        return start_date, end_date
+    else:
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        return start_date, end_date

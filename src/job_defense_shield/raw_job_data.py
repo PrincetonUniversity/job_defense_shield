@@ -23,15 +23,21 @@ class SlurmSacct(RawJobData):
 
     """Call sacct to get the raw job data from the Slurm database."""
 
-    def __init__(self, days, start, end, fields, clusters, partitions):
-        self.days = days
+    def __init__(self,
+                 start: datetime,
+                 end: datetime,
+                 fields: str,
+                 clusters: str,
+                 partitions: str) -> None:
         self.start_datetime = start
         self.end_datetime = end
         self.fields = fields
         self.clusters = clusters
         self.partitions = partitions
 
-    def verify_datetime(self, dt):
+    @staticmethod
+    def datetime_to_sacct(dt: datetime) -> str:
+        """Convert a Python datetime to sacct format."""
         ymd = dt.strftime('%Y-%m-%d')
         hms = dt.strftime('%H:%M:%S')
         return f"{ymd}T{hms}"
@@ -40,11 +46,9 @@ class SlurmSacct(RawJobData):
         """Return the sacct data in a pandas dataframe."""
         # convert slurm timestamps to seconds
         os.environ["SLURM_TIME_FORMAT"] = "%s"
-        start = datetime.now() - timedelta(days=self.days)
-        end = datetime.now()
-        self.start_datetime = self.verify_datetime(start)
-        self.end_datetime   = self.verify_datetime(end)
-        cmd = f"sacct -a -X -P -n -S {self.start_datetime} -E {self.end_datetime} "
+        sacct_start = self.datetime_to_sacct(self.start_datetime)
+        sacct_end   = self.datetime_to_sacct(self.end_datetime)
+        cmd = f"sacct -a -X -P -n -S {sacct_start} -E {sacct_end} "
         cmd += f"-M {self.clusters} -o {self.fields}"
         if self.partitions:
             cmd += f" -r {self.partitions}"

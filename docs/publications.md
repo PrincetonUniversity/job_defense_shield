@@ -2,7 +2,7 @@
 
 **Combating Underutilization with the Jobstats Job Monitoring Platform**  
 PEARC 2025, Columbus, Ohio (July 23, 2025)  
-Poster ([PDF](https://researchcomputing.princeton.edu/document/6246))  
+Poster: ([PDF](https://researchcomputing.princeton.edu/document/6246))  
 
 **Integration of Open OnDemand with the Jobstats Job Monitoring Platform**  
 Global Open OnDemand Conference, Harvard University, Cambridge, MA (March 19, 2025)    

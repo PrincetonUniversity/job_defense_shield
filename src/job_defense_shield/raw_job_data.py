@@ -7,6 +7,7 @@ from time import time
 from datetime import datetime
 from datetime import timedelta
 from abc import ABC, abstractmethod
+from typing import List
 import pandas as pd
 
 
@@ -26,12 +27,12 @@ class SlurmSacct(RawJobData):
     def __init__(self,
                  start: datetime,
                  end: datetime,
-                 fields: str,
+                 fields: List[str],
                  clusters: str,
                  partitions: str) -> None:
         self.start_datetime = start
         self.end_datetime = end
-        self.fields = fields
+        self.fields = ",".join(fields)
         self.clusters = clusters
         self.partitions = partitions
 
@@ -74,8 +75,8 @@ class SlurmSacct(RawJobData):
         if raw.empty:
             msg = ("\nCall to sacct resulted in no job data. If this is surprising\n"
                    "then check the spelling of your cluster and/or partition names\n"
-                   "in config.yml and -M <clusters> -r <partition>. Run again using\n"
-                   "the only option --usage-overview to see what is available.")
+                   "in config.yml and -M <clusters> -r <partition>. Try running again\n"
+                   "using the only option --usage-overview to see what is available.")
             print(msg)
             sys.exit()
         raw.columns = cols

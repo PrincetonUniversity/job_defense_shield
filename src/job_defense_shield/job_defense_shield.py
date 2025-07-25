@@ -12,8 +12,12 @@ from .utils import gpus_per_job
 from .utils import send_email
 from .utils import show_history_of_emails_sent
 from .utils import prepare_datetimes
-from .workday import WorkdayFactory
+from .utils import display_alerts
+from .utils import read_config_file
+from .utils import add_new_and_derived_fields
+from .utils import apply_strict_start
 from .efficiency import get_stats_dict
+from .workday import WorkdayFactory
 from .raw_job_data import SlurmSacct
 from .cleaner import SacctCleaner
 
@@ -110,97 +114,34 @@ def main():
                         help='Only include usage during the time window and not before')
     args = parser.parse_args()
 
-    if not args.email and args.no_emails_to_users:
-        print("--no-emails-to-users must appear with --email. Exiting ...")
-        sys.exit()
-
-    if not args.email and args.no_emails_to_admins:
-        print("--no-emails-to-admins must appear with --email. Exiting ...")
-        sys.exit()
-
     head = "\nJob Defense Shield (1.2.0)\n"
     head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
     fmt = "%a %b %-d, %Y at %-I:%M %p"
     head += f"INFO: {datetime.now().strftime(fmt)}\n"
     head += f"INFO: Python {sys.version}\n"
     head += f"INFO: Pandas {pd.__version__}\n"
-    print(head, end="")
+    print(head, end="", flush=True)
+
+    if not args.email and args.no_emails_to_users:
+        print("ERROR: --no-emails-to-users must appear with --email.\n")
+        sys.exit()
+    if not args.email and args.no_emails_to_admins:
+        print("ERROR: --no-emails-to-admins must appear with --email.\n")
+        sys.exit()
+    if (args.starttime or args.endtime) and args.email:
+        print("ERROR: Cannot send emails when using --starttime or --endtime. Only")
+        print("       reports can be generated when using these options.\n")
+        sys.exit()
 
     # read configuration file
     jds_path = os.path.join(os.path.dirname(__file__), "config.yaml")
     cwd_path = os.path.join(os.getcwd(), "config.yaml")
-    if args.config_file and os.path.isfile(args.config_file):
-        msg = f"INFO: Configuration file is {args.config_file}\n"
-        print(msg, end="")
-        head += msg
-        with open(args.config_file, "r", encoding="utf-8") as fp:
-            cfg = yaml.safe_load(fp)
-    elif args.config_file and not os.path.isfile(args.config_file):
-        print(f"ERROR: Configuration file does not exist ({args.config_file}). Exiting ...")
-        sys.exit()
-    elif args.config_file is None and os.path.isfile(jds_path):
-        msg = f"INFO: Configuration file is {jds_path}\n"
-        print(msg, end="")
-        head += msg
-        with open(jds_path, "r", encoding="utf-8") as fp:
-            cfg = yaml.safe_load(fp)
-    elif args.config_file is None and os.path.isfile(cwd_path):
-        msg = f"INFO: Configuration file is {cwd_path}\n"
-        print(msg, end="")
-        head += msg
-        with open(cwd_path, "r", encoding="utf-8") as fp:
-            cfg = yaml.safe_load(fp)
-    else:
-        print("ERROR: Configuration file not found. Exiting ...")
-        sys.exit()
-
-    if "violation-logs-path" not in cfg:
-        print('ERROR: "violation-logs-path" must be specified in the configuration file.')
-        sys.exit()
-    if not os.path.exists(cfg["violation-logs-path"]): 
-        dir_path = cfg["violation-logs-path"]
-        try:
-            os.makedirs(dir_path)
-        except OSError:
-            print(f"ERROR: Unable to create directory {dir_path}")
-            raise
-        except FileExistsError:
-            print(f"ERROR: Path {dir_path} already exists")
-            raise
-        except PermissionError:
-            print(f"ERROR: Permission denied: Unable to create {dir_path}")
-            raise
-        except Exception as e:
-            print(f"ERROR: An error occurred when making {dir_path}: {e}")
-            raise
-
-    if "jobstats-module-path" not in cfg:
-        cfg["jobstats-module-path"] = "/usr/local/jobstats/"
-    if "jobstats-config-path" not in cfg:
-        cfg["jobstats-config-path"] = "/etc/jobstats/"
-    if "verbose" not in cfg:
-        cfg["verbose"] = False
-    if "external-emails" not in cfg:
-        cfg["external-emails"] = {}
-    if "greeting-method" not in cfg:
-        print('INFO: Setting greeting-method to "basic"')
-        cfg["greeting-method"] = "basic"
-    if "workday-method" not in cfg:
-        print('INFO: Setting workday-method to "always"')
-        cfg["workday-method"] = "always"
-    if "partition-renamings" not in cfg:
-        cfg["partition-renamings"] = {}
-
-    sys_cfg = {"no_emails_to_users":   args.no_emails_to_users,
-               "no_emails_to_admins":  args.no_emails_to_admins,
-               "jobstats_module_path": cfg["jobstats-module-path"],
-               "jobstats_config_path": cfg["jobstats-config-path"],
-               "email_files_path":     cfg["email-files-path"],
-               "verbose":              cfg["verbose"],
-               "sender":               cfg["sender"],
-               "reply_to":             cfg["reply-to"],
-               "email_domain":         cfg["email-domain-name"],
-               "external_emails":      cfg["external-emails"]}
+    cfg, sys_cfg, head = read_config_file(args.config_file,
+                                          jds_path,
+                                          cwd_path,
+                                          head,
+                                          args.no_emails_to_users,
+                                          args.no_emails_to_admins)
 
     greeting_method = cfg["greeting-method"]
     violation_logs_path = cfg["violation-logs-path"]
@@ -211,15 +152,9 @@ def main():
         print("INFO: Today is not a workday. Emails to users and administrators will not")
         print("      be sent except for GPU jobs at 0% utilization. To force emails,")
         print("      modify config.yaml with 'workday-method: always'")
-
     if cfg["verbose"]:
-        for key in cfg.keys():
-            if any([c.isnumeric() for c in key]):
-                print(4 * " " + key)
-        for key in cfg.keys():
-            if "serial-allocating-multiple" in key:
-                print("serial-allocating-multiple", cfg[key]["cluster"], cfg[key]["partitions"])
- 
+        print(display_alerts(cfg))
+
     #######################
     ## CHECK EMAILS SENT ##
     #######################
@@ -309,15 +244,9 @@ def main():
                    "--jobs-overview or --longest-queued."))
         sys.exit()
 
-    # pandas display settings
-    pd.set_option("display.max_rows", None)
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.width", 1000)
-
     start_date, end_date = prepare_datetimes(args.starttime,
                                              args.endtime,
                                              args.days)
-
     fields = ["jobid",
               "user",
               "cluster",
@@ -339,15 +268,11 @@ def main():
               "jobname"]
     # jobname must be last in list below to catch "|" characters in jobname
     assert fields[-1] == "jobname"
-    fields = ",".join(fields)
-
-    use_cache = False if (args.email or args.report) else True
     raw = SlurmSacct(start_date,
                      end_date,
                      fields,
                      args.clusters,
-                     args.partition)
-    raw = raw.get_job_data()
+                     args.partition).get_job_data()
     if args.dump_files:
         raw.to_csv("DEBUG_RAW.csv", index=False)
 
@@ -360,33 +285,20 @@ def main():
     df = SacctCleaner(raw, field_renamings, partition_renamings).clean()
     pending = df[df.state == "PENDING"].copy()
     df = df[(df.state != "PENDING") & (df.elapsedraw > 0)]
-
     num_nulls = df.isnull().sum().sum()
     if num_nulls:
-        print(f"Number of null values in df: {num_nulls}")
+        print(f"WARNING: Number of null values in df dataframe: {num_nulls}")
 
     if args.strict_start:
-        # remove usage before the start of the time window
-        df["secs-from-start"] = df["start"] - start_date.timestamp()
-        df["secs-from-start"] = df["secs-from-start"].apply(lambda x: x if x < 0 else 0)
-        df["elapsedraw"] = df["elapsedraw"] + df["secs-from-start"]
-
-    def add_new_and_derived_fields(df):
-        df["cpu-seconds"] = df["elapsedraw"] * df["cores"]
-        df["gpus"] = df.alloctres.apply(gpus_per_job)
-        df["gpu-seconds"] = df["elapsedraw"] * df["gpus"]
-        df["cpu-only-seconds"] = np.where(df["gpus"] == 0, df["cpu-seconds"], 0)
-        df["elapsed-hours"] = df["elapsedraw"] / sph
-        df.loc[df["start"] != "Unknown", "start-date"] = pd.to_datetime(df["start"].astype(int), unit='s').dt.strftime("%a %-m/%d")
-        df["cpu-hours"] = df["cpu-seconds"] / sph
-        df["gpu-hours"] = df["gpu-seconds"] / sph
-        df["admincomment"] = df["admincomment"].apply(get_stats_dict)
-        return df
-
+        df = apply_strict_start(df, start_date)
     df = add_new_and_derived_fields(df)
+    # next line should be in utils.py but need resolve pytest path issues
+    # with import of: from .efficiency import get_stats_dict
+    df["admincomment"] = df["admincomment"].apply(get_stats_dict)
     df.reset_index(drop=True, inplace=True)
     if args.dump_files:
         df.to_csv("DEBUG_DF.csv", index=False)
+
 
     s = "\n"
     ###########################################

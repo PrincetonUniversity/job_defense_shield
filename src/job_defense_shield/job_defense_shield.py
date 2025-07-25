@@ -2,13 +2,8 @@ import os
 import sys
 import argparse
 from datetime import datetime
-from datetime import timedelta
-import numpy as np
 import pandas as pd
-import yaml
 
-from .utils import SECONDS_PER_HOUR as sph
-from .utils import gpus_per_job
 from .utils import send_email
 from .utils import show_history_of_emails_sent
 from .utils import prepare_datetimes

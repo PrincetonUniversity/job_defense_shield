@@ -1,5 +1,5 @@
 import os
-import yaml
+import sys
 import re
 import glob
 import smtplib
@@ -9,8 +9,11 @@ from typing import Tuple
 from typing import Optional
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+import yaml
 import numpy as np
 import pandas as pd
+
 
 # conversion factors
 SECONDS_PER_MINUTE = 60
@@ -291,7 +294,7 @@ def display_alerts(cfg: dict) -> str:
               "excessive-time-cpu"]
     indent = 2 * " "
     count = 0
-    output = "INFO: The following alerts were found:\n"
+    output = "INFO: The following alerts were found in the configuration file:\n"
     for key in cfg.keys():
         for alert in alerts:
             if alert in key:
@@ -302,7 +305,7 @@ def display_alerts(cfg: dict) -> str:
                 partitions = ",".join(cfg[key]["partitions"])
                 output += f"{7 * indent}cluster: {cluster}\n"
                 output += f"{7 * indent}partitions: {partitions}\n"
-    return output[:-1]
+    return f"{output}{4 * indent}None" if count == 0 else output[:-1]
 
 def apply_strict_start(df: pd.DataFrame,
                        start_date: datetime) -> pd.DataFrame:

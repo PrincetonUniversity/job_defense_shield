@@ -42,7 +42,10 @@ class LowEfficiency(Alert):
         self.pr = self.pr.groupby("user").agg({f"{self.xpu}-seconds":"sum"})
         self.pr = self.pr.reset_index(drop=False)
         total = self.pr[f"{self.xpu}-seconds"].sum()
-        assert total != 0, f"Total {self.xpu}-seconds is zero"
+        self.ce = pd.DataFrame({"user":[]})
+        self.admin = pd.DataFrame()
+        if total == 0:
+            return
         self.pr["proportion(%)"] = self.pr[f"{self.xpu}-seconds"].apply(lambda x: round(100 * x / total))
         self.pr = self.pr.rename(columns={f"{self.xpu}-seconds":f"{self.xpu}-seconds-all"})
         self.pr = self.pr.sort_values(by=f"{self.xpu}-seconds-all", ascending=False)
@@ -55,12 +58,10 @@ class LowEfficiency(Alert):
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsedraw"] >= self.min_run_time / mph) &
                           (self.df.admincomment != {})].copy()
-        # next line prevents (unlikely) failure when creating "{self.xpu}-tuples"
-        if self.ce.empty:
-            return
         if not self.ce.empty and hasattr(self, "nodelist"):
             self.ce = self.filter_by_nodelist(self.ce)
-        self.admin = pd.DataFrame()
+        if self.ce.empty:
+            return
         self.ce = self.ce.merge(self.pr, how="left", on="user")
         if self.xpu == "cpu":
             self.ce[f"{self.xpu}-tuple"] = self.ce.apply(lambda row:

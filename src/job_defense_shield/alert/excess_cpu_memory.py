@@ -86,7 +86,8 @@ class ExcessCPUMemory(Alert):
             self.gp = self.gp.rename(columns={"user":"jobs"})
             self.gp.reset_index(drop=False, inplace=True)
             total_mem_hours = self.gp["mem-hrs-alloc"].sum()
-            assert total_mem_hours != 0, "total_mem_hours found to be zero"
+            if total_mem_hours == 0:
+                return
             self.gp["proportion"] = self.gp["mem-hrs-alloc"] / total_mem_hours
             self.gp["Ratio"] = self.gp["mem-hrs-used"] / self.gp["mem-hrs-alloc"]
             self.gp = self.gp.sort_values("mem-hrs-unused", ascending=False)

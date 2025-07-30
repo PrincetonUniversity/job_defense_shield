@@ -44,7 +44,7 @@ The available settings are listed below:
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `mem_eff_threshold`: (Optional) Ignore jobs where the ratio of used to allocated CPU memory is greater than or equal to this value. Default: 1.0
+- `mem_eff_thres`: (Optional) Ignore jobs where the ratio of used to allocated CPU memory is greater than or equal to this value. Default: 1.0
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 

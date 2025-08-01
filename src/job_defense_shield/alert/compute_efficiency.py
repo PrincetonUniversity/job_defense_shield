@@ -45,7 +45,7 @@ class LowEfficiency(Alert):
         self.ce = pd.DataFrame({"user":[]})
         self.admin = pd.DataFrame()
         if total == 0:
-            return
+            return None
         self.pr["proportion(%)"] = self.pr[f"{self.xpu}-seconds"].apply(lambda x: round(100 * x / total))
         self.pr = self.pr.rename(columns={f"{self.xpu}-seconds":f"{self.xpu}-seconds-all"})
         self.pr = self.pr.sort_values(by=f"{self.xpu}-seconds-all", ascending=False)
@@ -61,7 +61,7 @@ class LowEfficiency(Alert):
         if not self.ce.empty and hasattr(self, "nodelist"):
             self.ce = self.filter_by_nodelist(self.ce)
         if self.ce.empty:
-            return
+            return None
         self.ce = self.ce.merge(self.pr, how="left", on="user")
         if self.xpu == "cpu":
             self.ce[f"{self.xpu}-tuple"] = self.ce.apply(lambda row:
@@ -102,7 +102,7 @@ class LowEfficiency(Alert):
         self.ce["eff(%)"] = 100.0 * self.ce[f"{self.xpu}-seconds-used"] / self.ce[f"{self.xpu}-seconds-total"]
         # next line prevents (unlikely) failure when creating "{self.xpu}-hours"
         if self.ce.empty:
-            return pd.DataFrame()
+            return None
         self.ce[f"{self.xpu}-hours"] = self.ce.apply(lambda row:
                                                      round(row[f"{self.xpu}-seconds-total"] / sph),
                                                      axis="columns")

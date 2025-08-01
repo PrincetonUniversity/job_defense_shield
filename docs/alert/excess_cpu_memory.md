@@ -34,14 +34,13 @@ Each configuration parameter is explained below:
 - `tb_hours_threshold`: The threshold value for (unused) memory-hours in units of TB-hours. A user must have this number or above to receive an email message. This quantity is the unused CPU memory of a job multiplied by the elapsed time (summed over all jobs).
 
 - `ratio_threshold`: This quantity is the sum of CPU memory used divded
-by the total memory allocated for all jobs of a given user.
-This quantity varies between 0 and 1.
+by the total memory allocated for all jobs of the user. This quantity varies between 0 and 1.
 
-- `median_ratio_threshold`: This is median value of memory used divided by
+- `median_ratio_threshold`: The median value of memory used divided by
 memory allocated for the individual jobs of the user. This quantity varies between 0 and 1.
 
-- `mean_ratio_threshold`: The mean value of the memory used divided by the
-memory allocated per job for a given user. This quantity varies between 0
+- `mean_ratio_threshold`: The mean value of memory used divided by
+memory allocated for the individual jobs for a given user. This quantity varies between 0
 and 1.
 
 - `email_file`: The text file to be used for the email message to users.

@@ -2,6 +2,7 @@ import pandas as pd
 from ..base import Alert
 from ..efficiency import cpu_efficiency
 from ..efficiency import gpu_efficiency
+from ..efficiency import gpu_memory_usage_mean_pct
 from ..utils import SECONDS_PER_HOUR as sph
 from ..utils import MINUTES_PER_HOUR as mph
 from ..utils import add_dividers
@@ -84,6 +85,28 @@ class LowEfficiency(Alert):
                 f"{self.xpu}-error-code"]
         self.ce[cols] = pd.DataFrame(self.ce[f"{self.xpu}-tuple"].tolist(), index=self.ce.index)
         self.ce = self.ce[self.ce[f"{self.xpu}-error-code"] == 0]
+        if self.ce.empty:
+            return None
+        if self.xpu == "gpu" and hasattr(self, "gpu_mem_eff_pct"):
+            num_jobs = len(self.ce)
+            self.ce[f"{self.xpu}-pair"] = self.ce.apply(lambda row:
+                                          gpu_memory_usage_mean_pct(row["admincomment"],
+                                                                    row["jobid"],
+                                                                    row["cluster"],
+                                                                    verbose=self.verbose),
+                                                                    axis="columns")
+            cols = [f"{self.xpu}-mem-mean-pct",
+                    f"{self.xpu}-error-code-2"]
+            self.ce[cols] = pd.DataFrame(self.ce[f"{self.xpu}-pair"].tolist(), index=self.ce.index)
+            self.ce = self.ce[self.ce[f"{self.xpu}-error-code-2"] == 0]
+            self.ce = self.ce[self.ce[f"{self.xpu}-mem-mean-pct"] <= self.gpu_mem_eff_pct]
+            num_rm = num_jobs - len(self.ce)
+            if num_rm:
+                clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
+                msg = (f"INFO: Removed {num_rm} of {num_jobs} jobs in low-gpu-efficiency "
+                       f"with gpu_mem_eff_pct >= {self.gpu_mem_eff_pct}(%) for {clus_part}.")
+                print(msg)
+
         self.ce["interactive"] = self.ce["jobname"].apply(lambda x:
                                                           1 if x.startswith("sys/dashboard") or
                                                                x.startswith("interactive") else 0)

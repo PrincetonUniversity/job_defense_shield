@@ -4,6 +4,7 @@ import json
 import gzip
 import base64
 from typing import Set
+from functools import partial
 import pandas as pd
 
 
@@ -120,10 +121,32 @@ def cpu_memory_usage(ss, jobid, cluster, precision=0, verbose=True):
     return (round(total_used / fac, precision), round(total / fac, precision), error_code)
 
 
-def gpu_memory_usage_eff_tuples(ss, jobid, cluster, precision=1, verbose=True):
-    """Return a list of tuples for each GPU of the job. Each tuple contains the
+def gpu_memory_usage_eff_tuples(ss, jobid, cluster, precision=1, op=None, verbose=True):
+    '''Return a list of tuples for each GPU of the job. Each tuple contains the
        memory used, memory allocated, and GPU utilization. An error code is
-       added at the end."""
+       added at the end.
+
+       The choices for the op parameter are:
+
+         1. None: Return tuples of used, allocated, error code for each GPU.
+
+         2. "max": Return tuple of maximum usage per GPU in units of GB and error
+                   code, e.g., (42.0, 0). One can also call the specialized version:
+                   gpu_memory_usage_max(ss, jobid, cluster, precision=1, verbose=True)
+
+         3. "max-percent": Return tuple of maximum percentage usage per GPU in
+                           units of GB and error code, e.g., (85.0, 0). The specialized version is:
+                           gpu_memory_usage_max_pct(ss, jobid, cluster, precision=1, verbose=True)
+
+         4. "mean": Return tuple of mean usage over the GPUs in units of GB and
+                    error code, e.g., (26.8, 0). One can also call the specialized version:
+                    gpu_memory_usage_mean(ss, jobid, cluster, precision=1, verbose=True)
+
+         5. "mean-percent": Return tuple of mean usage percentage over the GPUs
+                            and error code, e.g., (87.5, 0). The specialized version is:
+                            gpu_memory_usage_mean_pct(ss, jobid, cluster, precision=1, verbose=True)
+    '''
+
     if 'nodes' not in ss:
         if verbose:
             msg = "Warning: nodes not in ss for gpu_memory_usage_eff_tuples."
@@ -157,8 +180,23 @@ def gpu_memory_usage_eff_tuples(ss, jobid, cluster, precision=1, verbose=True):
                     if verbose:
                         print("GPU util erroneous:", jobid, cluster, util[g])
                     error_code = 3
+    if op == "max":
+        return (max([round(item[0], precision) for item in all_gpus]), error_code)
+    if op == "max-percent":
+        max_pct = max([100 * item[0] / item[1] for item in all_gpus])
+        return (round(max_pct, precision), error_code)
+    if op == "mean":
+        mean_usage = sum([item[0] for item in all_gpus]) / len(all_gpus)
+        return (round(mean_usage, precision), error_code)
+    if op == "mean-percent":
+        mean_pct = sum([100 * item[0] / item[1] for item in all_gpus]) / len(all_gpus)
+        return (round(mean_pct, precision), error_code)
     return (all_gpus, error_code)
 
+gpu_memory_usage_max = partial(gpu_memory_usage_eff_tuples, op="max")
+gpu_memory_usage_max_pct = partial(gpu_memory_usage_eff_tuples, op="max-percent")
+gpu_memory_usage_mean = partial(gpu_memory_usage_eff_tuples, op="mean")
+gpu_memory_usage_mean_pct = partial(gpu_memory_usage_eff_tuples, op="mean-percent")
 
 def max_cpu_memory_used_per_node(ss, jobid, cluster, precision=0, verbose=True):
     """Return the maximum of the used memory per node. The error code is needed

@@ -26,13 +26,13 @@ The available settings are listed below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
-- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all partitions.
+- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all of the partitions.
 
-- `eff_thres_pct`: Efficiency threshold percentage. Users with a GPU efficiency of less than or equal to this value will be considered to receive an email.
+- `eff_thres_pct`: Efficiency threshold percentage. Users with a mean GPU efficiency of less than or equal to this value will be considered to receive an email.
 
-- `eff_target_pct`: The minimum acceptable GPU utilization for a user. This quantity is not used in any calculations but it can be referenced using `<TARGET>` in the email file.
+- `eff_target_pct`: The minimum acceptable mean GPU utilization for a user. This quantity is not used in any calculations but it can be referenced using `<TARGET>` in the email file.
 
-- `absolute_thres_hours`: Absolute threshold hours. A user must have allocated more than this number of GPU-hours to receive an email.
+- `absolute_thres_hours`: Absolute threshold hours. A user must have consumed more than this number of GPU-hours to receive an email.
 
 - `email_file`: The text file to be used as the email message to users.
 
@@ -42,7 +42,9 @@ The available settings are listed below:
 
 - `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. Default: 0
 
-- `proportion_thres_pct`: (Optional) Proportion threshold percentage. A user must be using at least this proportion of the total GPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will exclude all users that are using less than 2% of the total GPU-hours. Default: 0
+- `proportion_thres_pct`: (Optional) Proportion threshold percentage. A user must have consumed at least this proportion of the total GPU-hours (as a percentage) in order to be sent an email. For example, a value of 2 will exclude all users that are using less than 2% of the total GPU-hours. Default: 0
+
+- `gpu_mem_eff_pct`: (Optional) Threshold for GPU memory efficiency as a percentage. Jobs with a GPU memory efficiency of greater than this value will be ignored. A job that uses 60 GB of an 80 GB GPU has a memory efficiency of 75%. For multi-GPU jobs, the mean GPU memory efficiency is used. This setting makes it possible to ignore jobs with low GPU utilization but high GPU memory usage. Default: 100
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 

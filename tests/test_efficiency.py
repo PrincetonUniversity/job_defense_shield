@@ -3,6 +3,10 @@ from efficiency import cpu_efficiency
 from efficiency import gpu_efficiency
 from efficiency import cpu_memory_usage
 from efficiency import gpu_memory_usage_eff_tuples
+from efficiency import gpu_memory_usage_max
+from efficiency import gpu_memory_usage_max_pct
+from efficiency import gpu_memory_usage_mean
+from efficiency import gpu_memory_usage_mean_pct
 from efficiency import max_cpu_memory_used_per_node
 from efficiency import num_gpus_with_zero_util
 from efficiency import cpu_nodes_with_zero_util
@@ -157,6 +161,90 @@ def test_gpu_memory_usage_eff_tuples():
                             "gpu_utilization": {3: 85}}}}
     actual = gpu_memory_usage_eff_tuples(ss, 12345, "c1")
     expected = ([(42.0, 80.0, 95.0), (62.0, 80.0, 85.0)], 0)
+    assert actual == expected
+
+
+def test_gpu_memory_usage_max():
+    used = 42 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}}}}
+    assert gpu_memory_usage_max(ss, 12345, "c1") == (42.0, 0)
+    used1 = 42 * 1024**3
+    used2 = 62 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used1},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: used2},
+                            "gpu_total_memory": {3: total},
+                            "gpu_utilization": {3: 85}}}}
+    actual = gpu_memory_usage_max(ss, 12345, "c1")
+    expected = (62.0, 0)
+    assert actual == expected
+
+
+def test_gpu_memory_usage_max_pct():
+    used = 42 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}}}}
+    assert gpu_memory_usage_max_pct(ss, 12345, "c1") == (52.5, 0)
+    used1 = 42 * 1024**3
+    used2 = 62 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used1},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: used2},
+                            "gpu_total_memory": {3: total},
+                            "gpu_utilization": {3: 85}}}}
+    actual = gpu_memory_usage_max_pct(ss, 12345, "c1")
+    expected = (77.5, 0)
+    assert actual == expected
+
+
+def test_gpu_memory_usage_mean():
+    used = 42 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}}}}
+    assert gpu_memory_usage_mean(ss, 12345, "c1") == (42.0, 0)
+    used1 = 42 * 1024**3
+    used2 = 62 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used1},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: used2},
+                            "gpu_total_memory": {3: total},
+                            "gpu_utilization": {3: 85}}}}
+    actual = gpu_memory_usage_mean(ss, 12345, "c1")
+    expected = (52.0, 0)
+    assert actual == expected
+
+
+def test_gpu_memory_usage_mean_pct():
+    used = 42 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}}}}
+    assert gpu_memory_usage_mean_pct(ss, 12345, "c1") == (52.5, 0)
+    used1 = 42 * 1024**3
+    used2 = 62 * 1024**3
+    total = 80 * 1024**3
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: used1},
+                            "gpu_total_memory": {0: total},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: used2},
+                            "gpu_total_memory": {3: total},
+                            "gpu_utilization": {3: 85}}}}
+    actual = gpu_memory_usage_mean_pct(ss, 12345, "c1")
+    expected = (65.0, 0)
     assert actual == expected
 
 

@@ -134,10 +134,12 @@ class ExcessiveTimeLimits(Alert):
                 usr["Cluster"] = self.cluster
                 usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr["Jobs"] = total_jobs
+                col = f"{xpu.upper()}-Hours-Unused"
+                usr[col] = usr[col].apply(round).astype("int64")
                 usr = usr[["User",
                            "Cluster",
                            "Alert-Partitions",
-                           f"{xpu.upper()}-Hours-Unused",
+                           col,
                            "Jobs"]]
                 self.emails.append((user, email, usr))
 

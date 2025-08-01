@@ -85,7 +85,12 @@ class Alert:
                            user_email_address,
                            subject=self.email_subject,
                            sender=self.sender,
-                           reply_to=self.reply_to)
+                           reply_to=self.reply_to,
+                           smtp_server=self.smtp_server,
+                           smtp_user=self.smtp_user,
+                           smtp_password=self.smtp_password,
+                           smtp_port=self.smtp_port,
+                           verbose=self.verbose)
                 print(email)
                 if usr is not None:
                     vfile = f"{self.vpath}/{self.violation}/{user}.csv"
@@ -98,7 +103,12 @@ class Alert:
                                    admin_email,
                                    subject=self.email_subject,
                                    sender=self.sender,
-                                   reply_to=self.reply_to)
+                                   reply_to=self.reply_to,
+                                   smtp_server=self.smtp_server,
+                                   smtp_user=self.smtp_user,
+                                   smtp_password=self.smtp_password,
+                                   smtp_port=self.smtp_port,
+                                   verbose=self.verbose)
                 if self.no_emails_to_users:
                     print(email)
 

@@ -5,7 +5,6 @@ import sys
 import subprocess
 from time import time
 from datetime import datetime
-from datetime import timedelta
 from abc import ABC, abstractmethod
 from typing import List
 import pandas as pd
@@ -53,7 +52,7 @@ class SlurmSacct(RawJobData):
         cmd += f"-M {self.clusters} -o {self.fields}"
         if self.partitions:
             cmd += f" -r {self.partitions}"
-        print(f"INFO: Calling sacct ... ", end="", flush=True)
+        print("INFO: Calling sacct ... ", end="", flush=True)
         start = time()
         try:
             result = subprocess.run(cmd,

@@ -3,6 +3,7 @@ import sys
 import re
 import glob
 import smtplib
+import ssl
 from datetime import datetime
 from datetime import timedelta
 from typing import Tuple
@@ -40,34 +41,6 @@ states = {
   'TO'  :'TIMEOUT'
   }
 JOBSTATES = dict(zip(states.values(), states.keys()))
-
-def gpus_per_job(tres: str) -> int:
-    """Return the number of allocated GPUs."""
-    gpus = re.findall(r"gres/gpu=\d+", tres)
-    return int(gpus[0].replace("gres/gpu=", "")) if gpus else 0
-
-def add_dividers(df_str: str,
-                 title: str="",
-                 pre: str="\n\n\n",
-                 units_row: bool=False) -> str:
-    """Add horizontal dividers to the output tables."""
-    rows = df_str.split("\n")
-    width = max([len(row) for row in rows] + [len(title)])
-    heading = title.center(width)
-    divider = "-" * width
-    if title and not units_row:
-        rows.insert(0, heading)
-        rows.insert(1, divider)
-        rows.insert(3, divider)
-    elif title and units_row:
-        rows.insert(0, heading)
-        rows.insert(1, divider)
-        rows.insert(4, divider)
-    else:
-        rows.insert(0, divider)
-        rows.insert(2, divider)
-    rows.append(divider)
-    return pre + "\n".join(rows) + "\n"
 
 def show_history_of_emails_sent(vpath, mydir, title, day_ticks) -> None:
     """Display the history of emails sent to users."""
@@ -132,67 +105,6 @@ def seconds_to_slurm_time_format(seconds: int) -> str:
     seconds %= 60
     return "%s%02d:%02d" % (hour, minutes, seconds)
 
-def send_email(email_body, addressee, subject, sender, reply_to):
-    """Send an email using simple HTML."""
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = subject
-    msg['From'] = sender
-    msg['To'] = addressee
-    msg.add_header("reply-to", reply_to)
-    text = ""
-    font = '<font face="Courier New, Courier, monospace">'
-    html = f'<html><head></head><body>{font}<pre>{email_body}</pre></font></body></html>'
-    part1 = MIMEText(text, 'plain')
-    part2 = MIMEText(html, 'html')
-    msg.attach(part1)
-    msg.attach(part2)
-    s = smtplib.SMTP('localhost')
-    s.sendmail(sender, addressee, msg.as_string())
-    s.quit()
-    return None
-
-def send_email_enhanced(email_body, addressee, subject, sender, reply_to):
-    """Send an email using HTML. Use nested tables and styles:
-       https://kinsta.com/blog/html-email/
-       and https://www.emailvendorselection.com/create-html-email/"""
-    from email.message import EmailMessage
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = sender
-    msg['To'] = addressee
-    msg.add_header("reply-to", reply_to)
-    html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
-    html += '<meta name="viewport" content="width=device-width,initial-scale=1">'
-    html += '<title></title></head><body><table width="600px" border="0"><tr>'
-    html += f'<td align="center">{email_body}</td></tr></table></body></html>'
-    msg.set_content(html, subtype="html")
-    with smtplib.SMTP('localhost') as s:
-        s.send_message(msg)
-
-def prepare_datetimes(starttime: Optional[str],
-                      endtime: Optional[str],
-                      days: int) -> Tuple[datetime, datetime]:
-    """If user only supplies --days then calculate start and end based
-       on current time. Otherwise calculate start and end based on what
-       is provided."""
-    fmt = "%Y-%m-%dT%H:%M:%S"
-    if starttime is not None and endtime is None:
-        start_date = datetime.strptime(starttime, fmt)
-        end_date = start_date + timedelta(days=days)
-        return start_date, end_date
-    elif starttime is None and endtime is not None:
-        end_date = datetime.strptime(endtime, fmt)
-        start_date = end_date - timedelta(days=days)
-        return start_date, end_date
-    elif starttime is not None and endtime is not None:
-        start_date = datetime.strptime(starttime, fmt)
-        end_date = datetime.strptime(endtime, fmt)
-        return start_date, end_date
-    else:
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        return start_date, end_date
-
 def read_config_file(config_file: Optional[str],
                      jds_path: Optional[str],
                      cwd_path: Optional[str],
@@ -227,6 +139,7 @@ def read_config_file(config_file: Optional[str],
         print("ERROR: Configuration file not found. Exiting ...")
         sys.exit()
  
+    # check for and/or create the violation logs directory
     if "violation-logs-path" not in cfg:
         print('ERROR: "violation-logs-path" must be specified in the configuration file.')
         sys.exit()
@@ -263,7 +176,19 @@ def read_config_file(config_file: Optional[str],
         cfg["workday-method"] = "always"
     if "partition-renamings" not in cfg:
         cfg["partition-renamings"] = {}
+    if "smtp-server" not in cfg:
+        cfg["smtp-server"] = None
+    if "smtp-user" not in cfg:
+        cfg["smtp-user"] = None
+    if "smtp-password" not in cfg:
+        cfg["smtp-password"] = None
+    smtp_password_from_env = os.getenv("JOBSTATS_SMTP_PASSWORD")
+    if smtp_password_from_env:
+        cfg["smtp-password"] = smtp_password_from_env
+    if "smtp-port" not in cfg:
+        cfg["smtp-port"] = None
 
+    # system or global configuration settings
     sys_cfg = {"no_emails_to_users":   no_emails_to_users,
                "no_emails_to_admins":  no_emails_to_admins,
                "jobstats_module_path": cfg["jobstats-module-path"],
@@ -273,7 +198,11 @@ def read_config_file(config_file: Optional[str],
                "sender":               cfg["sender"],
                "reply_to":             cfg["reply-to"],
                "email_domain":         cfg["email-domain-name"],
-               "external_emails":      cfg["external-emails"]}
+               "external_emails":      cfg["external-emails"],
+               "smtp_server":          cfg["smtp-server"],
+               "smtp_user":            cfg["smtp-user"],
+               "smtp_password":        cfg["smtp-password"],
+               "smtp_port":            cfg["smtp-port"]}
     return cfg, sys_cfg, head
 
 def display_alerts(cfg: dict) -> str:
@@ -307,6 +236,35 @@ def display_alerts(cfg: dict) -> str:
                 output += f"{7 * indent}partitions: {partitions}\n"
     return f"{output}{4 * indent}None" if count == 0 else output[:-1]
 
+def prepare_datetimes(starttime: Optional[str],
+                      endtime: Optional[str],
+                      days: int) -> Tuple[datetime, datetime]:
+    """If user only supplies --days then calculate start and end based
+       on current time. Otherwise calculate start and end based on what
+       is provided."""
+    fmt = "%Y-%m-%dT%H:%M:%S"
+    if starttime is not None and endtime is None:
+        start_date = datetime.strptime(starttime, fmt)
+        end_date = start_date + timedelta(days=days)
+        return start_date, end_date
+    elif starttime is None and endtime is not None:
+        end_date = datetime.strptime(endtime, fmt)
+        start_date = end_date - timedelta(days=days)
+        return start_date, end_date
+    elif starttime is not None and endtime is not None:
+        start_date = datetime.strptime(starttime, fmt)
+        end_date = datetime.strptime(endtime, fmt)
+        return start_date, end_date
+    else:
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        return start_date, end_date
+
+def gpus_per_job(tres: str) -> int:
+    """Return the number of allocated GPUs."""
+    gpus = re.findall(r"gres/gpu=\d+", tres)
+    return int(gpus[0].replace("gres/gpu=", "")) if gpus else 0
+
 def apply_strict_start(df: pd.DataFrame,
                        start_date: datetime) -> pd.DataFrame:
     """Remove usage before the start of the time window. By default
@@ -330,3 +288,93 @@ def add_new_and_derived_fields(df: pd.DataFrame) -> pd.DataFrame:
     df["cpu-hours"] = df["cpu-seconds"] / SECONDS_PER_HOUR
     df["gpu-hours"] = df["gpu-seconds"] / SECONDS_PER_HOUR
     return df
+
+def add_dividers(df_str: str,
+                 title: str="",
+                 pre: str="\n\n\n",
+                 units_row: bool=False) -> str:
+    """Add horizontal dividers to the output tables."""
+    rows = df_str.split("\n")
+    width = max([len(row) for row in rows] + [len(title)])
+    heading = title.center(width)
+    divider = "-" * width
+    if title and not units_row:
+        rows.insert(0, heading)
+        rows.insert(1, divider)
+        rows.insert(3, divider)
+    elif title and units_row:
+        rows.insert(0, heading)
+        rows.insert(1, divider)
+        rows.insert(4, divider)
+    else:
+        rows.insert(0, divider)
+        rows.insert(2, divider)
+    rows.append(divider)
+    return pre + "\n".join(rows) + "\n"
+
+def send_email(email_body: str,
+               addressee: str,
+               subject: str,
+               sender: str,
+               reply_to: str,
+               smtp_server: Optional[str],
+               smtp_user: Optional[str],
+               smtp_password: Optional[str],
+               smtp_port: Optional[int],
+               verbose: bool) -> None:
+    """Send an email using simple HTML. If smtp_server is not None then use
+       an external SMTP server as specified in the configuration file. One
+       advantage of using MIMEMultipart is that an attachment could be added
+       as a new feature."""
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = addressee
+    msg.add_header("reply-to", reply_to)
+    text = ""
+    font = '<font face="Courier New, Courier, monospace">'
+    html = f'<html><head></head><body>{font}<pre>{email_body}</pre></font></body></html>'
+    part1 = MIMEText(text, 'plain')
+    part2 = MIMEText(html, 'html')
+    msg.attach(part1)
+    msg.attach(part2)
+    if smtp_server:
+        if verbose:
+            print(f"INFO: SMTP server: {smtp_server}")
+            print(f"INFO: SMTP user: {smtp_user}")
+            passwd = smtp_password[0] + (len(smtp_password) - 1) * "*"
+            print(f"INFO: SMTP password: {passwd}")
+            print(f"INFO: SMTP port: {smtp_port}")
+        try:
+            context = ssl.create_default_context()
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls(context=context)
+                server.login(smtp_user, smtp_password)
+                server.sendmail(sender, addressee, msg.as_string())
+        except Exception as e:
+            print(f"ERROR: Failed to send email using external SMTP server: {e}")
+    else:
+        with smtplib.SMTP('localhost') as server:
+            server.sendmail(sender, addressee, msg.as_string())
+
+def send_email_enhanced(email_body: str,
+                        addressee: str,
+                        subject: str,
+                        sender: str,
+                        reply_to: str) -> None:
+    """Send an email using HTML. Use nested tables and styles:
+       https://kinsta.com/blog/html-email/
+       and https://www.emailvendorselection.com/create-html-email/"""
+    from email.message import EmailMessage
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = addressee
+    msg.add_header("reply-to", reply_to)
+    html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+    html += '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    html += '<title></title></head><body><table width="600px" border="0"><tr>'
+    html += f'<td align="center">{email_body}</td></tr></table></body></html>'
+    msg.set_content(html, subtype="html")
+    with smtplib.SMTP('localhost') as server:
+        server.send_message(msg)

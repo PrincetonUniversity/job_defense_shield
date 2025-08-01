@@ -145,8 +145,8 @@ def main():
     is_workday = WorkdayFactory(holidays_file).create_workday(workday_method).is_workday()
     if not is_workday:
         print("INFO: Today is not a workday. Emails to users and administrators will not")
-        print("      be sent except for GPU jobs at 0% utilization. To force emails,")
-        print("      modify config.yaml with 'workday-method: always'")
+        print("      be sent except for the cancellation of GPU jobs at 0% utilization. To")
+        print("      force emails, modify config.yaml with 'workday-method: always'")
     if cfg["verbose"]:
         print(display_alerts(cfg))
 
@@ -672,12 +672,16 @@ def main():
                            report_email,
                            subject="Cluster Utilization Report",
                            sender=cfg["sender"],
-                           reply_to=cfg["reply-to"])
+                           reply_to=cfg["reply-to"],
+                           smtp_server=cfg["smtp-server"],
+                           smtp_user=cfg["smtp-user"],
+                           smtp_password=cfg["smtp-password"],
+                           smtp_port=cfg["smtp-port"],
+                           verbose=cfg["verbose"])
         else:
             msg = ("ERROR: --report was found but report-emails and/or "
                    "sender were not defined in config.yaml.\n\n")
             print(msg)
-
     print(s, end="\n\n")
 
 

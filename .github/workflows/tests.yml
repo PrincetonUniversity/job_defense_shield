@@ -11,7 +11,7 @@ jobs:
           python-version: "3.7"
 
       - name: Install package
-        run: pip install pandas pytest pytest-cov
+        run: pip install pandas pyyaml pytest pytest-cov
 
       - name: Test package
         run: pytest --cov=./ --cov-report=xml

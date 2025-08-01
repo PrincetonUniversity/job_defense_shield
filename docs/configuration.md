@@ -198,6 +198,33 @@ $ job_defense_shield --config-file=/path/to/myconfig.yaml --low-gpu-efficiency
 
 The ability to use different configuration files provides additional flexibility. For instance, for some institutions it may make sense to have a different configuration file for each cluster or for different alerts.
 
+## Using an External SMTP Server for Sending Emails
+
+By default, Job Defense Shield will use a local SMTP server using `localhost` to send emails. This will work for almost all institutions and no configuration is needed.
+
+If the local server is insufficient then one can use an external SMTP server with TLS encryption by adding the following settings to the configuration file:
+
+```yaml
+smtp-server: smtp.example.edu
+smtp-user: username
+smtp-port: 587
+```
+
+The password is set using the following environment variable:
+
+```
+export JOBSTATS_SMTP_PASSWORD=********
+```
+
+Alternatively, one can specify the password in the configuration file:
+
+```yaml
+smtp-server: smtp.example.edu
+smtp-user: username
+smtp-password: ********
+smtp-port: 587
+```
+
 ## Each Alert Must Have a Different Name
 
 Consider the following two alerts (pay attention to the alert names):

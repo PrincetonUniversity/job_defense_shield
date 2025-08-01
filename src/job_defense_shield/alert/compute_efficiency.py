@@ -104,7 +104,7 @@ class LowEfficiency(Alert):
             if num_rm:
                 clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
                 msg = (f"INFO: Removed {num_rm} of {num_jobs} jobs in low-gpu-efficiency "
-                       f"with gpu_mem_eff_pct >= {self.gpu_mem_eff_pct}(%) for {clus_part}.")
+                       f"with gpu_mem_eff_pct > {self.gpu_mem_eff_pct}(%) for {clus_part}.")
                 print(msg)
 
         self.ce["interactive"] = self.ce["jobname"].apply(lambda x:

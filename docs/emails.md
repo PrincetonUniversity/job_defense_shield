@@ -78,7 +78,7 @@ Below are your jobs on <CLUSTER> that did not use all of the allocated nodes:
 Each alert has a finite set of placeholders that may be used to generate custom emails. There are
 a set of example email files in the `email` directory of the [GitHub repository](https://github.com/jdh4/job_defense_shield). It is
 recommended that you copy these and modify them as you see fit. It might also be a good
-idea to put them under version control along with `config.yaml` and `holidays.txt`.
+idea to put them under version control along with `config.yaml` and `holidays.txt`. It is also recommended to occasionally save the contents of your `crontab`.
 
 ## Testing the Sending of Emails to Users
 
@@ -101,9 +101,9 @@ For testing, one can add a second flag that will only send the emails to `admin_
 $ job_defense_shield --low-gpu-efficiency --email --no-emails-to-users
 ```
 
-The `--no-emails-to-users` flag will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml` without involving users.
+The `--no-emails-to-users` flag will also prevent violation log files from being updated. This allows administrators to test and modify the email messages as well as tune the threshold values in `config.yaml`.
 
-There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](alert/cancel_gpu_jobs.md). In this case, one should add the following settings to the alert entry:
+There is one alert that requires one extra step for testing, which is [Cancel 0% GPU Jobs](alert/cancel_gpu_jobs.md). In this case, one should add the following settings to the alert entry:
 
 ```yaml
   do_not_cancel: True
@@ -112,13 +112,15 @@ There is one alert that requires one extra step, which is [Cancel 0% GPU Jobs](a
 
 ## When Are Emails Sent?
 
-Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email for the same instance of underutilization. By default, this time period is 7 days.
+Emails to users are most effective when sent sparingly. For this reason, there is a command-line parameter `--days` to specify the amount of time that must pass before the user can receive another email for the same instance of underutilization (e.g., low GPU efficiency). By default, this time period is 7 days.
 
 The emails sent to users either contain the individual jobs or a summary for that week. Note that users can receive multiple emails about the same type of underutilization if there are multiple alerts covering different partitions or different clusters.
 
 The `Email` column in the table below shows the number of emails that each user has received about this particular instance of underutilization:
 
 ```
+$ job_defense_shield --zero-util-gpu-hours
+
                          GPU-Hours at 0% Utilization
 ---------------------------------------------------------------------
     User   GPU-Hours-At-0%  Jobs             JobID             Emails
@@ -134,7 +136,7 @@ Partitions: gpu, llm
        End: Wed Feb 19, 2025 at 09:50 AM
 ```
 
-The number in parentheses is the number of days since the last email was sent. For example, `2 (4)` means that the user has received 2 previous emails with the last one being sent 4 days ago. To see when the emails were sent, see [check mode](extra.md).
+The number in parentheses is the number of days since the last email was sent. For example, `2 (4)` means that the user has received 2 emails with the last one being sent 4 days ago. To see when the emails were sent, see [check mode](extra.md).
 
 ## Hyperlinks
 

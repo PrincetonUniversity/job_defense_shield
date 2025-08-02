@@ -7,7 +7,7 @@ We assume that the [Jobstats](https://github.com/PrincetonUniversity/jobstats) p
 
 Python 3.7 is the minimum supported version. The required dependencies for Job Defense Shield are `pandas`, `pyarrow`, `pyyaml` and `requests`. The `requests` module is needed to address the underutilization of actively running jobs. In this case, the Prometheus server must be queried.
 
-Job Defense Shield can be installed from PyPI:
+Job Defense Shield can be installed from the Python Package Index (PyPI):
 
 ```
 $ pip install job-defense-shield
@@ -28,7 +28,7 @@ At a later time, to upgrade to the latest version:
 (jds-env) $ pip install --upgrade job-defense-shield
 ```
 
-It is strongly recommended to use the latest version.
+It is strongly recommended to always use the latest version.
 
 ## Testing the Installation
 
@@ -40,7 +40,7 @@ $ job_defense_shield --help
 
 If the command above failed then see [Troubleshooting the Installation](#troubleshooting-the-installation).
 
-Next, try running a simple informational alert. To do this, make a trivial configuration file called `config.yaml` in the current working directory:
+Next, try running a simple informational alert. To do this, make a trivial configuration file called `config.yaml` in the current working directory with the following contents:
 
 ```
 $ cat config.yaml
@@ -61,7 +61,7 @@ report-emails:
 ```
 
 !!! tip
-    If the path that you specified for `violation-logs-path` does not exist then the software will try to make it. You can use any valid path for now. In the next section, you will choose the production paths for `violation-logs-path` and `email-files-path`.
+    If the path that you specify for `violation-logs-path` does not exist then the software will try to make it. You can use any valid path for now. In the next section, you will choose the production paths for `violation-logs-path` and `email-files-path`.
 
 Be sure to replace `email-domain-name`, `sender`, `reply-to` and `report-emails` with your values.
 
@@ -143,7 +143,7 @@ $ job_defense_shield --usage-overview --days=14
 !!! info
     Using a large value for the `--days` option can cause the Slurm database to fail to produce the data. The default is 7 days.
 
-One can only include data from specific clusters or partitions using the `-M` and `-r` options from `sacct`:
+One can only include data from specific clusters or partitions using the `-M` and `-r` options:
 
 ```
 $ job_defense_shield --usage-overview -M della -r cpu,gpu
@@ -154,7 +154,7 @@ Or equivalently:
 $ job_defense_shield --usage-overview --clusters=della --partition=cpu,gpu
 ```
 
-The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to `sacct`. See `man sacct` for more information.
+The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to the Slurm command `sacct`. See `man sacct` for more information.
 
 ## Email Test
 
@@ -164,7 +164,9 @@ By having your email address in `report-emails` in `config.yaml`, the `--report`
 $ job_defense_shield --usage-overview --report
 ```
 
-This feature is useful when combined with `cron`. That is, one can receive a daily report showing all of the instances of underutilization across all of the systems (see [reports](reports/overview.md)).
+This feature is useful when combined with `cron`. Specifically, one can receive a daily report showing all of the instances of underutilization across all of the systems. More will be said about this later.
+
+If the email test failed then see the next section about setting up an external SMTP server.
 
 ## Troubleshooting the Installation
 

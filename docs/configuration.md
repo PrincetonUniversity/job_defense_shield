@@ -41,7 +41,7 @@ zero-cpu-utilization-1:
     - admin@institution.edu
 ```
 
-Each line of the global settings is explained below. See [example.yaml](https://github.com/jdh4/job_defense_shield/blob/main/example.yaml) in the GitHub repository for a full configuration file example.
+Each line of the global settings is explained below. See [example.yaml](https://github.com/PrincetonUniversity/job_defense_shield/blob/main/example.yaml) in the GitHub repository for a full configuration file example.
 
 ## Global Settings
 
@@ -101,7 +101,7 @@ reply-to: support@institution.edu
 ```
 
 !!! tip
-    By using a `reply-to` that is different from `sender`, one can prevent auto-reply or out-of-office emails from creating new support tickets.
+    By using a `reply-to` that is different from `sender`, one can prevent auto-reply or out-of-office emails from creating new support tickets. If this choice is made then it is likely that users will need to forward any underutilization emails they receive to `sender` to open a new support ticket. Keep this issue in mind when writing the email messages.
 
 Use the `greeting-method` to determine the first line of the email that users receive:
 
@@ -123,12 +123,39 @@ Hello u12345,
 
 There is also `ldap` which calls `ldapsearch`. Our recommendation is `getent`. If you find that `getent` is not working properly during testing then use `basic`.
 
-Lastly, one can create multiple reports and have those sent to administrators by email when the `--report` flag is used:
+Lastly, one can create reports and have those sent to administrators by email when the `--report` flag is used:
 
 ```yaml
 report-emails:
   - admin1@institution.edu
   - admin2@institution.edu
+```
+
+## (Optional) External SMTP Server for Sending Emails
+
+By default, Job Defense Shield will use a local SMTP server using `localhost` to send emails. This will work for almost all institutions and no configuration is needed.
+
+If the local server is insufficient then one can specify an external SMTP server with TLS encryption by adding the following settings to the configuration file:
+
+```yaml
+smtp-server: smtp.example.edu
+smtp-user: username
+smtp-port: 587
+```
+
+The password is set using the following environment variable:
+
+```bash
+export JOBSTATS_SMTP_PASSWORD=********
+```
+
+Alternatively, one can specify the password in the configuration file:
+
+```yaml
+smtp-server: smtp.example.edu
+smtp-user: username
+smtp-password: ********
+smtp-port: 587
 ```
 
 ### Workdays
@@ -197,33 +224,6 @@ $ job_defense_shield --config-file=/path/to/myconfig.yaml --low-gpu-efficiency
 ```
 
 The ability to use different configuration files provides additional flexibility. For instance, for some institutions it may make sense to have a different configuration file for each cluster or for different alerts.
-
-## Using an External SMTP Server for Sending Emails
-
-By default, Job Defense Shield will use a local SMTP server using `localhost` to send emails. This will work for almost all institutions and no configuration is needed.
-
-If the local server is insufficient then one can use an external SMTP server with TLS encryption by adding the following settings to the configuration file:
-
-```yaml
-smtp-server: smtp.example.edu
-smtp-user: username
-smtp-port: 587
-```
-
-The password is set using the following environment variable:
-
-```
-export JOBSTATS_SMTP_PASSWORD=********
-```
-
-Alternatively, one can specify the password in the configuration file:
-
-```yaml
-smtp-server: smtp.example.edu
-smtp-user: username
-smtp-password: ********
-smtp-port: 587
-```
 
 ## Each Alert Must Have a Different Name
 
@@ -319,7 +319,7 @@ zero-cpu-utilization-1:
 
 ## Full Example Configuration File
 
-For more examples see [example.yaml](https://github.com/jdh4/job_defense_shield/blob/main/example.yaml) in the GitHub repository.
+For more examples see [example.yaml](https://github.com/PrincetonUniversity/job_defense_shield/blob/main/example.yaml) in the GitHub repository.
 
 ## Writing and Testing Custom Emails
 

@@ -58,9 +58,9 @@ Partitions: cpu
        End: Mon Mar 17, 2025 at 06:23 PM
 ```
 
-CPU-Hours (Unused) is the product of the number of CPU-cores and run time limit minus the elapsed time (summed over all jobs). The table is sorted by this quantity. Ratio Overall is CPU-Hours (Used) divided by CPU-Hours (unused) plus CPU-Hours (used). CPU-Rank is the rank of the user by CPU-Hours (used). The user that has consumed the most CPU-hours has a rank of 1.
+CPU-Hours (Unused) is the product of the number of CPU-cores and the difference between the run time limit and the elapsed time (summed over all jobs). The table is sorted by this quantity. Ratio Overall is CPU-Hours (Used) divided by CPU-Hours (unused) plus CPU-Hours (used). CPU-Rank is the rank of the user by CPU-Hours (used). The user that has consumed the most CPU-hours has a rank of 1.
 
-Looking at the data in the table above, we can decide on the threshold values to use for the alert. The following choices look like good starting values:
+Looking at the data in the table above, one can decide on the threshold values to use for the alert. The following choices look like good starting values:
 
 ```yaml
 excessive-time-cpu-1:
@@ -84,13 +84,13 @@ $ job_defense_shield --excessive-time-cpu
  User  CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs Emails
         (Unused)    (Used)  Overall  Mean  Median                     
 ----------------------------------------------------------------------
-u18587   497596     13765     0.03   0.03   0.02     10    644    0   
+u18587   495341     13716     0.03   0.03   0.02     10    643    0   
 u45521   105509     21595     0.17   0.17   0.13      8    109    0   
 ----------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
-     Start: Mon Mar 10, 2025 at 06:35 PM
-       End: Mon Mar 17, 2025 at 06:35 PM
+     Start: Mon Mar 10, 2025 at 06:24 PM
+       End: Mon Mar 17, 2025 at 06:24 PM
 ```
 
 This looks good. Only two users will receive an email.
@@ -202,7 +202,3 @@ Take a look at the various alerts and add what you like to your configuration fi
 - [Automatically Cancel GPU Jobs with 0% Utilization](cancel_gpu_jobs.md)
 - [GPU-Hours at 0% Utilization](zero_gpu_util.md)
 - [Low GPU Efficiency](low_gpu_util.md)
-
-## How does Job Defense Shield work?
-
-Summary statistics for each completed job are stored in a compressed format in the `AdminComment` field in the Slurm database. The software described here works by calling the Slurm `sacct` command while requesting several fields including `AdminComment`. The `sacct` output is stored in a `pandas` dataframe for processing. To get the data for running jobs, the Prometheus database is queried.

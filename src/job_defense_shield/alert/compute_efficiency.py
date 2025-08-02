@@ -199,6 +199,8 @@ class LowEfficiency(Alert):
                 tags["<CLUSTER>"] = self.cluster
                 tags["<PARTITIONS>"] = ",".join(sorted(set(usr["Partition(s)"])))
                 tags["<RANK>"] = myrank
+                if hasattr(self, "gpu_mem_eff_pct"):
+                    tags["<GPU-MEM-PCT>"] = str(self.gpu_mem_eff_pct)
                 tags["<EFFICIENCY>"] = usr['Efficiency'].values[0]
                 tags["<TARGET>"] = f"{str(self.eff_target_pct)}%"
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])

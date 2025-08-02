@@ -106,6 +106,7 @@ The following placeholders can be used in the email file:
 - `<PARTITIONS>`: A comma-separated list of the partitions used by the user.
 - `<EFFICIENCY>`: The mean GPU efficiency of the user.
 - `<RANK>`: The GPU-rank of the user as determined by number of allocated GPU-hours.
+- `<GPU-MEM-PCT>`: The value of `gpu_mem_eff_pct` from the alert settings.
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<TARGET>`: The value of `eff_target_pct` from the alert settings.
 - `<TABLE>`: A table of showing mean efficiency and other values for the user.

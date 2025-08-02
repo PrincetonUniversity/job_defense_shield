@@ -14,6 +14,7 @@ greeting-method: getent
 workday-method: file
 holidays-file: /usr/local/job_defense_shield/holidays.txt
 report-emails:
+  - job-alerts-aaaalegbihhpknikkw2fkdx6gi@institution.slack.com
   - admin1@institution.edu
   - admin2@institution.edu
 verbose: False
@@ -36,6 +37,7 @@ cancel-zero-gpu-jobs-1:
   email_file_cancel:         "cancel_gpu_jobs_scancel_3.txt"
   jobid_cache_path: /usr/local/job_defense_shield/
   admin_emails:
+    - job-alerts-aaaalegbihhpknikkw2fkdx6gi@institution.slack.com
     - admin@institution.edu
   warnings_to_admin: False
 

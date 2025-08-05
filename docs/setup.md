@@ -166,7 +166,7 @@ $ job_defense_shield --usage-overview --report
 
 This feature is useful when combined with `cron`. Specifically, one can receive a daily report showing all of the instances of underutilization across all of the systems. More will be said about this later.
 
-If the email test failed then see the next section about setting up an external SMTP server.
+If the email test failed then see the [Configuration](configuration.md) section for setting up an external SMTP server.
 
 ## Troubleshooting the Installation
 

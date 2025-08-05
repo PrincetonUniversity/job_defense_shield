@@ -23,6 +23,8 @@ class TooMuchCpuMemPerGpu(Alert):
             self.mem_eff_thres = 1.0
         if not hasattr(self, "cluster_name"):
             self.cluster_name = ""
+        if not hasattr(self, "gpu_hours_threshold"):
+            self.gpu_hours_threshold = 0
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
@@ -50,7 +52,6 @@ class TooMuchCpuMemPerGpu(Alert):
             self.df["CPU-Mem-per-GPU"] = self.df["mem-alloc"] / self.df.gpus
             self.df = self.df[self.df["CPU-Mem-per-GPU"] > self.cpu_mem_per_gpu_limit]
             self.df["Mem-Eff"] = self.df["CPU-Mem-Used"] / self.df["mem-alloc"]
-            # should user be ignored if even just one of their jobs is efficient?
             self.df = self.df[self.df["Mem-Eff"] < self.mem_eff_thres]
             self.df["CPU-Mem-per-GPU"] = self.df["CPU-Mem-per-GPU"].apply(lambda x:
                                               str(round(x, 1)).replace(".0", "") + " GB")
@@ -67,6 +68,13 @@ class TooMuchCpuMemPerGpu(Alert):
                     "CPU-Mem-per-GPU-Limit",
                     "CPU-Mem-Used"]
             self.df = self.df[cols]
+            # only include users with gpu-hours > gpu_hours_threshold
+            self.df["gpu-hours"] = self.df["gpus"] * self.df["elapsed-hours"]
+            self.gp = self.df.groupby("User").agg({"gpu-hours":"sum"}).reset_index()
+            self.gp = self.gp[self.gp["gpu-hours"] > self.gpu_hours_threshold]
+            self.df = self.df[self.df.User.isin(self.gp.User)]
+            self.df.drop(columns=["gpu-hours"], inplace=True)
+            # rename, format and sort
             renamings = {"jobid":"JobID",
                          "mem-alloc":"CPU-Mem",
                          "partition":"Partition",

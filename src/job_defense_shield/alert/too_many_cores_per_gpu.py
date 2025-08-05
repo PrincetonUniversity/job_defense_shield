@@ -21,6 +21,8 @@ class TooManyCoresPerGpu(Alert):
             self.report_title = "Too Many CPU-Cores Per GPU"
         if not hasattr(self, "cluster_name"):
             self.cluster_name = ""
+        if not hasattr(self, "gpu_hours_threshold"):
+            self.gpu_hours_threshold = 0
 
     def _filter_and_add_new_fields(self):
         # filter the dataframe
@@ -63,6 +65,13 @@ class TooManyCoresPerGpu(Alert):
                         "Cores-per-GPU",
                         "Cores-per-GPU-Target"]
                 self.df = self.df[cols]
+                # only include users with gpu-hours > gpu_hours_threshold
+                self.df["gpu-hours"] = self.df["gpus"] * self.df["elapsed-hours"]
+                self.gp = self.df.groupby("User").agg({"gpu-hours":"sum"}).reset_index()
+                self.gp = self.gp[self.gp["gpu-hours"] > self.gpu_hours_threshold]
+                self.df = self.df[self.df.User.isin(self.gp.User)]
+                self.df.drop(columns=["gpu-hours"], inplace=True)
+                # rename and format
                 renamings = {"jobid":"JobID",
                              "cores":"Cores",
                              "partition":"Partition",

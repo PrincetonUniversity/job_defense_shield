@@ -41,6 +41,8 @@ The available settings are listed below:
 - `cpu_mem_per_gpu_limit`: Identify jobs with a CPU memory allocation per GPU greater than this value. It is reasonable to use the same value as `cpu_mem_per_gpu_target` for this setting.
 
 - `email_file`: The text file to be used for the email message to users.
+ 
+`gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be considered. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 

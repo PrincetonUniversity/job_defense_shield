@@ -46,7 +46,7 @@ The available settings are listed below:
 
 - `num_gpus`: (Optional) Jobs with a number of allocated GPUs of less than or equal to `num_gpus` will be selected.
 
-- `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be included. This setting makes it possible to ignore users that are not using many resources. Default: 0
+- `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be included. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
 
 - `gpu_util_target`: (Optional) The minimum acceptable GPU utilization. This must be specified for the `<TARGET>` placeholder to be available. Default: 50
 

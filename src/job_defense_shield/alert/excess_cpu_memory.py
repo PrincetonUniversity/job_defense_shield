@@ -202,6 +202,8 @@ class ExcessCPUMemory(Alert):
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         """Drop and rename some of the columns."""
         if self.admin.empty:
+            if not self.show_empty_reports:
+                return ""
             column_names = ["User",
                             "Proportion",
                             "Mem-Hrs-Unused",

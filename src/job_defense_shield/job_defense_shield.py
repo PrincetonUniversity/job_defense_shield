@@ -332,8 +332,10 @@ def main():
             if args.email and is_workday:
                 zero_gpu_hours.create_emails(greeting_method)
                 zero_gpu_hours.send_emails_to_users()
-            s += zero_gpu_hours.generate_report_for_admins(keep_index=True)
-            s += zero_gpu_hours.add_report_metadata(start_date, end_date)
+            report = zero_gpu_hours.generate_report_for_admins(keep_index=True)
+            if report:
+                s += report
+                s += zero_gpu_hours.add_report_metadata(start_date, end_date)
 
 
     ############################
@@ -352,8 +354,10 @@ def main():
             if args.email and is_workday:
                 cpg.create_emails(greeting_method)
                 cpg.send_emails_to_users()
-            s += cpg.generate_report_for_admins()
-            s += cpg.add_report_metadata(start_date, end_date)
+            report = cpg.generate_report_for_admins()
+            if report:
+                s += report
+                s += cpg.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -372,8 +376,10 @@ def main():
             if args.email and is_workday:
                 mpg.create_emails(greeting_method)
                 mpg.send_emails_to_users()
-            s += mpg.generate_report_for_admins()
-            s += mpg.add_report_metadata(start_date, end_date)
+            report = mpg.generate_report_for_admins()
+            if report:
+                s += report
+                s += mpg.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -392,8 +398,10 @@ def main():
             if args.email and is_workday:
                 gpu_frag.create_emails(greeting_method)
                 gpu_frag.send_emails_to_users()
-            s += gpu_frag.generate_report_for_admins()
-            s += gpu_frag.add_report_metadata(start_date, end_date)
+            report = gpu_frag.generate_report_for_admins()
+            if report:
+                s += report
+                s += gpu_frag.add_report_metadata(start_date, end_date)
 
 
     ########################
@@ -412,8 +420,10 @@ def main():
             if args.email and is_workday:
                 low_gpu.create_emails(greeting_method)
                 low_gpu.send_emails_to_users()
-            s += low_gpu.generate_report_for_admins()
-            s += low_gpu.add_report_metadata(start_date, end_date)
+            report = low_gpu.generate_report_for_admins()
+            if report:
+                s += report
+                s += low_gpu.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -433,8 +443,10 @@ def main():
             if args.email and is_workday:
                 time_limits.create_emails(greeting_method)
                 time_limits.send_emails_to_users()
-            s += time_limits.generate_report_for_admins()
-            s += time_limits.add_report_metadata(start_date, end_date)
+            report = time_limits.generate_report_for_admins()
+            if report:
+                s += report
+                s += time_limits.add_report_metadata(start_date, end_date)
 
 
     ############################
@@ -453,8 +465,10 @@ def main():
             if args.email and is_workday:
                 too_power.create_emails(greeting_method)
                 too_power.send_emails_to_users()
-            s += too_power.generate_report_for_admins()
-            s += too_power.add_report_metadata(start_date, end_date)
+            report = too_power.generate_report_for_admins()
+            if report:
+                s += report
+                s += too_power.add_report_metadata(start_date, end_date)
 
 
     ##########################
@@ -473,8 +487,10 @@ def main():
             if args.email and is_workday:
                 zero_cpu.create_emails(greeting_method)
                 zero_cpu.send_emails_to_users()
-            s += zero_cpu.generate_report_for_admins()
-            s += zero_cpu.add_report_metadata(start_date, end_date)
+            report = zero_cpu.generate_report_for_admins()
+            if report:
+                s += report
+                s += zero_cpu.add_report_metadata(start_date, end_date)
 
 
     ########################
@@ -493,8 +509,10 @@ def main():
             if args.email and is_workday:
                 low_cpu.create_emails(greeting_method)
                 low_cpu.send_emails_to_users()
-            s += low_cpu.generate_report_for_admins()
-            s += low_cpu.add_report_metadata(start_date, end_date)
+            report = low_cpu.generate_report_for_admins()
+            if report:
+                s += report
+                s += low_cpu.add_report_metadata(start_date, end_date)
 
 
     #######################
@@ -513,8 +531,10 @@ def main():
             if args.email and is_workday:
                 mem_hours.create_emails(greeting_method)
                 mem_hours.send_emails_to_users()
-            s += mem_hours.generate_report_for_admins(keep_index=True)
-            s += mem_hours.add_report_metadata(start_date, end_date)
+            report = mem_hours.generate_report_for_admins(keep_index=True)
+            if report:
+                s += report
+                s += mem_hours.add_report_metadata(start_date, end_date)
 
 
     ###########################################
@@ -533,8 +553,10 @@ def main():
             if args.email and is_workday:
                 serial.create_emails(greeting_method)
                 serial.send_emails_to_users()
-            s += serial.generate_report_for_admins(keep_index=True)
-            s += serial.add_report_metadata(start_date, end_date)
+            report = serial.generate_report_for_admins(keep_index=True)
+            if report:
+                s += report
+                s += serial.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -553,8 +575,10 @@ def main():
             if args.email and is_workday:
                 cpu_frag.create_emails(greeting_method)
                 cpu_frag.send_emails_to_users()
-            s += cpu_frag.generate_report_for_admins(keep_index=False)
-            s += cpu_frag.add_report_metadata(start_date, end_date)
+            report = cpu_frag.generate_report_for_admins(keep_index=False)
+            if report:
+                s += report
+                s += cpu_frag.add_report_metadata(start_date, end_date)
 
 
     #################################
@@ -574,8 +598,10 @@ def main():
             if args.email and is_workday:
                 time_limits.create_emails(greeting_method)
                 time_limits.send_emails_to_users()
-            s += time_limits.generate_report_for_admins()
-            s += time_limits.add_report_metadata(start_date, end_date)
+            report = time_limits.generate_report_for_admins()
+            if report:
+                s += report
+                s += time_limits.add_report_metadata(start_date, end_date)
 
 
     ####################

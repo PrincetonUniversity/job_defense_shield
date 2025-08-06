@@ -147,6 +147,8 @@ class ExcessiveTimeLimits(Alert):
         """Generate a table for system administrators."""
         xpu = self.mode
         if self.admin.empty:
+            if not self.show_empty_reports:
+                return ""
             column_names = ["User",
                             f"{xpu.upper()}-Hours-Unused",
                             f"{xpu.upper()}-Hours",

@@ -118,6 +118,8 @@ class ZeroUtilGPUHours(Alert):
 
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.admin.empty:
+            if not self.show_empty_reports:
+                return ""
             column_names = ["User",
                             "GPU-Hours-At-0%",
                             "Jobs",

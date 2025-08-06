@@ -202,7 +202,8 @@ def read_config_file(config_file: Optional[str],
                "smtp_server":          cfg["smtp-server"],
                "smtp_user":            cfg["smtp-user"],
                "smtp_password":        cfg["smtp-password"],
-               "smtp_port":            cfg["smtp-port"]}
+               "smtp_port":            cfg["smtp-port"],
+               "show_empty_reports":   cfg["show-empty-reports"]}
     return cfg, sys_cfg, head
 
 def display_alerts(cfg: dict) -> str:

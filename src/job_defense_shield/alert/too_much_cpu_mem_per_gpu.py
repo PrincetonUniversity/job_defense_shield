@@ -138,6 +138,8 @@ class TooMuchCpuMemPerGpu(Alert):
 
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.df.empty:
+            if not self.show_empty_reports:
+                return ""
             column_names = ["JobID",
                             "User",
                             "Hours",

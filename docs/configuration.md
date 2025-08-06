@@ -209,10 +209,16 @@ external-emails:
   u23456: einstein@yahoo.com
 ```
 
-Additional information is available by turning on the `verbose` setting. This will show the jobs that are beening ignored (e.g., due to missing metrics). The recommendation is to keep this turned off:
+Additional information is available by turning on the `verbose` setting. This will show the individual alerts and the jobs that are being ignored (e.g., due to missing metrics). The recommendation is to keep this turned off:
 
 ```yaml
 verbose: False
+```
+
+One can show or hide empty reports:
+
+```yaml
+show-empty-reports: True
 ```
 
 ## Specifying a Custom Configuration File

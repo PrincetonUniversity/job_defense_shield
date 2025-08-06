@@ -228,6 +228,8 @@ class LowEfficiency(Alert):
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         """Return dataframe for admins."""
         if self.admin.empty:
+            if not self.show_empty_reports:
+                return ""
             column_names = ["User",
                             f"{self.xpu.upper()}-Hours",
                             "Proportion(%)",

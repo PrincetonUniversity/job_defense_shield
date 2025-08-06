@@ -23,6 +23,8 @@ class TooManyCoresPerGpu(Alert):
             self.cluster_name = ""
         if not hasattr(self, "gpu_hours_threshold"):
             self.gpu_hours_threshold = 0
+        if not hasattr(self, "cpu_eff_threshold"):
+            self.cpu_eff_threshold = 100
 
     def _filter_and_add_new_fields(self):
         # filter the dataframe
@@ -38,50 +40,53 @@ class TooManyCoresPerGpu(Alert):
         if not self.df.empty and hasattr(self, "nodelist"):
             self.df = self.filter_by_nodelist(self.df)
         self.df.rename(columns={"user":"User"}, inplace=True)
-        if not self.df.empty:
-            self.df["cpu-tuple"] = self.df.apply(lambda row:
-                                                 cpu_efficiency(row["admincomment"],
-                                                                row["elapsedraw"],
-                                                                row["jobid"],
-                                                                row["cluster"],
-                                                                single=True,
-                                                                verbose=self.verbose),
-                                                                axis="columns")
-            cols = ["CPU-Eff", "error-code"]
-            self.df[cols] = pd.DataFrame(self.df["cpu-tuple"].tolist(), index=self.df.index)
-            self.df = self.df[self.df["error-code"] == 0]
-            if not self.df.empty:
-                self.df["Cores-per-GPU"] = self.df.cores / self.df.gpus
-                self.df["Cores-per-GPU"] = self.df["Cores-per-GPU"].apply(lambda x:
-                                           str(round(x, 1)).replace(".0", ""))
-                self.df["Cores-per-GPU-Target"] = self.cores_per_gpu_target
-                cols = ["jobid",
-                        "User",
-                        "partition",
-                        "elapsed-hours",
-                        "CPU-Eff",
-                        "cores",
-                        "gpus",
-                        "Cores-per-GPU",
-                        "Cores-per-GPU-Target"]
-                self.df = self.df[cols]
-                # only include users with gpu-hours > gpu_hours_threshold
-                self.df["gpu-hours"] = self.df["gpus"] * self.df["elapsed-hours"]
-                self.gp = self.df.groupby("User").agg({"gpu-hours":"sum"}).reset_index()
-                self.gp = self.gp[self.gp["gpu-hours"] > self.gpu_hours_threshold]
-                self.df = self.df[self.df.User.isin(self.gp.User)]
-                self.df.drop(columns=["gpu-hours"], inplace=True)
-                # rename and format
-                renamings = {"jobid":"JobID",
-                             "cores":"Cores",
-                             "partition":"Partition",
-                             "gpus":"GPUs",
-                             "elapsed-hours":"Hours"}
-                self.df = self.df.rename(columns=renamings)
-                self.df["Hours"] = self.df["Hours"].apply(lambda x: str(round(x, 1))
-                                                          if x < 5 else str(round(x)))
-                self.df["CPU-Eff"] = self.df["CPU-Eff"].apply(lambda x: f"{x}%"
-                                                              if x < 5 else f"{round(x)}%")
+        if self.df.empty:
+            return None
+        self.df["cpu-tuple"] = self.df.apply(lambda row:
+                                             cpu_efficiency(row["admincomment"],
+                                                            row["elapsedraw"],
+                                                            row["jobid"],
+                                                            row["cluster"],
+                                                            single=True,
+                                                            verbose=self.verbose),
+                                                            axis="columns")
+        cols = ["CPU-Eff", "error-code"]
+        self.df[cols] = pd.DataFrame(self.df["cpu-tuple"].tolist(), index=self.df.index)
+        self.df = self.df[self.df["error-code"] == 0]
+        self.df = self.df[self.df["CPU-Eff"] <= self.cpu_eff_threshold]
+        if self.df.empty:
+            return None
+        self.df["Cores-per-GPU"] = self.df.cores / self.df.gpus
+        self.df["Cores-per-GPU"] = self.df["Cores-per-GPU"].apply(lambda x:
+                                   str(round(x, 1)).replace(".0", ""))
+        self.df["Cores-per-GPU-Target"] = self.cores_per_gpu_target
+        cols = ["jobid",
+                "User",
+                "partition",
+                "elapsed-hours",
+                "CPU-Eff",
+                "cores",
+                "gpus",
+                "Cores-per-GPU",
+                "Cores-per-GPU-Target"]
+        self.df = self.df[cols]
+        # only include users with gpu-hours > gpu_hours_threshold
+        self.df["gpu-hours"] = self.df["gpus"] * self.df["elapsed-hours"]
+        self.gp = self.df.groupby("User").agg({"gpu-hours":"sum"}).reset_index()
+        self.gp = self.gp[self.gp["gpu-hours"] > self.gpu_hours_threshold]
+        self.df = self.df[self.df.User.isin(self.gp.User)]
+        self.df.drop(columns=["gpu-hours"], inplace=True)
+        # rename and format
+        renamings = {"jobid":"JobID",
+                     "cores":"Cores",
+                     "partition":"Partition",
+                     "gpus":"GPUs",
+                     "elapsed-hours":"Hours"}
+        self.df = self.df.rename(columns=renamings)
+        self.df["Hours"] = self.df["Hours"].apply(lambda x: str(round(x, 1))
+                                                  if x < 5 else str(round(x)))
+        self.df["CPU-Eff"] = self.df["CPU-Eff"].apply(lambda x: f"{x}%"
+                                                      if x < 5 else f"{round(x)}%")
 
     def create_emails(self, method):
         g = GreetingFactory().create_greeting(method)

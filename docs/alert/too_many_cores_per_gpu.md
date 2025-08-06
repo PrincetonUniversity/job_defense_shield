@@ -38,6 +38,8 @@ The available settings are listed below:
 
 `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be considered. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
 
+- `cpu_eff_threshold`: (Optional) Ignore jobs with a CPU efficiency greater than this value. Default: 100
+
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False

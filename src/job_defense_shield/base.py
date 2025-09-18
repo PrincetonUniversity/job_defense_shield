@@ -235,7 +235,14 @@ class Alert:
             return counts
         if counts.tolist() == ["0 (-)"] * len(counts):
             return pd.Series(["0"] * len(counts), index=counts.index)
-        max_len = max([len(count.split()[1]) for count in counts.tolist()])
+        counts = counts.apply(lambda x: f"{x} (--)"
+                              if isinstance(x, (int, float))
+                              else x)
+        lengths = [1]
+        for count in counts.tolist():
+            if "(" in count and ")" in count and len(count.split()) > 1:
+               lengths.append(len(count.split()[1]))
+        max_len = max(lengths)
         def fix_spacing(item: str):
             num_sent, days_ago = item.split()
             pair = f"{num_sent}{(max_len - len(days_ago)) * ' '} {days_ago}"

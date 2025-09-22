@@ -143,7 +143,7 @@ def read_config_file(config_file: Optional[str],
     if "violation-logs-path" not in cfg:
         print('ERROR: "violation-logs-path" must be specified in the configuration file.')
         sys.exit()
-    if not os.path.exists(cfg["violation-logs-path"]): 
+    if not os.path.exists(cfg["violation-logs-path"]):
         dir_path = cfg["violation-logs-path"]
         try:
             os.makedirs(dir_path)
@@ -174,6 +174,8 @@ def read_config_file(config_file: Optional[str],
     if "workday-method" not in cfg:
         print('INFO: Setting workday-method to "always"')
         cfg["workday-method"] = "always"
+    if "show-empty-reports" not in cfg:
+        cfg["show-empty-reports"] = False
     if "partition-renamings" not in cfg:
         cfg["partition-renamings"] = {}
     if "smtp-server" not in cfg:
@@ -195,6 +197,7 @@ def read_config_file(config_file: Optional[str],
                "jobstats_config_path": cfg["jobstats-config-path"],
                "email_files_path":     cfg["email-files-path"],
                "verbose":              cfg["verbose"],
+               "show_empty_reports":   cfg["show-empty-reports"],
                "sender":               cfg["sender"],
                "reply_to":             cfg["reply-to"],
                "email_domain":         cfg["email-domain-name"],

@@ -131,7 +131,7 @@ report-emails:
   - admin2@institution.edu
 ```
 
-## (Optional) External SMTP Server for Sending Emails
+### (Optional) External SMTP Server for Sending Emails
 
 By default, Job Defense Shield will use a local SMTP server using `localhost` to send emails. This will work for almost all institutions and no configuration is needed.
 

@@ -1,4 +1,4 @@
-cff-version: 1.2.2
+cff-version: 1.2.3
 title: Job Defense Shield
 message: >-
   If you use this software, please cite it using the
@@ -28,5 +28,5 @@ keywords:
   - HPC
   - Jobstats
 license: GPL-2.0
-version: 1.2.2
-date-released: '2025-09-18'
+version: 1.2.3
+date-released: '2025-09-23'

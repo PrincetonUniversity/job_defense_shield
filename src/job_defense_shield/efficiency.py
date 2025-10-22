@@ -3,19 +3,29 @@
 import json
 import gzip
 import base64
+from typing import Tuple
 from typing import Set
+from typing import Optional
+from typing import Union
 from functools import partial
 import pandas as pd
 
 
-def get_stats_dict(ss64):
+def get_stats_dict(ss64: Optional[str]) -> dict:
     """Convert the base64-encoded summary statistics to JSON."""
     if (not ss64) or pd.isna(ss64) or ss64 == "JS1:Short" or ss64 == "JS1:None":
         return {}
     return json.loads(gzip.decompress(base64.b64decode(ss64[4:])))
 
 
-def cpu_efficiency(ss, elapsedraw, jobid, cluster, single=False, precision=1, verbose=True):
+def cpu_efficiency(ss: dict,
+                   elapsedraw: int,
+                   jobid: str,
+                   cluster: str,
+                   single: bool=False,
+                   precision: int=1,
+                   verbose: bool=True) -> Union[Tuple[Union[int, float], int],
+                                                Tuple[int, int, int]]:
     """Return a (CPU time used, CPU time allocated, error code)-tuple for a given job.
        If single=True then return a (CPU time used / CPU time allocated, error code)-tuple.
        The error code is needed since the summary statistics (ss) may be malformed."""
@@ -52,7 +62,14 @@ def cpu_efficiency(ss, elapsedraw, jobid, cluster, single=False, precision=1, ve
     return (total_used, total, error_code)
 
 
-def gpu_efficiency(ss, elapsedraw, jobid, cluster, single=False, precision=1, verbose=True):
+def gpu_efficiency(ss: dict,
+                   elapsedraw: int,
+                   jobid: str,
+                   cluster: str,
+                   single: bool=False,
+                   precision: int=1,
+                   verbose: bool=True) -> Union[Tuple[Union[int, float], int],
+                                                Tuple[Union[int, float], int, int]]:
     """Return a (GPU time used, GPU time allocated, error code)-tuple for a given job.
        If single=True then return a (GPU time used / GPU time allocated, error code)-tuple.
        The error code is needed since the summary statistics (ss) may be malformed."""
@@ -89,7 +106,11 @@ def gpu_efficiency(ss, elapsedraw, jobid, cluster, single=False, precision=1, ve
     return (total_used, total, error_code)
 
 
-def cpu_memory_usage(ss, jobid, cluster, precision=0, verbose=True):
+def cpu_memory_usage(ss: dict,
+                     jobid: str,
+                     cluster: str,
+                     precision: int=0,
+                     verbose: bool=True) -> Tuple[Union[int, float], Union[int, float], int]:
     """Return the total memory used and allocated."""
     if 'nodes' not in ss:
         if verbose:
@@ -121,7 +142,12 @@ def cpu_memory_usage(ss, jobid, cluster, precision=0, verbose=True):
     return (round(total_used / fac, precision), round(total / fac, precision), error_code)
 
 
-def gpu_memory_usage_eff_tuples(ss, jobid, cluster, precision=1, op=None, verbose=True):
+def gpu_memory_usage_eff_tuples(ss: dict,
+                                jobid: str,
+                                cluster: str,
+                                precision: int=1,
+                                op: Optional[str]=None,
+                                verbose: bool=True):
     '''Return a list of tuples for each GPU of the job. Each tuple contains the
        memory used, memory allocated, and GPU utilization. An error code is
        added at the end.
@@ -198,7 +224,11 @@ gpu_memory_usage_max_pct = partial(gpu_memory_usage_eff_tuples, op="max-percent"
 gpu_memory_usage_mean = partial(gpu_memory_usage_eff_tuples, op="mean")
 gpu_memory_usage_mean_pct = partial(gpu_memory_usage_eff_tuples, op="mean-percent")
 
-def max_cpu_memory_used_per_node(ss, jobid, cluster, precision=0, verbose=True):
+def max_cpu_memory_used_per_node(ss: dict,
+                                 jobid: str,
+                                 cluster: str,
+                                 precision: int=0,
+                                 verbose: bool=True) -> Tuple[Union[int, float], int]:
     """Return the maximum of the used memory per node. The error code is needed
        since the summary statistics (ss) may be malformed."""
     if 'nodes' not in ss:
@@ -217,7 +247,8 @@ def max_cpu_memory_used_per_node(ss, jobid, cluster, precision=0, verbose=True):
             alloc = ss['nodes'][node]['total_memory']
         except Exception as e:
             if verbose:
-                msg = f"Warning: used_memory or total_memory not in ss for max_cpu_memory_used_per_node ({e})."
+                msg = ("Warning: used_memory or total_memory not in ss for "
+                       f"max_cpu_memory_used_per_node ({e}).")
                 print(msg, jobid, cluster)
             error_code = 2
             return (-1, error_code)
@@ -231,7 +262,10 @@ def max_cpu_memory_used_per_node(ss, jobid, cluster, precision=0, verbose=True):
     return (round(max(mem_per_node) / 1024**3, precision), error_code)
 
 
-def num_gpus_with_zero_util(ss, jobid, cluster, verbose=True):
+def num_gpus_with_zero_util(ss: dict,
+                            jobid: str,
+                            cluster: str,
+                            verbose: bool=True) -> Tuple[int, int]:
     """Return the number of GPUs with zero utilization. The error code is needed
        since the summary statistics (ss) may be malformed."""
     if 'nodes' not in ss:
@@ -259,7 +293,10 @@ def num_gpus_with_zero_util(ss, jobid, cluster, verbose=True):
     return (ct, error_code)
 
 
-def cpu_nodes_with_zero_util(ss, jobid, cluster, verbose=True):
+def cpu_nodes_with_zero_util(ss: dict,
+                             jobid: str,
+                             cluster: str,
+                             verbose: bool=True) -> Tuple[int, int]:
     """Return the number of nodes with zero CPU utilization. The error code is needed
        since the summary statistics (ss) may be malformed."""
     if 'nodes' not in ss:
@@ -284,7 +321,10 @@ def cpu_nodes_with_zero_util(ss, jobid, cluster, verbose=True):
     return (counter, error_code)
 
 
-def get_nodelist(ss, jobid, cluster, verbose=True) -> Set[str]:
+def get_nodelist(ss: dict,
+                 jobid: str,
+                 cluster: str,
+                 verbose: bool=True) -> Tuple[Set[str], int]:
     """Return a Python set of the node names used by the job."""
     if 'nodes' not in ss:
         if verbose:

@@ -29,7 +29,7 @@ Each configuration parameter is explained below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
-- `partitions`: Specify one or more Slurm partitions.
+- `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
       
 - `tb_hours_threshold`: The threshold value for (unused) memory-hours in units of TB-hours. A user must have this number or above to receive an email message. This quantity is the unused CPU memory of a job multiplied by the elapsed time (summed over all jobs).
 
@@ -62,6 +62,10 @@ and 1.
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
+- `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
+- `excluded_partitions`: (Optional) List of partitions to exclude from this alert. This is useful when `partitions: ["*"]` is used.
 
 - `excluded_users`: (Optional) List of usernames to exclude from the alert.
 

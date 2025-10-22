@@ -43,7 +43,7 @@ The settings are explained below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
-- `partitions`: Specify one or more Slurm partitions.
+- `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
 
 - `sampling_period_minutes`: Number of minutes between executions of this alert. This number must be equal to the time between `cron` jobs for this alert (see [cron](#cron) section below). One reasonable choice for this setting is 15 minutes.
 
@@ -83,9 +83,11 @@ The settings are explained below:
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. This setting is only available for `cancel_minutes`. It will not work with `sliding_cancel_minutes`. See [example](../nodelist.md).
 
-- `excluded_users`: (Optional) List of usernames to exclude from this alert.
-
 - `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
+- `excluded_partitions`: (Optional) List of partitions to exclude from this alert. This is useful when `partitions: ["*"]` is used.
+
+- `excluded_users`: (Optional) List of usernames to exclude from this alert.
 
 - `do_not_cancel`: (Optional) If `True` then `scancel` will not be called. This is useful for testing only. In this case, one should call the alert with `--email --no-emails-to-users`. Default: `False`
 

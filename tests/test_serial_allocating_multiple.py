@@ -54,6 +54,7 @@ def test_serial_allocating_multiple_cores():
                        "nodes":[1] * n_jobs,
                        "cores":[32, 16, 8, 16, 32],
                        "partition":["cpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "elapsedraw":[wallclock_secs] * n_jobs,
                        "elapsed-hours":[round(wallclock_hrs)] * n_jobs,
                        "cpu-hours":[32 * wallclock_hrs,

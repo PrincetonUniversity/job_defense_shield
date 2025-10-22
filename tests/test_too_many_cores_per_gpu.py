@@ -12,6 +12,7 @@ def test_too_many_cores_per_gpu():
                        "cores":[96, 20, 96, 8, 64],
                        "gpus":[3, 1, 3, 4, 2],
                        "partition":["pli"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "state":["COMPLETED"] * n_jobs,
                        "admincomment":[ss] * n_jobs,
                        "elapsedraw":[424242] * n_jobs,

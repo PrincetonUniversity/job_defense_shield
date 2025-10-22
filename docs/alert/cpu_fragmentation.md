@@ -37,7 +37,7 @@ The parameters are explained below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
-- `partitions`: Specify one or more Slurm partitions.
+- `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
 
 - `cores_per_node`: CPU-cores per node.
 
@@ -54,6 +54,10 @@ The parameters are explained below:
 - `cores_per_node_thres`: (Optional) Only consider jobs with less than this number of cores per node. If this setting is used then the following settings will be ignored: `cores_per_node`, `mem_per_node`, and `safety_frac`. Additionally, the only placeholders that will be available are `<GREETING>`, `<DAYS>`, `<CLUSTER>`, `<PARTITIONS>`, `<TABLE>`, and `<JOBSTATS>`. The `<TABLE>` placeholder will not contain `Min-Nodes`. The `cores_per_node_thres` setting provides a simple way to address multinode CPU fragmentation on a cluster composed of hetergeneous nodes.
 
 - `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
+
+- `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
+- `excluded_partitions`: (Optional) List of partitions to exclude from this alert. This is useful when `partitions: ["*"]` is used.
 
 - `excluded_users`: (Optional) List of usernames to exclude from the alert.
 

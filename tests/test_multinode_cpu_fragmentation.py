@@ -208,6 +208,7 @@ def test_zero_cpu_utilization():
                        "state":["COMPLETED"] * n_jobs,
                        "gpus":[0] * n_jobs,
                        "partition":["cpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "elapsed-hours":[round(wallclock_hrs)] * n_jobs})
     cpu_frag = MultinodeCpuFragmentation(df,
                                          0,

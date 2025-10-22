@@ -86,6 +86,7 @@ def test_zero_cpu_utilization():
                        "cores":[42] * n_jobs,
                        "state":["COMPLETED"] * n_jobs,
                        "partition":["cpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "elapsed-hours":[round(wallclock_hrs)] * n_jobs})
     zero_cpu = ZeroCPU(df,
                        0,

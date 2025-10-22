@@ -31,6 +31,21 @@ Multiple partitions can be entered as a YAML list:
     - serial
 ```
 
+All partitions can be included with:
+
+```yaml
+  partitions:
+    - "*"
+```
+
+Or equivalently:
+
+```yaml
+  partitions: ["*"]
+```
+
+When all partitions are included, one can exclude specific partitions with `excluded_partitions`.
+
 Next, run the alert without `--email` so that no emails are sent but the output is displayed in the terminal:
 
 ```

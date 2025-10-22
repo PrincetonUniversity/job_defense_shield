@@ -25,7 +25,7 @@ The parameters are explained below:
 - `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
 per alert.
 
-- `partitions`: Specify one or more Slurm partitions.
+- `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
 
 - `eff_thres_pct`: Efficiency threshold percentage. Users with a `eff_thres_pct` os less than or equal to this value will receive an email. plus more
 
@@ -44,6 +44,10 @@ per alert.
 - `proportion_thres_pct`: (Optional) Proportional threshold percentage. A user must being using at least this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours. Default: 0
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
+- `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
+- `excluded_partitions`: (Optional) List of partitions to exclude from this alert. This is useful when `partitions: ["*"]` is used.
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 

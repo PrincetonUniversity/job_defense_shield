@@ -60,6 +60,7 @@ def test_low_efficiency():
                        "jobname":["myjob"] * n_jobs,
                        "cores":[14] * n_jobs,
                        "partition":["cpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "cpu-seconds":[num_cores * wallclock_secs] * n_jobs,
                        "elapsedraw":[wallclock_secs] * n_jobs})
     low_eff = LowEfficiencyCPU(df,

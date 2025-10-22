@@ -26,7 +26,7 @@ The available settings are listed below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
-- `partitions`: Specify one or more Slurm partitions. The number of GPU-hours is summed over all of the partitions.
+- `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`). The number of GPU-hours is summed over all of the partitions.
 
 - `eff_thres_pct`: Efficiency threshold percentage. Users with a mean GPU efficiency of less than or equal to this value will be considered to receive an email.
 
@@ -47,6 +47,10 @@ The available settings are listed below:
 - `gpu_mem_eff_pct`: (Optional) Threshold for GPU memory efficiency as a percentage. Jobs with a GPU memory efficiency of greater than this value will be ignored. A job that uses 60 GB of an 80 GB GPU has a memory efficiency of 75%. For multi-GPU jobs, the mean GPU memory efficiency is used. This setting makes it possible to ignore jobs with low GPU utilization but high GPU memory usage. Default: 100
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
+- `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
+- `excluded_partitions`: (Optional) List of partitions to exclude from this alert. This is useful when `partitions: ["*"]` is used.
 
 - `excluded_users`: (Optional) List of usernames to exclude from receiving emails.
 

@@ -111,6 +111,7 @@ def test_gpu_model_too_powerful():
                        "gpus": [1, 1, 1, 1, 1, 6],
                        "state":["COMPLETED"] * n_jobs,
                        "partition":["gpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "elapsed-hours":[100] * n_jobs})
     too_power = GpuModelTooPowerful(df,
                                     0,

@@ -85,6 +85,7 @@ def test_zero_util_gpu_hours():
                        "cluster":["della"] * n_jobs,
                        "gpus":[4, 1, 2, 1, 4],
                        "partition":["gpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "elapsed-hours":[wallclock_hrs] * n_jobs})
     zero = ZeroUtilGPUHours(df,
                             0,

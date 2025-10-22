@@ -53,6 +53,7 @@ def test_excess_cpu_memory():
                        "cores":[num_cores] * n_jobs,
                        "state":["COMPLETED"] * n_jobs,
                        "partition":["cpu"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "elapsed-hours":[round(wallclock_hrs)] * n_jobs})
     xmem = ExcessCPUMemory(df,
                            0,

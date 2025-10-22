@@ -145,6 +145,7 @@ def test_too_much_cpu_mem_per_gpu():
                        "cores":[12] * n_jobs,
                        "gpus":[1, 1, 2, 1, 1, 1],
                        "partition":["pli"] * n_jobs,
+                       "qos":["short"] * n_jobs,
                        "state":["COMPLETED"] * n_jobs,
                        "admincomment":[ss1, ss2, ss3, ss4, ss5, ss6],
                        "elapsedraw":[424242] * n_jobs,

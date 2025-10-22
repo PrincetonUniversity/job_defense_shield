@@ -24,7 +24,7 @@ The parameters are explained below:
 
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
-- `partitions`: Specify one or more Slurm partitions.
+- `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
 
 - `cpu_hours_threshold`: A user must have apparently wasted this number of CPU-hours to be considered.
 
@@ -43,6 +43,10 @@ The parameters are explained below:
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
+
+- `excluded_qos`: (Optional) List of QOSes to exclude from this alert.
+
+- `excluded_partitions`: (Optional) List of partitions to exclude from this alert. This is useful when `partitions: ["*"]` is used.
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 

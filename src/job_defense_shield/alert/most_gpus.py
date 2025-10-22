@@ -29,6 +29,7 @@ class MostGPUs(Alert):
                 "elapsed-hours",
                 "admincomment",
                 "elapsedraw"]
+        self.df = self.df[self.df.gpus > 0]
         self.gp = self.df[cols].groupby("user").apply(lambda d:
                                                       d.iloc[d["gpus"].argmax()])
         self.gp = self.gp.sort_values("gpus", ascending=False)[:10]

@@ -57,11 +57,12 @@ class CancelZeroGpuJobs(Alert):
            (self.fraction_of_period >= 0.9 / self.num_cancel_alerts):
             self.fraction_of_period = 0.75 / self.num_cancel_alerts
             print(f"INFO: Forcing fraction_of_period to {self.fraction_of_period}")
-        if not hasattr(self, "excluded_qos"):
-            self.excluded_qos = []
 
     def _filter_and_add_new_fields(self):
-        clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
+        if "*" in self.partitions:
+            clus_part = f"{self.cluster} (all partitions)"
+        else:
+            clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
         print(f"INFO: Cancellation of GPU jobs at 0% utilization on {clus_part} is enabled.")
         start_time = time.time()
         self.lg = self.df.copy()
@@ -78,11 +79,13 @@ class CancelZeroGpuJobs(Alert):
             self.df = self.df[(self.df.state == "RUNNING") &
                               (self.df.gpus > 0) &
                               (self.df.cluster == self.cluster) &
-                              (self.df.partition.isin(self.partitions)) &
                               (self.df.elapsedraw >= lower) &
                               (self.df.elapsedraw <  upper) &
                               (~self.df.qos.isin(self.excluded_qos)) &
+                              (~self.df.partition.isin(self.excluded_partitions)) &
                               (~self.df.user.isin(self.excluded_users))].copy()
+            if "*" not in self.partitions:
+                self.df = self.df[self.df.partition.isin(self.partitions)]
             self.df.rename(columns={"user":"User"}, inplace=True)
             self.cancellations = []
 
@@ -105,7 +108,10 @@ class CancelZeroGpuJobs(Alert):
             # read cache file containing jobid's that are known to be using the gpus
             pre_approved = []
             if hasattr(self, "jobid_cache_path") and os.path.isdir(self.jobid_cache_path):
-                prts = "_".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    prts = "_all_partitions"
+                else:
+                    prts = "_".join(sorted(set(self.partitions)))
                 jobid_cache_file = os.path.join(self.jobid_cache_path,
                                                 f".jobid_cache_{self.cluster}_{prts}.pkl")
                 if os.path.isfile(jobid_cache_file):
@@ -131,7 +137,10 @@ class CancelZeroGpuJobs(Alert):
                     # write cache file of jobid's that are known to be using the gpus
                     if hasattr(self, "jobid_cache_path"):
                         jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
-                        prts = "_".join(sorted(set(self.partitions)))
+                        if "*" in self.partitions:
+                            prts = "_all_partitions"
+                        else:
+                            prts = "_".join(sorted(set(self.partitions)))
                         jobid_cache_file = os.path.join(self.jobid_cache_path,
                                                         f".jobid_cache_{self.cluster}_{prts}.pkl")
                         with open(jobid_cache_file, "wb") as fp:
@@ -177,11 +186,12 @@ class CancelZeroGpuJobs(Alert):
             self.lg = self.lg[(self.lg.state == "RUNNING") &
                               (self.lg.gpus > 0) &
                               (self.lg.cluster == self.cluster) &
-                              (self.lg.partition.isin(self.partitions)) &
                               (self.lg.elapsedraw >= lower) &
                               (~self.lg.qos.isin(self.excluded_qos)) &
+                              (~self.lg.partition.isin(self.excluded_partitions)) &
                               (~self.lg.user.isin(self.excluded_users))].copy()
-
+            if "*" not in self.partitions:
+                self.lg = self.lg[self.lg.partition.isin(self.partitions)]
             self.sliding_warnings = []
             self.sliding_cancellations = []
             if not self.lg.empty:
@@ -202,7 +212,10 @@ class CancelZeroGpuJobs(Alert):
                     print("ERROR: 'jobid_cache_path' must exist to use sliding_cancel_minutes.")
                     self.lg = pd.DataFrame(columns=self.lg.columns)
                 else:
-                    prts = "_".join(sorted(set(self.partitions)))
+                    if "*" in self.partitions:
+                        prts = "_all_partitions"
+                    else:
+                        prts = "_".join(sorted(set(self.partitions)))
                     jobid_cache_file = os.path.join(self.jobid_cache_path,
                                                     f".sliding_cache_{self.cluster}_{prts}.csv")
                     if os.path.isfile(jobid_cache_file):
@@ -337,7 +350,10 @@ class CancelZeroGpuJobs(Alert):
                 tags = {}
                 tags["<GREETING>"] = g.greeting(user)
                 tags["<CLUSTER>"] = self.cluster
-                tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    tags["<PARTITIONS>"] = "all partitions"
+                else:
+                    tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
                 tags["<SAMPLING>"] = str(self.sampling_period_minutes)
                 tags["<CANCEL-MIN>"] = str(self.cancel_minutes)
                 tags["<CANCEL-HRS>"] = f"{round(self.cancel_minutes / mph)}"
@@ -409,7 +425,10 @@ class CancelZeroGpuJobs(Alert):
                                                  self.email_file_cancel,
                                                  tags)
                     email = translator.replace_tags()
-                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                    if "*" in self.partitions:
+                        usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                    else:
+                        usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                     usr["User"] = user
                     usr = usr[["User",
                                "Cluster",
@@ -465,7 +484,7 @@ class CancelZeroGpuJobs(Alert):
                 tags = {}
                 tags["<GREETING>"] = g.greeting(user)
                 tags["<CLUSTER>"] = self.cluster
-                tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
+                tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 tags["<SAMPLING>"] = str(self.sampling_period_minutes)
                 tags["<WARNING-MIN>"] = str(self.sliding_warning_minutes)
                 tags["<WARNING-HRS>"] = f"{round(self.sliding_warning_minutes / mph)}"
@@ -525,7 +544,10 @@ class CancelZeroGpuJobs(Alert):
                                              tags)
                 email = translator.replace_tags()
                 usr = cl[cl.User == user].copy()
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                else:
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr = usr[["User",
                            "Cluster",
                            "Alert-Partitions",

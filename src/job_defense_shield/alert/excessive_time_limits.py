@@ -33,11 +33,13 @@ class ExcessiveTimeLimits(Alert):
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
                           (self.df.state.isin(["COMPLETED"])) &
+                          (~self.df.qos.isin(self.excluded_qos)) &
+                          (~self.df.partition.isin(self.excluded_partitions)) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
-
+        if "*" not in self.partitions:
+            self.df = self.df[self.df.partition.isin(self.partitions)]
         self.df = self.df[self.df.admincomment != {}]
         if not self.df.empty and hasattr(self, "nodelist"):
             self.df = self.filter_by_nodelist(self.df)
@@ -120,7 +122,7 @@ class ExcessiveTimeLimits(Alert):
                 tags["<CASE>"] = case
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<CLUSTER>"] = self.cluster
-                tags["<PARTITIONS>"] = usr.Partitions.values[0]
+                tags["<PARTITIONS>"] = ",".join(sorted(set(usr["Partitions"])))
                 tags["<MODE-UPPER>"] = self.mode.upper()
                 tags["<AVERAGE>"] = str(round(100 * usr["mean-ratio"].values[0]))
                 tags["<NUM-JOBS>"] = str(total_jobs)
@@ -132,7 +134,10 @@ class ExcessiveTimeLimits(Alert):
                                              tags)
                 email = translator.replace_tags()
                 usr["Cluster"] = self.cluster
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                else:
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr["Jobs"] = total_jobs
                 col = f"{xpu.upper()}-Hours-Unused"
                 usr[col] = usr[col].apply(round).astype("int64")

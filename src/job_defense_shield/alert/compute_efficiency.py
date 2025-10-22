@@ -36,8 +36,11 @@ class LowEfficiency(Alert):
         # compute proportion (self.pr) using as much data as possible; we do not
         # exclude any users for this part
         self.pr = self.df[(self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
+                          (~self.df.qos.isin(self.excluded_qos)) &
+                          (~self.df.partition.isin(self.excluded_partitions)) &
                           pd.notna(self.df[f"{self.xpu}-seconds"])].copy()
+        if "*" not in self.partitions:
+            self.pr = self.pr[self.pr.partition.isin(self.partitions)]
         if not self.pr.empty and hasattr(self, "nodelist"):
             self.pr = self.filter_by_nodelist(self.pr)
         self.pr = self.pr.groupby("user").agg({f"{self.xpu}-seconds":"sum"})
@@ -55,10 +58,13 @@ class LowEfficiency(Alert):
 
         # second dataframe (self.ce) based on admincomment
         self.ce = self.df[(self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
                           (~self.df.user.isin(self.excluded_users)) &
+                          (~self.df.qos.isin(self.excluded_qos)) &
+                          (~self.df.partition.isin(self.excluded_partitions)) &
                           (self.df["elapsedraw"] >= self.min_run_time / mph) &
                           (self.df.admincomment != {})].copy()
+        if "*" not in self.partitions:
+            self.ce = self.ce[self.ce.partition.isin(self.partitions)]
         if not self.ce.empty and hasattr(self, "nodelist"):
             self.ce = self.filter_by_nodelist(self.ce)
         if self.ce.empty:
@@ -210,7 +216,10 @@ class LowEfficiency(Alert):
                                              tags)
                 email = translator.replace_tags()
                 usr["Cluster"] = self.cluster
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                else:
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 xhrs = f"{self.xpu.upper()}-Hours"
                 usr[xhrs] = usr[xhrs].astype("int64")
                 usr["Efficiency"] = usr["Efficiency"].apply(lambda x:

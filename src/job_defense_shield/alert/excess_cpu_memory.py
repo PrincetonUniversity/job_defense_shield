@@ -29,10 +29,13 @@ class ExcessCPUMemory(Alert):
     def _filter_and_add_new_fields(self):
         # exclude gpu jobs?
         self.df = self.df[(self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
                           (self.df.state != "OUT_OF_MEMORY") &
+                          (~self.df.qos.isin(self.excluded_qos)) &
+                          (~self.df.partition.isin(self.excluded_partitions)) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
+        if "*" not in self.partitions:
+            self.df = self.df[self.df.partition.isin(self.partitions)]
         if not self.df.empty and self.include_running_jobs:
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
@@ -191,7 +194,10 @@ class ExcessCPUMemory(Alert):
                                              tags)
                 email = translator.replace_tags()
                 usr["Cluster"] = self.cluster
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                else:
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr = usr[["User",
                            "Cluster",
                            "Alert-Partitions",

@@ -24,9 +24,12 @@ class ZeroCPU(Alert):
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
+                          (~self.df.qos.isin(self.excluded_qos)) &
+                          (~self.df.partition.isin(self.excluded_partitions)) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
+        if "*" not in self.partitions:
+            self.df = self.df[self.df.partition.isin(self.partitions)]
         if not self.df.empty and self.include_running_jobs:
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
@@ -85,6 +88,7 @@ class ZeroCPU(Alert):
             vfile = f"{self.vpath}/{self.violation}/{user}.csv"
             if self.has_sufficient_time_passed_since_last_email(vfile):
                 usr = self.df[self.df.User == user].copy()
+                # why hard coded?
                 if len(usr) == 1 and \
                    usr.Nodes.values[0] == 1 and \
                    usr.Cores.values[0] < 4:
@@ -96,7 +100,7 @@ class ZeroCPU(Alert):
                 tags["<GREETING>"] = g.greeting(user)
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<CLUSTER>"] = self.cluster
-                tags["<PARTITIONS>"] = ",".join(sorted(set(self.partitions)))
+                tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 tags["<NUM-JOBS>"] = str(len(usr))
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
@@ -105,7 +109,10 @@ class ZeroCPU(Alert):
                                              tags)
                 email = translator.replace_tags()
                 usr["Cluster"] = self.cluster
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                else:
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr = usr[["User",
                            "Cluster",
                            "Alert-Partitions",

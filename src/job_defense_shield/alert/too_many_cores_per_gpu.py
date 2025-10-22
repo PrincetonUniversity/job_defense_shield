@@ -29,11 +29,14 @@ class TooManyCoresPerGpu(Alert):
     def _filter_and_add_new_fields(self):
         # filter the dataframe
         self.df = self.df[(self.df.cluster == self.cluster) &
-                          (self.df.partition.isin(self.partitions)) &
                           (self.df.gpus > 0) &
                           (self.df.cores > self.cores_per_gpu_limit * self.df.gpus) &
+                          (~self.df.qos.isin(self.excluded_qos)) &
+                          (~self.df.partition.isin(self.excluded_partitions)) &
                           (~self.df.user.isin(self.excluded_users)) &
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
+        if "*" not in self.partitions:
+            self.df = self.df[self.df.partition.isin(self.partitions)]
         if not self.df.empty and self.include_running_jobs:
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]
@@ -107,13 +110,16 @@ class TooManyCoresPerGpu(Alert):
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
-                tags["<PARTITIONS>"] = ",".join(self.partitions)
+                tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,
                                              tags)
                 email = translator.replace_tags()
                 usr["Cluster"] = self.cluster
-                usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
+                if "*" in self.partitions:
+                    usr["Alert-Partitions"] = "ALL-PARTITIONS"
+                else:
+                    usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr = usr[["User",
                            "Cluster",      
                            "Alert-Partitions",

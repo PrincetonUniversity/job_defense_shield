@@ -30,6 +30,8 @@ class Alert:
         self.vpath = vpath
         self.vbase = os.path.join(self.vpath, self.violation)
         self.excluded_users = []
+        self.excluded_partitions = []
+        self.excluded_qos = []
         self.emails = []
         self.email_file = None
         self.admin_emails = []

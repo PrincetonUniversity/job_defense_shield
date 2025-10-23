@@ -44,7 +44,7 @@ Or equivalently:
   partitions: ["*"]
 ```
 
-When all partitions are included, one can exclude specific partitions with `excluded_partitions`.
+When all partitions are included, one can exclude specific partitions with `excluded_partitions`. An alternative to using `"*"` for a cluster with a large number of partitions is YAML anchors and aliases.
 
 Next, run the alert without `--email` so that no emails are sent but the output is displayed in the terminal:
 

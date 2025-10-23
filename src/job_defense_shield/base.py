@@ -134,11 +134,15 @@ class Alert:
         """Add data to the bottom of the report."""
         s = ""
         if not dates_only:
-            s += f"   Cluster: {self.cluster}\n" 
-            s += f"Partitions: {', '.join(self.partitions)}\n" 
+            s += f"   Cluster: {self.cluster}\n"
+            prts = ", ".join(self.partitions)
+            avail = 80 - len("Partitions: ")
+            if len(prts) >= avail:
+                prts = prts[:avail - 1] + "+"
+            s += f"Partitions: {prts}\n"
         fmt = "%a %b %d, %Y at %I:%M %p"
-        s += f"     Start: {start_date.strftime(fmt)}\n" 
-        s += f"       End: {end_date.strftime(fmt)}\n" 
+        s += f"     Start: {start_date.strftime(fmt)}\n"
+        s += f"       End: {end_date.strftime(fmt)}\n"
         return s
 
     def get_admincomment_for_running_jobs(self) -> pd.Series:

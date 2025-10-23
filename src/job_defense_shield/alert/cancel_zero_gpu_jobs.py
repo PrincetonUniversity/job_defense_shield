@@ -109,7 +109,7 @@ class CancelZeroGpuJobs(Alert):
             pre_approved = []
             if hasattr(self, "jobid_cache_path") and os.path.isdir(self.jobid_cache_path):
                 if "*" in self.partitions:
-                    prts = "_all_partitions"
+                    prts = "all_partitions"
                 else:
                     prts = "_".join(sorted(set(self.partitions)))
                 jobid_cache_file = os.path.join(self.jobid_cache_path,
@@ -138,7 +138,7 @@ class CancelZeroGpuJobs(Alert):
                     if hasattr(self, "jobid_cache_path"):
                         jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
                         if "*" in self.partitions:
-                            prts = "_all_partitions"
+                            prts = "all_partitions"
                         else:
                             prts = "_".join(sorted(set(self.partitions)))
                         jobid_cache_file = os.path.join(self.jobid_cache_path,
@@ -213,7 +213,7 @@ class CancelZeroGpuJobs(Alert):
                     self.lg = pd.DataFrame(columns=self.lg.columns)
                 else:
                     if "*" in self.partitions:
-                        prts = "_all_partitions"
+                        prts = "all_partitions"
                     else:
                         prts = "_".join(sorted(set(self.partitions)))
                     jobid_cache_file = os.path.join(self.jobid_cache_path,

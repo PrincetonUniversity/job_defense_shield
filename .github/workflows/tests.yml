@@ -3,7 +3,7 @@ on: [workflow_dispatch]
 jobs:
   tests:
     name: Check Python ${{ matrix.python-version }} on Ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version: ["3.7", "3.12"]

@@ -30,7 +30,9 @@ class MostCores(Alert):
                 "admincomment",
                 "elapsedraw"]
         self.gp = self.df[cols].groupby("user").apply(lambda d:
-                                                      d.iloc[d["cores"].argmax()])
+                                                      d.iloc[d["cores"].argmax()],
+                                                      include_groups=False)
+        self.gp.reset_index(inplace=True)
         self.gp = self.gp.sort_values("cores", ascending=False)[:10]
         self.gp = self.gp.rename(columns={"elapsed-hours":"Hours"})
         self.gp.state = self.gp.state.apply(lambda x: JOBSTATES[x])
@@ -40,7 +42,8 @@ class MostCores(Alert):
                                                          row["elapsedraw"],
                                                          row["jobid"],
                                                          row["cluster"],
-                                                         single=True)
+                                                         single=True,
+                                                         verbose=self.verbose)
                                           if row["admincomment"] != {}
                                           else ("--", 0), axis="columns")
             cols = ["CPU-eff", "error-code"]
@@ -52,7 +55,7 @@ class MostCores(Alert):
                                                           else f"{round(x)}%")
             self.gp["Hours"] = self.gp["Hours"].apply(lambda h: str(round(h, 1))
                                                       if h < 2 else str(round(h)))
-            renamings = {"jobid":"JobID", 
+            renamings = {"jobid":"JobID",
                          "user":"User",
                          "cluster":"Cluster",
                          "cores":"Cores",

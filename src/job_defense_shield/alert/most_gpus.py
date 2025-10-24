@@ -29,10 +29,12 @@ class MostGPUs(Alert):
                 "elapsed-hours",
                 "admincomment",
                 "elapsedraw"]
-        self.df = self.df[self.df.gpus > 0]
+        self.df = self.df[(self.df.gpus > 0) & (self.df.elapsedraw > 0)]
         self.gp = self.df[cols].groupby("user").apply(lambda d:
-                                                      d.iloc[d["gpus"].argmax()])
-        self.gp = self.gp.sort_values("gpus", ascending=False)[:10]
+                                                      d.iloc[d["gpus"].argmax()],
+                                                      include_groups=False)
+        self.gp.reset_index(inplace=True)
+        self.gp = self.gp.sort_values("gpus", ascending=False)[:200]
         self.gp.rename(columns={"elapsed-hours":"Hours"}, inplace=True)
         self.gp.state = self.gp.state.apply(lambda x: JOBSTATES[x])
         if not self.gp.empty:
@@ -41,7 +43,8 @@ class MostGPUs(Alert):
                                                          row["elapsedraw"],
                                                          row["jobid"],
                                                          row["cluster"],
-                                                         single=True)
+                                                         single=True,
+                                                         verbose=self.verbose)
                                           if row["admincomment"] != {}
                                           else ("--", 0), axis="columns")
             cols = ["GPU-eff", "error-code"]

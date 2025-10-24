@@ -58,6 +58,9 @@ def cpu_efficiency(ss: dict,
             msg = "Warning: total_used > total in cpu_efficiency:"
             print(msg, jobid, cluster, total_used, total)
     if single:
+        if total == 0:
+            error_code = 4
+            return (-1, error_code)
         return (round(100 * total_used / total, precision), error_code)
     return (total_used, total, error_code)
 
@@ -102,6 +105,9 @@ def gpu_efficiency(ss: dict,
             msg = "Warning: total_used > total in gpu_efficiency."
             print(msg, jobid, cluster, total_used, total)
     if single:
+        if total == 0:
+            error_code = 4
+            return (-1, error_code)
         return (round(100 * total_used / total, precision), error_code)
     return (total_used, total, error_code)
 

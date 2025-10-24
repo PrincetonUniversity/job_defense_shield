@@ -1,3 +1,4 @@
+import pandas as pd
 from ..base import Alert
 from ..utils import add_dividers
 
@@ -41,22 +42,32 @@ class UsageOverview(Alert):
                                                  if row["cluster"] == cluster
                                                  else row[field], axis="columns")
             return gp
-
         self.df = self.df[self.df["elapsedraw"] > 0].copy()
-        self.by_cluster = compute_utilization(["cluster"])
-        self.by_cluster["cpu-hours"] = self.format_email_counts(self.by_cluster["cpu-hours"])
-        self.by_cluster["gpu-hours"] = self.format_email_counts(self.by_cluster["gpu-hours"])
-        self.by_partition = compute_utilization(["cluster", "partition"], simple=False)
-        self.special = self.by_partition.copy()
-        self.special["cpu-hours"] = self.format_email_counts(self.special["cpu-hours"])
-        self.special["gpu-hours"] = self.format_email_counts(self.special["gpu-hours"])
-        renamings = {"cluster":"Cluster",
-                     "partition":"Partition",
-                     "users":"Users",
-                     "cpu-hours":"CPU-Hours",
-                     "gpu-hours":"GPU-Hours"}
-        self.by_cluster.rename(columns=renamings, inplace=True)
-        self.special.rename(columns=renamings, inplace=True)
+        if self.df.empty:
+            self.by_cluster = pd.DataFrame({"Cluster":[],
+                                            "Users":[],
+                                            "CPU-Hours":[],
+                                            "GPU-Hours":[]})
+            self.special = pd.DataFrame({"Cluster":[],
+                                         "Partition":[],
+                                         "Users":[],
+                                         "CPU-Hours":[],
+                                         "GPU-Hours":[]})
+        else:
+            self.by_cluster = compute_utilization(["cluster"])
+            self.by_cluster["cpu-hours"] = self.format_email_counts(self.by_cluster["cpu-hours"])
+            self.by_cluster["gpu-hours"] = self.format_email_counts(self.by_cluster["gpu-hours"])
+            self.by_partition = compute_utilization(["cluster", "partition"], simple=False)
+            self.special = self.by_partition.copy()
+            self.special["cpu-hours"] = self.format_email_counts(self.special["cpu-hours"])
+            self.special["gpu-hours"] = self.format_email_counts(self.special["gpu-hours"])
+            renamings = {"cluster":"Cluster",
+                         "partition":"Partition",
+                         "users":"Users",
+                         "cpu-hours":"CPU-Hours",
+                         "gpu-hours":"GPU-Hours"}
+            self.by_cluster.rename(columns=renamings, inplace=True)
+            self.special.rename(columns=renamings, inplace=True)
  
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         clus = self.by_cluster.to_string(index=keep_index, justify="center")

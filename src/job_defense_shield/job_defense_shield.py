@@ -664,10 +664,12 @@ def main():
     ## MOST CPU-CORES ##
     ####################
     if args.most_cores:
+        params = sys_cfg
         most_cores = MostCores(df,
                                days_between_emails=args.days,
                                violation="null",
-                               vpath=violation_logs_path)
+                               vpath=violation_logs_path,
+                               **params)
         s += most_cores.generate_report_for_admins()
         s += most_cores.add_report_metadata(start_date,
                                             end_date,
@@ -678,10 +680,12 @@ def main():
     ## MOST GPUS ##
     ###############
     if args.most_gpus:
+        params = sys_cfg
         most_gpus = MostGPUs(df,
                              days_between_emails=args.days,
                              violation="null",
-                             vpath=violation_logs_path)
+                             vpath=violation_logs_path,
+                             **params)
         s += most_gpus.generate_report_for_admins()
         s += most_gpus.add_report_metadata(start_date,
                                            end_date,

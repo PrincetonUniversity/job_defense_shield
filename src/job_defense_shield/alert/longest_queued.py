@@ -17,7 +17,7 @@ class LongestQueuedJobs(Alert):
 
     def _add_required_fields(self):
         if not hasattr(self, "report_title"):
-            self.report_title = "Longest Queue Times (1 job per user, ignoring job arrays)"
+            self.report_title = "Longest Queue Times (1 job per user, ignoring job arrays, 3+ days)"
 
     def _filter_and_add_new_fields(self):
         # filter the dataframe
@@ -38,7 +38,10 @@ class LongestQueuedJobs(Alert):
                 "s-days",
                 "e-days"]
         self.df = self.df[cols].groupby("user").apply(lambda d:
-                                                      d.iloc[d["s-days"].argmax()])
+                                                      d.iloc[d["s-days"].argmax()],
+                                                      include_groups=False)
+        self.df.reset_index(inplace=True)
+        self.df = self.df[cols]
         self.df.sort_values("s-days", ascending=False, inplace=True)
         self.df = self.df[self.df["s-days"] >= 3][:10]
         column_names = pd.MultiIndex.from_tuples([('JobID', ''),

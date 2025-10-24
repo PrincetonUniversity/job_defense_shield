@@ -30,11 +30,16 @@ class MostGPUs(Alert):
                 "admincomment",
                 "elapsedraw"]
         self.df = self.df[(self.df.gpus > 0) & (self.df.elapsedraw > 0)]
-        self.gp = self.df[cols].groupby("user").apply(lambda d:
-                                                      d.iloc[d["gpus"].argmax()],
-                                                      include_groups=False)
-        self.gp.reset_index(inplace=True)
-        self.gp = self.gp.sort_values("gpus", ascending=False)[:200]
+        major, minor, _ = map(int, pd.__version__.split("."))
+        if major >= 2 and minor >= 2:
+            self.gp = self.df[cols].groupby("user").apply(lambda d:
+                                                          d.iloc[d["gpus"].argmax()],
+                                                          include_groups=False)
+            self.gp.reset_index(inplace=True)
+        else:
+            self.gp = self.df[cols].groupby("user").apply(lambda d:
+                                                          d.iloc[d["gpus"].argmax()])
+        self.gp = self.gp.sort_values("gpus", ascending=False)[:10]
         self.gp.rename(columns={"elapsed-hours":"Hours"}, inplace=True)
         self.gp.state = self.gp.state.apply(lambda x: JOBSTATES[x])
         if not self.gp.empty:

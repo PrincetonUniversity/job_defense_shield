@@ -29,10 +29,15 @@ class MostCores(Alert):
                 "elapsed-hours",
                 "admincomment",
                 "elapsedraw"]
-        self.gp = self.df[cols].groupby("user").apply(lambda d:
-                                                      d.iloc[d["cores"].argmax()],
-                                                      include_groups=False)
-        self.gp.reset_index(inplace=True)
+        major, minor, _ = map(int, pd.__version__.split("."))
+        if major >= 2 and minor >= 2:
+            self.gp = self.df[cols].groupby("user").apply(lambda d:
+                                                          d.iloc[d["cores"].argmax()],
+                                                          include_groups=False)
+            self.gp.reset_index(inplace=True)
+        else:
+            self.gp = self.df[cols].groupby("user").apply(lambda d:
+                                                          d.iloc[d["cores"].argmax()])
         self.gp = self.gp.sort_values("cores", ascending=False)[:10]
         self.gp = self.gp.rename(columns={"elapsed-hours":"Hours"})
         self.gp.state = self.gp.state.apply(lambda x: JOBSTATES[x])

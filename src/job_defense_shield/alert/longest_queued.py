@@ -37,10 +37,15 @@ class LongestQueuedJobs(Alert):
                 "partition",
                 "s-days",
                 "e-days"]
-        self.df = self.df[cols].groupby("user").apply(lambda d:
-                                                      d.iloc[d["s-days"].argmax()],
-                                                      include_groups=False)
-        self.df.reset_index(inplace=True)
+        major, minor, _ = map(int, pd.__version__.split("."))
+        if major >= 2 and minor >= 2:
+            self.df = self.df[cols].groupby("user").apply(lambda d:
+                                                          d.iloc[d["s-days"].argmax()],
+                                                          include_groups=False)
+            self.df.reset_index(inplace=True)
+        else:
+            self.df = self.df[cols].groupby("user").apply(lambda d:
+                                                          d.iloc[d["s-days"].argmax()])
         self.df = self.df[cols]
         self.df.sort_values("s-days", ascending=False, inplace=True)
         self.df = self.df[self.df["s-days"] >= 3][:10]

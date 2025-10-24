@@ -111,9 +111,12 @@ class ExcessiveTimeLimits(Alert):
                 jobs["Time-Allocated"] = jobs["limit-minutes"].apply(lambda x:
                                                                      seconds_to_slurm_time_format(spm * x))
                 jobs["Percent-Used"] = jobs["mean-ratio"].apply(lambda x: f"{round(100 * x)}%")
-                cols = ["jobid", "Time-Used", "Time-Allocated", "Percent-Used", "cores"]
+                if xpu == "gpu":
+                    cols = ["jobid", "Time-Used", "Time-Allocated", "Percent-Used", "cores", "gpus"]
+                else:
+                    cols = ["jobid", "Time-Used", "Time-Allocated", "Percent-Used", "cores"]
                 jobs = jobs[cols].sort_values(by="jobid")
-                renamings = {"jobid":"JobID", "cores":"CPU-Cores"}
+                renamings = {"jobid":"JobID", "cores":"CPU-Cores", "gpus":"GPUs"}
                 jobs = jobs.rename(columns=renamings)
                 indent = 4 * " "
                 table = jobs.to_string(index=False, justify="center").split("\n")

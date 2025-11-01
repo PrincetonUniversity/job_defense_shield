@@ -34,7 +34,7 @@ class UsageOverview(Alert):
                                                       f"{x} ({round(100 * x / total)}%)")
             else:
                 for cluster in gp["cluster"].unique():
-                    for field in ["cpu-hours", "gpu-hours"]:
+                    for field in cols:
                         total = gp[gp["cluster"] == cluster][field].sum()
                         if total != 0:
                             gp[field] = gp.apply(lambda row:
@@ -73,4 +73,4 @@ class UsageOverview(Alert):
         clus = self.by_cluster.to_string(index=keep_index, justify="center")
         part = self.special.to_string(index=False, justify="center")
         return add_dividers(clus, self.report_title) + \
-               add_dividers(part, f"{self.report_title} and Partition")
+               add_dividers(part, f"{self.report_title} and Partition", clusters=True)

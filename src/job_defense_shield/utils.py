@@ -295,7 +295,8 @@ def add_new_and_derived_fields(df: pd.DataFrame) -> pd.DataFrame:
 def add_dividers(df_str: str,
                  title: str="",
                  pre: str="\n\n\n",
-                 units_row: bool=False) -> str:
+                 units_row: bool=False,
+                 clusters: bool=False) -> str:
     """Add horizontal dividers to the output tables."""
     rows = df_str.split("\n")
     width = max([len(row) for row in rows] + [len(title)])
@@ -305,6 +306,16 @@ def add_dividers(df_str: str,
         rows.insert(0, heading)
         rows.insert(1, divider)
         rows.insert(3, divider)
+        if clusters:
+            cluster_change = []
+            prev = rows[4].split()[0]
+            for i, row in enumerate(rows[4:]):
+                curr = row.split()[0]
+                if curr != prev:
+                    cluster_change.append(i + 4)
+                    prev = curr
+            for i, idx in enumerate(cluster_change):
+               rows.insert(idx + i, divider)
     elif title and units_row:
         rows.insert(0, heading)
         rows.insert(1, divider)

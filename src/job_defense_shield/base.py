@@ -153,7 +153,7 @@ class Alert:
         from jobstats import Jobstats
         from config import PROM_SERVER
         num_jobs = len(self.df[self.df.state == "RUNNING"])
-        print(f"INFO: Querying server for AdminComment on {num_jobs} running jobs ... ",
+        print(f"INFO: Querying Prometheus server for data on {num_jobs} running jobs ... ",
               end="",
               flush=True)
         start = time()
@@ -192,7 +192,9 @@ class Alert:
         jb = jb[jb["num_other_nodes"] == 0]
         cols = ["node-tuple", "job_nodes", "error_code", "num_other_nodes"]
         jb.drop(columns=cols, inplace=True)
-        print(f"INFO: Applied nodelist (removed {num_jobs - len(jb)} of {num_jobs} jobs)")
+        num_rm = num_jobs - len(jb)
+        pct = f"{round(100 * num_rm / num_jobs)}%" if num_jobs else "--%"
+        print(f"INFO: Applied nodelist (removed {num_rm} or {pct} of the {num_jobs} jobs)")
         return jb
 
     def has_sufficient_time_passed_since_last_email(self, vfile: str) -> bool:

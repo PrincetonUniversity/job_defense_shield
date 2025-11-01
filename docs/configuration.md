@@ -24,6 +24,7 @@ report-emails:
   - admin1@institution.edu
   - admin2@institution.edu
 verbose: False
+show-empty-reports: False
 
 
 ##################################

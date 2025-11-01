@@ -38,6 +38,7 @@ cluster  partition   users   cpu-hours     gpu-hours
    della     gpu-ee    2       173   (0%)    23   (0%)
    della      grace    1        11   (0%)    11   (0%)
    della      malik    1         2   (0%)     0   (0%)
+------------------------------------------------------
  stellar      cimes   21   2941001  (44%)     0   (0%)
  stellar         pu   56   2426873  (36%)     0   (0%)
  stellar       pppl   33   1340776  (20%)     0   (0%)
@@ -45,6 +46,7 @@ cluster  partition   users   cpu-hours     gpu-hours
  stellar        all   48     12377   (0%)     0   (0%)
  stellar        gpu   20     11044   (0%)  1926 (100%)
  stellar     bigmem    1        66   (0%)     0   (0%)
+------------------------------------------------------
 traverse        all    1    189987 (100%) 47497 (100%)
 ------------------------------------------------------
      Start: Fri Mar 07, 2025 at 11:27 AM

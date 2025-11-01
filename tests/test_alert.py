@@ -16,6 +16,13 @@ def test_add_dividers():
     expected = "points\n------\nx y\n------\n1 1\n2 2\n3 3\n------\n"
     assert actual == expected
 
+def test_add_dividers_partitions():
+    df_str = "x y\na 1\na 2\nb 3\nc 4"
+    title = "points"
+    actual = add_dividers(df_str, title, pre="", clusters=True)
+    expected = "points\n------\nx y\n------\na 1\na 2\n------\nb 3\n------\nc 4\n------\n"
+    assert actual == expected
+
 def test_gpus_per_job():
     assert gpus_per_job("") == 0
     assert gpus_per_job("UNKNOWN") == 0

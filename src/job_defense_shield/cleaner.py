@@ -100,8 +100,12 @@ class SacctCleaner(BaseCleaner):
                     start.isnumeric() and \
                     end.isnumeric():
                     return int(end) - int(start)
+                elif limit_minutes == "UNLIMITED" and \
+                    state == "CANCELLED" and \
+                    not start.isnumeric():
+                    return -1
                 else:
-                    return limit_minutes
+                    return int(limit_minutes)
             self.raw["limit-minutes"] = self.raw.apply(lambda row:
                                         fix_limit_minutes(row["limit-minutes"],
                                                           row["state"],
@@ -137,8 +141,12 @@ class SacctCleaner(BaseCleaner):
                     start.isnumeric() and \
                     end.isnumeric():
                     return int(end) - int(start)
+                elif limit_minutes == "Partition_Limit" and \
+                    state == "CANCELLED" and \
+                    not start.isnumeric():
+                    return -1
                 else:
-                    return limit_minutes
+                    return int(limit_minutes)
             self.raw["limit-minutes"] = self.raw.apply(lambda row:
                                         fix_limit_minutes(row["limit-minutes"],
                                                           row["state"],

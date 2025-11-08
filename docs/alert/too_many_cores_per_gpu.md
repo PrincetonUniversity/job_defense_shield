@@ -30,19 +30,19 @@ The available settings are listed below:
 
 - `cores_per_gpu_target`: This should be the number of CPU-cores divided by the number of GPUs per node. For instance, for nodes with 96 cores and 8 GPUs, one should use 96/8=12.
 
-- `cores_per_gpu_limit`: Include jobs where the number of CPU-cores per GPU is equal to or greater than this value. One may set this equal to `cores_per_gpu_target` or a value slightly larger.
+- `cores_per_gpu_limit`: Consider jobs where the number of CPU-cores per GPU is equal to or greater than this value. One should set this parameter equal to `cores_per_gpu_target` or a value slightly larger.
 
 - `cores_per_node`: Number of CPU-cores per node.
 
 - `email_file`: The text file to be used for the email message to users.
 
-`gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be considered. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
+- `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be considered. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
 
-- `cpu_eff_threshold`: (Optional) Ignore jobs with a CPU efficiency greater than this value. Default: 100
+- `cpu_eff_threshold`: (Optional) Ignore jobs with a CPU efficiency (as a percentage) greater than this value. For instance, to ignore jobs with CPU efficiency of greater than 80% use `cpu_eff_threshold: 80`. Default: 100
 
-- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
+- `min_run_time`: (Optional) Minimum run time in minutes for a job to be considered. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be considered. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -70,15 +70,15 @@ $ job_defense_shield --too-many-cores-per-gpu
  JobID     User  Hours CPU-Eff  GPUs Cores-per-GPU  Cores-per-GPU-Target Emails
 -------------------------------------------------------------------------------
 62675166  u79355  1.8     5%      1         48                12          2 (1)
-62733079  u73812  1.3    15%      2         32                12          0   
-62735106  u73812  1.4    15%      2         32                12          0   
+62733079  u12345  1.3    15%      2         32                12          0   
+62735106  u12345  1.4    15%      2         32                12          0   
 62950436  u23992  1.2     7%      1         32                12          0   
 62952770  u23992  1.2     1%      1         32                12          0   
 -------------------------------------------------------------------------------
    Cluster: della
 Partitions: gpu
      Start: Tue Mar 04, 2025 at 11:32 AM
-       End: Tue Mar 18, 2025 at 11:32 AM
+       End: Tue Mar 11, 2025 at 11:32 AM
 ```
 
 ## Email Message to Users
@@ -143,5 +143,5 @@ $ job_defense_shield --too-many-cores-per-gpu --check
 Below is an example entry for `crontab`:
 
 ```
-0 9 * * * /path/to/job_defense_shield --too-many-cores-per-gpu --email > /path/to/log/too_many_cores_per_gpu.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --too-many-cores-per-gpu --email > /path/to/log/too_many_cores_per_gpu.log 2>&1
 ```

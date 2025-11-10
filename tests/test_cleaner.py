@@ -142,3 +142,23 @@ def test_unlimited_time_limits():
     s.raw = s.unlimited_time_limits()
     expected = pd.Series(["100", 100, 50, -1])
     pd.testing.assert_series_equal(s.raw["limit-minutes"], expected, check_names=False)
+
+def test_partition_limit_time_limits():
+    # can fail if now_secs is different in main code due to slow execution
+    jobid = [1, 2, 3, 4]
+    state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING"]
+    limit_minutes = ["100", "Partition_Limit", "Partition_Limit", "Partition_Limit"]
+    now_secs = int(datetime.now().timestamp())
+    start = ["0", "0", str(now_secs - 50), "0"]
+    end = ["100", "100", "42", "-1"]
+    raw = pd.DataFrame({"jobid":jobid,
+                        "state":state,
+                        "limit-minutes":limit_minutes,
+                        "start":start,
+                        "end":end})
+    field_renamings = {}
+    partition_renamings = {}
+    s = SacctCleaner(raw, field_renamings, partition_renamings)
+    s.raw = s.partition_limit_time_limits()
+    expected = pd.Series(["100", 100, 50, -1])
+    pd.testing.assert_series_equal(s.raw["limit-minutes"], expected, check_names=False)

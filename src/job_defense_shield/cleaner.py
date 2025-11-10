@@ -100,8 +100,53 @@ class SacctCleaner(BaseCleaner):
                     start.isnumeric() and \
                     end.isnumeric():
                     return int(end) - int(start)
+                elif limit_minutes == "UNLIMITED" and \
+                    state == "CANCELLED" and \
+                    not start.isnumeric():
+                    return -1
                 else:
-                    return limit_minutes
+                    return int(limit_minutes)
+            self.raw["limit-minutes"] = self.raw.apply(lambda row:
+                                        fix_limit_minutes(row["limit-minutes"],
+                                                          row["state"],
+                                                          row["start"],
+                                                          row["end"]),
+                                        axis="columns")
+        return self.raw
+
+    def partition_limit_time_limits(self) -> pd.DataFrame:
+        """Slurm allows for jobs with time limits that are mapped to the Partition
+           Timelimit denoted by Partition_Limit. This function handles these
+           non-numeric values with the exception of pending jobs. Rows with null
+           values for limit-minutes have already been dropped. Pending jobs are
+           assigned a limit-minutes of -1 so that all values are numerical. Running
+           jobs are assigned a limit-minutes equal to the elapsed time of the job.
+           The else condition returns Partition_Limit which is later addressed by
+           the method limit_minutes_final."""
+        num_partition_limit = len(self.raw[self.raw["limit-minutes"] == "Partition_Limit"])
+        if num_partition_limit:
+            print(f"{self.indent}Number Partition_Limit: {num_partition_limit}")
+            now_secs = int(datetime.now().timestamp())
+            def fix_limit_minutes(limit_minutes: str,
+                                  state: str,
+                                  start: str,
+                                  end: str) -> Union[int, str]:
+                if limit_minutes == "Partition_Limit" and state == "PENDING":
+                    return -1
+                elif limit_minutes == "Partition_Limit" and \
+                    state == "RUNNING" and \
+                    start.isnumeric():
+                    return now_secs - int(start)
+                elif limit_minutes == "Partition_Limit" and \
+                    start.isnumeric() and \
+                    end.isnumeric():
+                    return int(end) - int(start)
+                elif limit_minutes == "Partition_Limit" and \
+                    state == "CANCELLED" and \
+                    not start.isnumeric():
+                    return -1
+                else:
+                    return int(limit_minutes)
             self.raw["limit-minutes"] = self.raw.apply(lambda row:
                                         fix_limit_minutes(row["limit-minutes"],
                                                           row["state"],
@@ -227,6 +272,7 @@ class SacctCleaner(BaseCleaner):
         self.raw.partition = self.rename_partitions()
         self.raw.state = self.unify_cancel_state()
         self.raw = self.unlimited_time_limits()
+        self.raw = self.partition_limit_time_limits()
         self.raw = self.clean_nodes_and_cores()
         #self.raw = self.remove_nulls()
         self.raw = self.clean_time_columns()

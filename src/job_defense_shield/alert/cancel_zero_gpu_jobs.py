@@ -28,9 +28,9 @@ class CancelZeroGpuJobs(Alert):
 
     Jobs with an elapsed time plus (sliding cancel - slide warning) that
     are less than limit-minutes cannot be excluded since real limit may
-    be UNLIMITED. Would need to add new column to track UNLIMITED jobs.
-    Users still receive warnings in these cases. Such jobs are also not
-    excluded using the fixed window approach.
+    be UNLIMITED or Partition_Limit. Would need to add new column to track
+    UNLIMITED and Partition_Limit jobs. Users still receive warnings in these
+    cases. Such jobs are also not excluded using the fixed window approach.
 
     For fixed window approach or the first N minutes of the jobs,
     right now take jobs with run times of greater than warning and less than

@@ -138,7 +138,7 @@ def read_config_file(config_file: Optional[str],
     else:
         print("ERROR: Configuration file not found. Exiting ...")
         sys.exit()
- 
+
     # check for and/or create the violation logs directory
     if "violation-logs-path" not in cfg:
         print('ERROR: "violation-logs-path" must be specified in the configuration file.')
@@ -189,6 +189,13 @@ def read_config_file(config_file: Optional[str],
         cfg["smtp-password"] = smtp_password_from_env
     if "smtp-port" not in cfg:
         cfg["smtp-port"] = None
+    if "ldap-server" not in cfg:
+        cfg["ldap-server"] = None
+    if "ldap-password" not in cfg:
+        cfg["ldap-password"] = None
+    if "ldap-org" not in cfg:
+        cfg["ldap-org"] = None
+
 
     # system or global configuration settings
     sys_cfg = {"no_emails_to_users":   no_emails_to_users,
@@ -205,7 +212,11 @@ def read_config_file(config_file: Optional[str],
                "smtp_user":            cfg["smtp-user"],
                "smtp_password":        cfg["smtp-password"],
                "smtp_port":            cfg["smtp-port"],
-               "show_empty_reports":   cfg["show-empty-reports"]}
+               "show_empty_reports":   cfg["show-empty-reports"],
+               "ldap_server":          cfg["ldap-server"],
+               "ldap_org":             cfg["ldap-org"],
+               "ldap_password":        cfg["ldap-password"],
+        }
     return cfg, sys_cfg, head
 
 def display_alerts(cfg: dict) -> str:

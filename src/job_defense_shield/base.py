@@ -9,7 +9,7 @@ from .utils import send_email
 from .utils import SECONDS_PER_HOUR as sph
 from .utils import HOURS_PER_DAY as hpd
 from .efficiency import get_nodelist
-
+from .ldap import ldap_email_lookup
 
 class Alert:
 
@@ -81,6 +81,8 @@ class Alert:
             for user, email, usr in self.emails:
                 if user in self.external_emails:
                     user_email_address = self.external_emails[user]
+                if self.ldap_server:
+                    user_email_address = ldap_email_lookup(user, ldap_server=self.ldap_server, ldap_org=self.ldap_org, ldap_password=self.ldap_password)
                 else:
                     user_email_address = f"{user}{self.email_domain}"
                 send_email(email,
@@ -211,7 +213,7 @@ class Alert:
             if not vhist.empty:
                 last_sent_email_date = vhist["Email-Sent"].max()
         seconds_since_last_email = datetime.now().timestamp() - last_sent_email_date.timestamp()
-        seconds_threshold = self.days_between_emails * hpd * sph 
+        seconds_threshold = self.days_between_emails * hpd * sph
         return seconds_since_last_email >= seconds_threshold
 
     def get_emails_sent_count(self, user: str, violation: str) -> str:

@@ -269,7 +269,11 @@ def main():
                      args.clusters,
                      args.partition).get_job_data()
     if args.dump_files:
-        raw.to_csv("DEBUG_RAW.csv", index=False)
+        dg = raw.copy()
+        private_users = {key:f"u{i}" for i, key in enumerate(dg.user.unique())}
+        dg.user = dg.user.map(private_users)
+        dg.to_csv("DEBUG_RAW.csv", index=False)
+        del dg
 
     # clean the raw data
     field_renamings = {"cputimeraw":"cpu-seconds",
@@ -292,8 +296,12 @@ def main():
     df["admincomment"] = df["admincomment"].apply(get_stats_dict)
     df.reset_index(drop=True, inplace=True)
     if args.dump_files:
-        df.to_csv("DEBUG_DF.csv", index=False)
-
+        dg = df.copy()
+        dg.user = dg.user.map(private_users)
+        dg.to_csv("DEBUG_DF.csv", index=False)
+        del dg
+        dfiles = "see DEBUG_RAW.csv and DEBUG_DF.csv"
+        print(f"INFO: Wrote debug files with obfuscated usernames ({dfiles}).")
 
     s = "\n"
     ###########################################

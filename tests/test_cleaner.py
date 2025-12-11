@@ -125,12 +125,12 @@ def test_unify_cancel_state():
 
 def test_unlimited_time_limits():
     # can fail if now_secs is different in main code due to slow execution
-    jobid = [1, 2, 3, 4]
-    state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING"]
-    limit_minutes = ["100", "UNLIMITED", "UNLIMITED", "UNLIMITED"]
+    jobid = [1, 2, 3, 4, 5]
+    state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING", "CANCELLED"]
+    limit_minutes = ["100", "UNLIMITED", "UNLIMITED", "UNLIMITED", "UNLIMITED"]
     now_secs = int(datetime.now().timestamp())
-    start = ["0", "0", str(now_secs - 50), "0"]
-    end = ["100", "100", "42", "-1"]
+    start = ["0", "0", str(now_secs - 50), "0", "Unknown"]
+    end = ["100", "100", "Unknown", "-1", "Unknown"]
     raw = pd.DataFrame({"jobid":jobid,
                         "state":state,
                         "limit-minutes":limit_minutes,
@@ -140,17 +140,17 @@ def test_unlimited_time_limits():
     partition_renamings = {}
     s = SacctCleaner(raw, field_renamings, partition_renamings)
     s.raw = s.unlimited_time_limits()
-    expected = pd.Series(["100", 100, 50, -1])
+    expected = pd.Series(["100", "100", "50", "-1", "-1"])
     pd.testing.assert_series_equal(s.raw["limit-minutes"], expected, check_names=False)
 
 def test_partition_limit_time_limits():
     # can fail if now_secs is different in main code due to slow execution
-    jobid = [1, 2, 3, 4]
-    state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING"]
-    limit_minutes = ["100", "Partition_Limit", "Partition_Limit", "Partition_Limit"]
+    jobid = [1, 2, 3, 4, 5]
+    state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING", "CANCELLED"]
+    limit_minutes = ["100"] + 4 * ["Partition_Limit"]
     now_secs = int(datetime.now().timestamp())
-    start = ["0", "0", str(now_secs - 50), "0"]
-    end = ["100", "100", "42", "-1"]
+    start = ["0", "0", str(now_secs - 50), "0", "Unknown"]
+    end = ["100", "100", "42", "-1", "Unknown"]
     raw = pd.DataFrame({"jobid":jobid,
                         "state":state,
                         "limit-minutes":limit_minutes,
@@ -160,5 +160,50 @@ def test_partition_limit_time_limits():
     partition_renamings = {}
     s = SacctCleaner(raw, field_renamings, partition_renamings)
     s.raw = s.partition_limit_time_limits()
-    expected = pd.Series(["100", 100, 50, -1])
+    expected = pd.Series(["100", "100", "50", "-1", "-1"])
     pd.testing.assert_series_equal(s.raw["limit-minutes"], expected, check_names=False)
+
+def test_limit_minutes_final():
+    raw = pd.DataFrame({"jobid":[1, 2, 3, 4, 5, 6],
+                        "limit-minutes":["100", "200", "Partition_Limit", "UNLIMITED", "", "-1"]})
+    field_renamings = {}
+    partition_renamings = {}
+    s = SacctCleaner(raw, field_renamings, partition_renamings)
+    s.raw = s.limit_minutes_final()
+    expected = pd.Series([100, 200, -1])
+    pd.testing.assert_series_equal(s.raw["limit-minutes"],
+                                   expected,
+                                   check_names=False,
+                                   check_index=False)
+
+def test_time_limits_end_to_end():
+    """Test the two preprocessing methods and the final method for dealing
+       with time limits."""
+    # can fail if now_secs is different in main code due to slow execution
+    jobid = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    state = ["COMPLETED", "COMPLETED", "RUNNING", "PENDING", "CANCELLED", "REQUEUED",
+             "PENDING", "RUNNING", "CANCELLED", "REQUEUED"]
+    limit_minutes = ["100", "UNLIMITED", "UNLIMITED", "UNLIMITED", "UNLIMITED", "UNLIMITED",
+                     "Partition_Limit", "Partition_Limit", "Partition_Limit", "Partition_Limit"]
+    now_secs = int(datetime.now().timestamp())
+    start = ["0", "0", str(now_secs - 50), "Unknown", "Unknown", "Unknown",
+             "Unknown", str(now_secs - 50), "100", "Unknown"]
+    end = ["100", "100", "Unknown", "Unknown", "Unknown", "Unknown",
+           "Unknown", "Unknown", "200", "Unknown"]
+    raw = pd.DataFrame({"jobid":jobid,
+                        "state":state,
+                        "limit-minutes":limit_minutes,
+                        "start":start,
+                        "end":end})
+    field_renamings = {}
+    partition_renamings = {}
+    s = SacctCleaner(raw, field_renamings, partition_renamings)
+    s.raw = s.unlimited_time_limits()
+    s.raw = s.partition_limit_time_limits()
+    s.raw = s.limit_minutes_final()
+    expected = pd.Series([100, 100, 50, -1, -1,
+                          -1, 50, 100])
+    pd.testing.assert_series_equal(s.raw["limit-minutes"],
+                                   expected,
+                                   check_names=False,
+                                   check_index=False)

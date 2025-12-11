@@ -75,13 +75,20 @@ class SacctCleaner(BaseCleaner):
 
     def unlimited_time_limits(self) -> pd.DataFrame:
         """Slurm allows for jobs with unlimited time limits denoted
-           by UNLIMITED. This function handles these non-numeric values with the
-           exception of pending jobs. Rows with null values for limit-minutes
-           have already been dropped. Pending jobs are assigned a limit-minutes
-           of -1 so that all values are numerical. Running jobs are assigned a
-           limit-minutes equal to the elapsed time of the job. The else
-           condition returns UNLIMITED which is later addressed by the method
-           limit_minutes_final."""
+           by UNLIMITED. This function handles these non-numeric values.
+
+           Rows with null values for limit-minutes have already been dropped.
+           Pending jobs are assigned a limit-minutes of -1 so that all
+           values are numerical. Running jobs are assigned a limit-minutes
+           equal to the elapsed time of the job. The else condition returns
+           UNLIMITED which is later addressed by the method
+           limit_minutes_final. This second method also ensures that all values
+           are of type integer.
+
+           The reason for not dropping these rows now is that they may be
+           dropped for other reasons in subsequent cleaning functions. Could
+           also combine both methods by cleaning time limits after all of the
+           other cleaning steps."""
         num_unlimited = len(self.raw[self.raw["limit-minutes"] == "UNLIMITED"])
         if num_unlimited:
             print(f"{self.indent}Number UNLIMITED: {num_unlimited}")
@@ -89,23 +96,23 @@ class SacctCleaner(BaseCleaner):
             def fix_limit_minutes(limit_minutes: str,
                                   state: str,
                                   start: str,
-                                  end: str) -> Union[int, str]:
+                                  end: str) -> str:
                 if limit_minutes == "UNLIMITED" and state == "PENDING":
-                    return -1
+                    return "-1"
                 elif limit_minutes == "UNLIMITED" and \
                     state == "RUNNING" and \
                     start.isnumeric():
-                    return now_secs - int(start)
+                    return str(now_secs - int(start))
                 elif limit_minutes == "UNLIMITED" and \
                     start.isnumeric() and \
                     end.isnumeric():
-                    return int(end) - int(start)
+                    return str(int(end) - int(start))
                 elif limit_minutes == "UNLIMITED" and \
                     state == "CANCELLED" and \
                     not start.isnumeric():
-                    return -1
+                    return "-1"
                 else:
-                    return int(limit_minutes)
+                    return limit_minutes
             self.raw["limit-minutes"] = self.raw.apply(lambda row:
                                         fix_limit_minutes(row["limit-minutes"],
                                                           row["state"],
@@ -115,14 +122,25 @@ class SacctCleaner(BaseCleaner):
         return self.raw
 
     def partition_limit_time_limits(self) -> pd.DataFrame:
-        """Slurm allows for jobs with time limits that are mapped to the Partition
-           Timelimit denoted by Partition_Limit. This function handles these
-           non-numeric values with the exception of pending jobs. Rows with null
+        """Slurm allows for jobs with time limits that are mapped to the
+           Partition Timelimit denoted by Partition_Limit. This function handles
+           these non-numeric values.
+
+           According to the Slurm sacct documentation and our own tests, only
+           pending jobs can have a Timelimit of Partition_Limit. Rows with null
            values for limit-minutes have already been dropped. Pending jobs are
-           assigned a limit-minutes of -1 so that all values are numerical. Running
-           jobs are assigned a limit-minutes equal to the elapsed time of the job.
-           The else condition returns Partition_Limit which is later addressed by
-           the method limit_minutes_final."""
+           assigned a limit-minutes of -1 so that all values are numerical. This
+           is okay since the only alerts that consider pending jobs is
+           --longest-queued which does not depend on the time limit. For safety,
+           we still handle cases where running jobs have a time limit of
+           Partition_Limit. Running jobs are assigned a limit-minutes equal to
+           the elapsed time of the job.
+
+           The else condition returns Partition_Limit which is later addressed
+           by the method limit_minutes_final. This second method also ensures
+           that all values are of type integer. Instead of assigning the time
+           limit to -1 for pending jobs, one could write code to find the
+           maximum time limit for the partition and use that."""
         num_partition_limit = len(self.raw[self.raw["limit-minutes"] == "Partition_Limit"])
         if num_partition_limit:
             print(f"{self.indent}Number Partition_Limit: {num_partition_limit}")
@@ -130,23 +148,23 @@ class SacctCleaner(BaseCleaner):
             def fix_limit_minutes(limit_minutes: str,
                                   state: str,
                                   start: str,
-                                  end: str) -> Union[int, str]:
+                                  end: str) -> str:
                 if limit_minutes == "Partition_Limit" and state == "PENDING":
-                    return -1
+                    return "-1"
                 elif limit_minutes == "Partition_Limit" and \
                     state == "RUNNING" and \
                     start.isnumeric():
-                    return now_secs - int(start)
+                    return str(now_secs - int(start))
                 elif limit_minutes == "Partition_Limit" and \
                     start.isnumeric() and \
                     end.isnumeric():
-                    return int(end) - int(start)
+                    return str(int(end) - int(start))
                 elif limit_minutes == "Partition_Limit" and \
                     state == "CANCELLED" and \
                     not start.isnumeric():
-                    return -1
+                    return "-1"
                 else:
-                    return int(limit_minutes)
+                    return limit_minutes
             self.raw["limit-minutes"] = self.raw.apply(lambda row:
                                         fix_limit_minutes(row["limit-minutes"],
                                                           row["state"],
@@ -242,15 +260,17 @@ class SacctCleaner(BaseCleaner):
     def limit_minutes_final(self) -> pd.DataFrame:
         """This method makes sures that all values of limit-minutes are
            numerical. This method exists since there is concern about
-           states like RESIZING, REQUEUED and SUSPENDED. Jobs in a state
-           of PENDING are handled above when limit-minutes is UNLIMITED."""
+           states like RESIZING, REQUEUED and SUSPENDED. This method also deals
+           with specific instances of UNLIMITED and Partition_Limit which were
+           not handled by their respective methods above."""
         self.raw = self.raw[pd.notna(self.raw["limit-minutes"])]
         if self.raw["limit-minutes"].dtype == 'object':
             num_rows = len(self.raw)
-            self.raw = self.raw[self.raw["limit-minutes"].str.isnumeric()]
-            num_dropped = len(self.raw) - num_rows
+            self.raw = self.raw[self.raw["limit-minutes"].str.isnumeric() |
+                                (self.raw["limit-minutes"] == "-1")]
+            num_dropped = num_rows - len(self.raw)
             if num_dropped:
-                print(f"{self.indent}{num_dropped} rows dropped for non-numeric limit-minutes")
+                print(f"{self.indent}{num_dropped} rows dropped for invalid limit-minutes")
         self.raw["limit-minutes"] = self.raw["limit-minutes"].astype("int64")
         return self.raw
 

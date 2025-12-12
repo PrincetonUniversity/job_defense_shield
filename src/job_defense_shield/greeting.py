@@ -1,10 +1,8 @@
 """Abstract and concrete implementations of email greetings."""
 
 import pwd
-import string
-import subprocess
-from base64 import b64decode
 from abc import ABC, abstractmethod
+from .ldap import ldap_lookup_name
 
 
 class Greeting(ABC):
@@ -24,7 +22,7 @@ class GreetingBasic(Greeting):
         return f"Hello {user},"
 
 
-class GreetingGetent:
+class GreetingGetent(Greeting):
 
     """A greeting based on getent passwd."""
 
@@ -44,25 +42,12 @@ class GreetingLDAP(Greeting):
     """Another greeting that uses LDAP. The ldap3 Python
        module is not used to avoid having an additional dependency."""
 
+    def __init__(self, ldap: dict) -> None:
+        self.ldap = ldap
+
     def greeting(self, user: str) -> str:
         """Return the greeting or first line for user emails."""
-        cmd = f"ldapsearch -x uid={user} displayname"
-        output = subprocess.run(cmd,
-                                stdout=subprocess.PIPE,
-                                shell=False,
-                                timeout=5,
-                                text=True,
-                                check=True)
-        lines = output.stdout.split('\n')
-        trans_table = str.maketrans('', '', string.punctuation)
-        for line in lines:
-            if line.startswith("displayname:"):
-                full_name = line.replace("displayname:", "").strip()
-                if ": " in full_name:
-                    full_name = b64decode(full_name).decode("utf-8")
-                if full_name.translate(trans_table).replace(" ", "").isalpha():
-                    return f"Hi {full_name.split()[0]},"
-        return f"Hello {user},"
+        return ldap_lookup_name(user, self.ldap)
 
 
 class GreetingCustom(Greeting):
@@ -76,13 +61,16 @@ class GreetingCustom(Greeting):
 
 class GreetingFactory:
 
+    def __init__(self, ldap: dict) -> None:
+        self.ldap = ldap
+
     def create_greeting(self, method):
         if method == "basic":
             return GreetingBasic()
         elif method == "getent":
             return GreetingGetent()
         elif method == "ldap":
-            return GreetingLDAP()
+            return GreetingLDAP(self.ldap)
         elif method == "custom":
             return GreetingCustom()
         else:

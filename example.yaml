@@ -7,6 +7,7 @@ jobstats-module-path: /usr/local/jobstats/
 jobstats-config-path: /etc/jobstats/
 violation-logs-path:  /usr/local/job_defense_shield/violations/
 email-files-path:     /usr/local/job_defense_shield/email/
+email-method: "simple"
 email-domain-name: "@institution.edu"
 sender:   support@institution.edu
 reply-to: support@institution.edu

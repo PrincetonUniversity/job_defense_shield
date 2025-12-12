@@ -1,14 +1,46 @@
 import subprocess
+import string
+from base64 import b64decode
+from functools import partial
+from typing import Dict
+from typing import Optional
 
 
-def ldap_email_lookup(user: str, ldap_server: str, ldap_org: str, ldap_password: str) -> str:
-
+def ldap_lookup(user: str,
+                ldap: Dict[str, Optional[str]],
+                attribute: str) -> str:
     """
-    Function to take a username and perform an ldaps query to get the mail entry.
-    This is useful for institutions which do not use standardized email addresses.
+    Function to take a username and perform an ldaps query to get the email
+    entry. This is useful for institutions which do not use standardized email
+    addresses. The ldap3 Python module is not used to avoid a dependency.
+
+    Options for ldapsearch:
+
+    -x    Simple authentication (no SASL)
+    -LLL  Print responses in LDIF format without comments
+    -H    Specify comma-separated URI(s) referring to the ldap server(s)
+    -D    The distinguished name to bind to the LDAP directory (cn is common
+          name, ou is organizational unit, o is organization name, dc is domain
+          component, c is country name)
+    -b    The base distinguished name or the location in the directory where the
+          search for a particular directory object begins
+    -w    The password for simple authentication
     """
 
-    cmd = f"ldapsearch -xLLL -H ldaps://{ldap_server} -b ou=People,o={ldap_org} -D cn=client,o={ldap_org} -w {ldap_password} '(uid={user})' mail"
+    ldap_server      = ldap["ldap_server"]
+    ldap_dn          = ldap["ldap_dn"]
+    ldap_base_dn     = ldap["ldap_base_dn"]
+    ldap_password    = ldap["ldap_password"]
+    ldap_uid         = ldap["ldap_uid"]
+    ldap_displayname = ldap["ldap_displayname"]
+    ldap_mail        = ldap["ldap_mail"]
+
+    cmd = (f"ldapsearch -x -LLL -H ldaps://{ldap_server} -D {ldap_dn} "
+           f"-b {ldap_base_dn} -w {ldap_password} ({ldap_uid}={user})")
+    if attribute == "name":
+        cmd += f" {ldap_displayname}"
+    elif attribute == "mail":
+        cmd += f" {ldap_mail}"
     output = subprocess.run(cmd,
                             stdout=subprocess.PIPE,
                             shell=True,
@@ -16,10 +48,24 @@ def ldap_email_lookup(user: str, ldap_server: str, ldap_org: str, ldap_password:
                             text=True,
                             check=True)
     lines = output.stdout.split('\n')
-    email = ''
-    for line in lines:
-        if line.startswith("mail: "):
-            email = line.replace("mail:", "").strip()
+    if attribute == "mail":
+        email = ''
+        for line in lines:
+            if line.startswith(f"{ldap_mail}: "):
+                email = line.replace(f"{ldap_mail}:", "").strip()
+                return email
+        return email
+    elif attribute == "name":
+        trans_table = str.maketrans('', '', string.punctuation)
+        for line in lines:
+            if line.startswith(f"{ldap_displayname}:"):
+                full_name = line.replace(f"{ldap_displayname}:", "").strip()
+                if ": " in full_name:
+                    full_name = b64decode(full_name).decode("utf-8")
+                if full_name.translate(trans_table).replace(" ", "").isalpha():
+                    return f"Hi {full_name.split()[0]},"
+        return f"Hello {user},"
 
-    return email
 
+ldap_lookup_name = partial(ldap_lookup, attribute="name")
+ldap_lookup_mail = partial(ldap_lookup, attribute="mail")

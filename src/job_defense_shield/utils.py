@@ -164,6 +164,8 @@ def read_config_file(config_file: Optional[str],
         cfg["jobstats-module-path"] = "/usr/local/jobstats/"
     if "jobstats-config-path" not in cfg:
         cfg["jobstats-config-path"] = "/etc/jobstats/"
+    if "email-method" not in cfg:
+        cfg["email-method"] = "simple"
     if "verbose" not in cfg:
         cfg["verbose"] = False
     if "external-emails" not in cfg:
@@ -191,11 +193,27 @@ def read_config_file(config_file: Optional[str],
         cfg["smtp-port"] = None
     if "ldap-server" not in cfg:
         cfg["ldap-server"] = None
+    if "ldap-dn" not in cfg:
+        cfg["ldap-dn"] = None
+    if "ldap-base-dn" not in cfg:
+        cfg["ldap-base-dn"] = None
     if "ldap-password" not in cfg:
         cfg["ldap-password"] = None
-    if "ldap-org" not in cfg:
-        cfg["ldap-org"] = None
+    if "ldap-uid" not in cfg:
+        cfg["ldap-uid"] = "uid"
+    if "ldap-displayname" not in cfg:
+        cfg["ldap-displayname"] = "displayname"
+    if "ldap-mail" not in cfg:
+        cfg["ldap-mail"] = "mail"
 
+    # ldap parameters
+    ldap_params = {"ldap_server":      cfg["ldap-server"],
+                   "ldap_dn":          cfg["ldap-dn"],
+                   "ldap_base_dn":     cfg["ldap-base-dn"],
+                   "ldap_password":    cfg["ldap-password"],
+                   "ldap_uid":         cfg["ldap-uid"],
+                   "ldap_displayname": cfg["ldap-displayname"],
+                   "ldap_mail":        cfg["ldap-mail"]}
 
     # system or global configuration settings
     sys_cfg = {"no_emails_to_users":   no_emails_to_users,
@@ -213,11 +231,9 @@ def read_config_file(config_file: Optional[str],
                "smtp_password":        cfg["smtp-password"],
                "smtp_port":            cfg["smtp-port"],
                "show_empty_reports":   cfg["show-empty-reports"],
-               "ldap_server":          cfg["ldap-server"],
-               "ldap_org":             cfg["ldap-org"],
-               "ldap_password":        cfg["ldap-password"],
-        }
+               "ldap":                 ldap_params}
     return cfg, sys_cfg, head
+
 
 def display_alerts(cfg: dict) -> str:
     """Return a listing of the alerts found in the configuration file."""

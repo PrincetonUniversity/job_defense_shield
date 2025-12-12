@@ -344,7 +344,7 @@ class CancelZeroGpuJobs(Alert):
            since this alert is considered urgent. That is, emails are sent
            immediately."""
         if hasattr(self, "cancel_minutes") and not self.df.empty:
-            g = GreetingFactory().create_greeting(method)
+            g = GreetingFactory(self.ldap).create_greeting(method)
             for user in self.df.User.unique():
                 indent = 4 * " "
                 tags = {}
@@ -449,7 +449,7 @@ class CancelZeroGpuJobs(Alert):
                                                             "GPUs-Unused"])
             idle.jobid = idle.jobid.astype("str")
             self.lg = pd.merge(self.lg, idle, how="left", on="jobid")
-            g = GreetingFactory().create_greeting(method)
+            g = GreetingFactory(self.ldap).create_greeting(method)
             ###################
             # sliding warning #
             ###################

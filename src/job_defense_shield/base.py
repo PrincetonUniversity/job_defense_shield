@@ -9,7 +9,8 @@ from .utils import send_email
 from .utils import SECONDS_PER_HOUR as sph
 from .utils import HOURS_PER_DAY as hpd
 from .efficiency import get_nodelist
-from .ldap import ldap_email_lookup
+from .ldap import ldap_lookup_mail
+
 
 class Alert:
 
@@ -76,29 +77,40 @@ class Alert:
     def send_emails_to_users(self) -> None:
         """Send emails to users and administrators. Update the violation
            log file of each user. The value of usr can be None in
-           cancel_zero_gpu_jobs."""
+           cancel_zero_gpu_jobs. Note that ldap_lookup_mail will return an
+           empty string if it encounters trouble. This explains the counter
+           and the check for on user_email_address not evaluating to False.
+        """
         if not self.no_emails_to_users:
+            email_not_found = []
             for user, email, usr in self.emails:
+                if self.email_method == "simple":
+                    user_email_address = f"{user}{self.email_domain}"
+                elif self.email_method == "ldap":
+                    user_email_address = ldap_lookup_mail(user, self.ldap)
+                    if user_email_address == "":
+                        email_not_found.append(user)
                 if user in self.external_emails:
                     user_email_address = self.external_emails[user]
-                if self.ldap_server:
-                    user_email_address = ldap_email_lookup(user, ldap_server=self.ldap_server, ldap_org=self.ldap_org, ldap_password=self.ldap_password)
-                else:
-                    user_email_address = f"{user}{self.email_domain}"
-                send_email(email,
-                           user_email_address,
-                           subject=self.email_subject,
-                           sender=self.sender,
-                           reply_to=self.reply_to,
-                           smtp_server=self.smtp_server,
-                           smtp_user=self.smtp_user,
-                           smtp_password=self.smtp_password,
-                           smtp_port=self.smtp_port,
-                           verbose=self.verbose)
-                print(email)
-                if usr is not None:
-                    vfile = f"{self.vpath}/{self.violation}/{user}.csv"
-                    self.update_violation_log(usr, vfile)
+                if user_email_address:
+                    send_email(email,
+                               user_email_address,
+                               subject=self.email_subject,
+                               sender=self.sender,
+                               reply_to=self.reply_to,
+                               smtp_server=self.smtp_server,
+                               smtp_user=self.smtp_user,
+                               smtp_password=self.smtp_password,
+                               smtp_port=self.smtp_port,
+                               verbose=self.verbose)
+                    print(email)
+                    if usr is not None:
+                        vfile = f"{self.vpath}/{self.violation}/{user}.csv"
+                        self.update_violation_log(usr, vfile)
+            if email_not_found:
+                ct = len(email_not_found)
+                missing = ",".join(email_not_found)
+                print(f"ERROR: {ct} email addresses not found via ldap ({missing})")
         if not self.no_emails_to_admins:
             for user, email, usr in self.emails:
                 for admin_email in self.admin_emails:

@@ -14,6 +14,7 @@ jobstats-module-path: /path/to/jobstats/module/
 jobstats-config-path: /path/to/jobstats/config/
 violation-logs-path:  /path/to/violations/
 email-files-path:     /path/to/email/
+email-method: "simple"
 email-domain-name: "@institution.edu"
 sender:   support@institution.edu
 reply-to: support@institution.edu
@@ -86,14 +87,6 @@ Set the path to your email files. A set of example files is found in the `email`
 email-files-path: /path/to/email/
 ```
 
-Specify the email domain for your institution:
-
-```yaml
-email-domain-name: "@institution.edu"
-```
-
-Usernames will be concatenated with the email domain to make user email addresses.
-
 Specify the `sender` and `reply-to` values for sending emails:
 
 ```yaml
@@ -104,7 +97,73 @@ reply-to: support@institution.edu
 !!! tip
     By using a `reply-to` that is different from `sender`, one can prevent auto-reply or out-of-office emails from creating new support tickets. If this choice is made then it is likely that users will need to forward any underutilization emails they receive to `sender` to open a new support ticket. Keep this issue in mind when writing the email messages.
 
-Use the `greeting-method` to determine the first line of the email that users receive:
+
+### Email Addresses of Users
+
+There are two methods for generating the email addresses of the users. The first choice is `simple`:
+
+```yaml
+email-method: "simple"
+email-domain-name: "@institution.edu"
+```
+
+For `simple`, usernames are concatenated with `email-domain-name` to make user email addresses.
+
+The second choice is `ldap`. Below are the required settings to use `ldap`:
+
+```yaml
+email-method: "ldap"
+ldap-server: ldap.princeton.edu
+ldap-dn: "uid=csesldap,o=Princeton University,c=US"
+ldap-base-dn: "o=Princeton University,c=US"
+ldap-password: "********"
+```
+
+The additional optional settings are:
+
+```yaml
+ldap-uid: "uid"
+ldap-mail: "mail"
+```
+
+For the settings above, the command below would be ran to find the email address of the user:
+
+```bash
+ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
+-b "o=Princeton University,c=US" -w "********" '(uid=<username>)' mail
+```
+
+If the optional settings were:
+
+```yaml
+ldap-uid: "netid"
+ldap-mail: "emailaddress"
+```
+
+Then the command above would become:
+
+```bash
+ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
+-b "o=Princeton University,c=US" -w "********" '(netid=<username>)' emailaddress
+```
+
+The `ldap3` Python module is not used to avoid a dependency.
+
+The email addresses produced by `simple` and `ldap` can be overridden with `external-emails`:
+
+```yaml
+external-emails:
+  u12345: alan.turing@gmail.com
+  u23456: einstein@yahoo.com
+```
+
+If a username is found in `external-emails` then the associated email adress will be used instead of what comes from `simple` or `ldap`. This is mainly used withe choice of `simple` to handle a few specific individuals.
+
+### Greeting Method for Emails
+
+The greeting is the first line of the email such as "Hello Alan (u12345),".
+
+Set the `greeting-method` to determine the greeting. For instance:
 
 ```yaml
 greeting-method: getent
@@ -122,9 +181,44 @@ A choice of `basic` will produce:
 Hello u12345,
 ```
 
-There is also `ldap` which calls `ldapsearch`. Our recommendation is `getent`. If you find that `getent` is not working properly during testing then use `basic`.
+There is also `ldap` (see below). Our recommendation is `getent`. If you find that `getent` is not working properly during testing then use `basic`.
 
-Lastly, one can create reports and have those sent to administrators by email when the `--report` flag is used:
+And similarly for the name of the user:
+
+```bash
+ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
+-b "o=Princeton University,c=US" -w "********" '(uid=<username>)' displayname
+```
+
+If using `ldap` as the email method then those settings can be reused.
+
+```
+ldap-server: ldap.princeton.edu
+ldap-dn: "uid=csesldap,o=Princeton University,c=US"
+ldap-base-dn: "o=Princeton University,c=US"
+ldap-password: "********"
+```
+
+If the optional settings were:
+
+```yaml
+ldap-uid: "netid"
+ldap-displayname: "fullname"
+ldap-mail: "emailaddress"
+```
+
+Then the commands would become:
+
+```bash
+ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
+-b "o=Princeton University,c=US" -w "********" '(netid=<username>)' fullname
+```
+
+It is fine to use `simple` for the email method and `ldap` for the greeting.
+
+### Reports for Administrators
+
+One can create reports and have those sent to administrators by email when the `--report` flag is used. Specify the email adresses of the administrators that should receive the reports:
 
 ```yaml
 report-emails:
@@ -201,14 +295,6 @@ partition-renamings:
 ```
 
 If a partition is renamed then the new name must be used throughout the configuration file.
-
-For users that do not use their institutional email address, one can specify external addresses:
-
-```yaml
-external-emails:
-  u12345: alan.turing@gmail.com
-  u23456: einstein@yahoo.com
-```
 
 Additional information is available by turning on the `verbose` setting. This will show the individual alerts and the jobs that are being ignored (e.g., due to missing metrics). The recommendation is to keep this turned off:
 

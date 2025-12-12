@@ -166,7 +166,7 @@ class LowEfficiency(Alert):
 
     def create_emails(self, method):
         rank_text = {1:"the most", 2:"the 2nd most", 3:"the 3rd most"}
-        g = GreetingFactory().create_greeting(method)
+        g = GreetingFactory(self.ldap).create_greeting(method)
         for user in self.ce.user.unique():
             vfile = f"{self.vpath}/{self.violation}/{user}.csv"
             if self.has_sufficient_time_passed_since_last_email(vfile):

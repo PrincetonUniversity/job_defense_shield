@@ -136,7 +136,7 @@ class MultinodeCpuFragmentation(Alert):
                             self.df = self.df[cols]
 
     def create_emails(self, method):
-        g = GreetingFactory().create_greeting(method)
+        g = GreetingFactory(self.ldap).create_greeting(method)
         for user in self.df.user.unique():
             vfile = f"{self.vpath}/{self.violation}/{user}.csv"
             if self.has_sufficient_time_passed_since_last_email(vfile):

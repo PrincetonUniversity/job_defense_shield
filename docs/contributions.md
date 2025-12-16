@@ -2,7 +2,7 @@
 
 Contributions to the Jobstats platform and its tools are welcome. To work with the code, build a Conda environment:
 
-```
+```bash
 $ conda create --name jds-dev python=3.12     \
                               pandas          \
                               pyarrow         \
@@ -24,13 +24,13 @@ $ conda activate jds-dev
 
 Be sure that the tests are passing before making a pull request:
 
-```
+```bash
 (jds-dev) $ pytest
 ```
 
 There are additional options for development:
 
-```
+```bash
 (jds-dev) $ pytest  --cov=. --capture=tee-sys tests
 (jds-dev) $ pytest -s tests  # use the -s option to run print statements
 ```
@@ -39,7 +39,7 @@ There are additional options for development:
 
 Run `ruff` and make sure it is passing for each source file modified:
 
-```
+```bash
 (jds-dev) $ ruff check myfile.py
 ```
 
@@ -49,7 +49,7 @@ Run `ruff` and make sure it is passing for each source file modified:
 The documentation is generated with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/). To build and
 serve the documentation:
 
-```
+```bash
 (jds-dev) $ mkdocs build
 (jds-dev) $ mkdocs serve
 # open a web browser

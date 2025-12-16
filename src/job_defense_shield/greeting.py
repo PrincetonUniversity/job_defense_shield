@@ -2,7 +2,7 @@
 
 import pwd
 from abc import ABC, abstractmethod
-from .ldap import ldap_lookup_name
+from .ldap_lookups import ldap_lookup_name
 
 
 class Greeting(ABC):

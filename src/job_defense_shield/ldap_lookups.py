@@ -10,9 +10,10 @@ def ldap_lookup(user: str,
                 ldap: Dict[str, Optional[str]],
                 attribute: str) -> str:
     """
-    Function to take a username and perform an ldaps query to get the email
-    entry. This is useful for institutions which do not use standardized email
-    addresses. The ldap3 Python module is not used to avoid a dependency.
+    Function to take a username and perform an ldaps query to get either the
+    first name of the user or the user email address. This is useful for
+    institutions which do not use standardized email addresses. The ldap3 Python
+    module is not used to avoid a dependency.
 
     Options for ldapsearch:
 
@@ -35,8 +36,8 @@ def ldap_lookup(user: str,
     ldap_displayname = ldap["ldap_displayname"]
     ldap_mail        = ldap["ldap_mail"]
 
-    cmd = (f"ldapsearch -x -LLL -H ldaps://{ldap_server} -D {ldap_dn} "
-           f"-b {ldap_base_dn} -w {ldap_password} ({ldap_uid}={user})")
+    cmd = (f"ldapsearch -x -LLL -H ldaps://{ldap_server} -D \"{ldap_dn}\" "
+           f"-b \"{ldap_base_dn}\" -w '{ldap_password}' '({ldap_uid}={user})'")
     if attribute == "name":
         cmd += f" {ldap_displayname}"
     elif attribute == "mail":
@@ -49,7 +50,7 @@ def ldap_lookup(user: str,
                             check=True)
     lines = output.stdout.split('\n')
     if attribute == "mail":
-        email = ''
+        email = ""
         for line in lines:
             if line.startswith(f"{ldap_mail}: "):
                 email = line.replace(f"{ldap_mail}:", "").strip()
@@ -58,12 +59,14 @@ def ldap_lookup(user: str,
     elif attribute == "name":
         trans_table = str.maketrans('', '', string.punctuation)
         for line in lines:
+            # no space after semicolon in next line is intentional since if
+            # base64 then line will start with displayname::
             if line.startswith(f"{ldap_displayname}:"):
                 full_name = line.replace(f"{ldap_displayname}:", "").strip()
                 if ": " in full_name:
                     full_name = b64decode(full_name).decode("utf-8")
                 if full_name.translate(trans_table).replace(" ", "").isalpha():
-                    return f"Hi {full_name.split()[0]},"
+                    return f"Hi {full_name.split()[0]} ({user}),"
         return f"Hello {user},"
 
 

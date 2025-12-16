@@ -149,6 +149,14 @@ def main():
         print("      force emails, modify config.yaml with 'workday-method: always'")
     if cfg["verbose"]:
         print(display_alerts(cfg))
+    if cfg["email-method"] == "simple" and cfg["email-domain-name"] is None:
+        print('ERROR: Must specify email-domain-name when using "simple" for email-method.')
+        sys.exit()
+    is_none = any([cfg[f"ldap-{s}"] is None for s in ["server", "dn", "base-dn", "password"]])
+    if (cfg["email-method"] == "ldap" or cfg["greeting-method"] == "ldap") and is_none:
+        print("ERROR: If using ldap to lookup email addresses or names then must")
+        print("       set ldap-server, ldap-dn, ldap-base-dn and ldap-password.")
+        sys.exit()
 
     #######################
     ## CHECK EMAILS SENT ##

@@ -25,7 +25,7 @@ report-emails:
   - admin1@institution.edu
   - admin2@institution.edu
 verbose: False
-show-empty-reports: False
+show-empty-reports: True
 
 
 ##################################
@@ -36,7 +36,7 @@ zero-cpu-utilization-1:
   partitions:
     - cpu
     - bigmem
-  min_run_time: 61 # minutes
+  min_run_time: 61  # minutes
   email_file: "zero_cpu_utilization.txt"
   admin_emails:
     - job-alerts-aaaalegbihhpknikkw2fkdx6gi@institution.slack.com
@@ -100,22 +100,28 @@ reply-to: support@institution.edu
 
 ### Email Addresses of Users
 
-There are two methods for generating the email addresses of the users. The first choice is `simple`:
+There are two methods for obtaining the email addresses of the users.
+
+#### Simple
+
+The most common choice is:
 
 ```yaml
 email-method: "simple"
 email-domain-name: "@institution.edu"
 ```
 
-For `simple`, usernames are concatenated with `email-domain-name` to make user email addresses.
+For `simple`, usernames are concatenated with `email-domain-name` to make user email addresses. For example, for the settings above, if the username is `u12345` then the email address will be `u12345@institution.edu`.
 
-The second choice is `ldap`. Below are the required settings to use `ldap`:
+#### LDAP
+
+The second choice is `ldap` which has the following required settings:
 
 ```yaml
 email-method: "ldap"
-ldap-server: ldap.princeton.edu
-ldap-dn: "uid=csesldap,o=Princeton University,c=US"
-ldap-base-dn: "o=Princeton University,c=US"
+ldap-server: ldap.institution.edu
+ldap-dn: "uid=rc,o=My University,c=US"
+ldap-base-dn: "o=My University,c=US"
 ldap-password: "********"
 ```
 
@@ -129,8 +135,8 @@ ldap-mail: "mail"
 For the settings above, the command below would be ran to find the email address of the user:
 
 ```bash
-ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
--b "o=Princeton University,c=US" -w "********" '(uid=<username>)' mail
+ldapsearch -x -LLL -H ldaps://ldap.institution.edu -D "uid=rc,o=My University,c=US" \
+-b "o=My University,c=US" -w '********' '(uid=<username>)' mail
 ```
 
 If the optional settings were:
@@ -143,11 +149,13 @@ ldap-mail: "emailaddress"
 Then the command above would become:
 
 ```bash
-ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
--b "o=Princeton University,c=US" -w "********" '(netid=<username>)' emailaddress
+ldapsearch -x -LLL -H ldaps://ldap.institution.edu -D "uid=rc,o=My University,c=US" \
+-b "o=My University,c=US" -w '********' '(netid=<username>)' emailaddress
 ```
 
 The `ldap3` Python module is not used to avoid a dependency.
+
+### Email Address Overrides
 
 The email addresses produced by `simple` and `ldap` can be overridden with `external-emails`:
 
@@ -157,46 +165,45 @@ external-emails:
   u23456: einstein@yahoo.com
 ```
 
-If a username is found in `external-emails` then the associated email adress will be used instead of what comes from `simple` or `ldap`. This is mainly used withe choice of `simple` to handle a few specific individuals.
+If a username is found in `external-emails` then the associated email address will be used instead of what comes from `simple` or `ldap`. This is mainly used with the choice of `simple` to handle a few specific individuals.
 
 ### Greeting Method for Emails
 
-The greeting is the first line of the email such as "Hello Alan (u12345),".
+The greeting is the first line of the email such as "Hello Alan (u12345)," where u12345 is the username. There are four choices for `greeting-method`: `basic`, `getent`, `ldap`, and `custom`.
 
-Set the `greeting-method` to determine the greeting. For instance:
+If the choice is `basic`:
 
 ```yaml
-greeting-method: getent
+greeting-method: basic
 ```
 
-The `getent` method will call `getent passwd` on the username to find the first name of the user in producing a greeting such as:
-
-```
-Hello Alan (u12345),
-```
-
-A choice of `basic` will produce:
+Then the greeting will be the username only, for example:
 
 ```
 Hello u12345,
 ```
 
-There is also `ldap` (see below). Our recommendation is `getent`. If you find that `getent` is not working properly during testing then use `basic`.
+The `getent` method (recommended) will call `getent passwd` on the username to find the first name of the user. This produces a greeting such as:
 
-And similarly for the name of the user:
+```
+Hi Alan (u12345),
+```
+
+The choice of `ldap` produces a greeting with the same format as `getent`. The following settings are required for `ldap`:
+
+
+```
+ldap-server: ldap.institution.edu
+ldap-dn: "uid=rc,o=My University,c=US"
+ldap-base-dn: "o=My University,c=US"
+ldap-password: "********"
+```
+
+For the settings above, the command below would be ran to find the first name of the user:
 
 ```bash
-ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
--b "o=Princeton University,c=US" -w "********" '(uid=<username>)' displayname
-```
-
-If using `ldap` as the email method then those settings can be reused.
-
-```
-ldap-server: ldap.princeton.edu
-ldap-dn: "uid=csesldap,o=Princeton University,c=US"
-ldap-base-dn: "o=Princeton University,c=US"
-ldap-password: "********"
+ldapsearch -x -LLL -H ldaps://ldap.institution.edu -D "uid=rc,o=My University,c=US" \
+-b "o=My University,c=US" -w '********' '(uid=<username>)' displayname
 ```
 
 If the optional settings were:
@@ -204,17 +211,16 @@ If the optional settings were:
 ```yaml
 ldap-uid: "netid"
 ldap-displayname: "fullname"
-ldap-mail: "emailaddress"
 ```
 
-Then the commands would become:
+Then the command would become:
 
 ```bash
-ldapsearch -x -LLL -H ldaps://ldap.princeton.edu -D "uid=csesldap,o=Princeton University,c=US" \
--b "o=Princeton University,c=US" -w "********" '(netid=<username>)' fullname
+ldapsearch -x -LLL -H ldaps://ldap.institution.edu -D "uid=rc,o=My University,c=US" \
+-b "o=My University,c=US" -w '********' '(netid=<username>)' fullname
 ```
 
-It is fine to use `simple` for the email method and `ldap` for the greeting.
+To use `custom` one must modify the source code.
 
 ### Reports for Administrators
 
@@ -266,9 +272,22 @@ The file `holidays.txt` should be a list of dates with the format YYYY-MM-DD:
 
 ```
 $ cat holidays.txt
-2025-05-26
-2025-06-19
-2025-07-04
+2026-01-01
+2026-01-02
+2026-01-19
+2026-05-25
+2026-06-19
+2026-07-03
+2026-09-07
+2026-11-26
+2026-11-27
+2026-12-24
+2026-12-25
+2026-12-31
+2027-01-01
+2027-01-18
+2027-05-31
+2027-06-18
 ```
 
 If you only want to avoid weekends and U.S. Federal holidays then use:
@@ -291,7 +310,7 @@ Partition names can be renamed:
 
 ```yaml
 partition-renamings:
-  datascience: datasci
+  datascience: ds
 ```
 
 If a partition is renamed then the new name must be used throughout the configuration file.

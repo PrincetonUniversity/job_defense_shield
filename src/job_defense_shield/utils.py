@@ -166,6 +166,8 @@ def read_config_file(config_file: Optional[str],
         cfg["jobstats-config-path"] = "/etc/jobstats/"
     if "email-method" not in cfg:
         cfg["email-method"] = "simple"
+    if "email-domain-name" not in cfg:
+        cfg["email-domain-name"] = None
     if "verbose" not in cfg:
         cfg["verbose"] = False
     if "external-emails" not in cfg:
@@ -224,6 +226,7 @@ def read_config_file(config_file: Optional[str],
                "verbose":              cfg["verbose"],
                "sender":               cfg["sender"],
                "reply_to":             cfg["reply-to"],
+               "email_method":         cfg["email-method"],
                "email_domain":         cfg["email-domain-name"],
                "external_emails":      cfg["external-emails"],
                "smtp_server":          cfg["smtp-server"],

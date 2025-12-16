@@ -9,7 +9,7 @@ from .utils import send_email
 from .utils import SECONDS_PER_HOUR as sph
 from .utils import HOURS_PER_DAY as hpd
 from .efficiency import get_nodelist
-from .ldap import ldap_lookup_mail
+from .ldap_lookups import ldap_lookup_mail
 
 
 class Alert:
@@ -79,7 +79,7 @@ class Alert:
            log file of each user. The value of usr can be None in
            cancel_zero_gpu_jobs. Note that ldap_lookup_mail will return an
            empty string if it encounters trouble. This explains the counter
-           and the check for on user_email_address not evaluating to False.
+           and the check for user_email_address not evaluating to False.
         """
         if not self.no_emails_to_users:
             email_not_found = []

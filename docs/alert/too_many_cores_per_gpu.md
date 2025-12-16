@@ -30,7 +30,7 @@ The available settings are listed below:
 
 - `cores_per_gpu_target`: This should be the number of CPU-cores divided by the number of GPUs per node. For instance, for nodes with 96 cores and 8 GPUs, one should use 96/8=12.
 
-- `cores_per_gpu_limit`: Consider jobs where the number of CPU-cores per GPU is equal to or greater than this value. One should set this parameter equal to `cores_per_gpu_target` or a value slightly larger.
+- `cores_per_gpu_limit`: Only consider jobs where the number of CPU-cores per GPU is greater than this value. One should set this parameter equal to `cores_per_gpu_target` or a value slightly larger.
 
 - `cores_per_node`: Number of CPU-cores per node.
 

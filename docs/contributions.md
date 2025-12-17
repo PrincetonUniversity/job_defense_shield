@@ -1,6 +1,12 @@
 # Contributions
 
-Contributions to the Jobstats platform and its tools are welcome. To work with the code, build a Conda environment:
+Contributions to Job Defense Shield are welcome. The software has benefitted from these code submissions:
+- using LDAP for obtaining user email addresses (T. Langford, Yale Univ.)
+- handling `Partition_Limit` in sacct data (P. Edmon, Harvard Univ.)
+
+## Development Environment
+
+To work with the code, build a Conda environment:
 
 ```bash
 $ conda create --name jds-dev python=3.12     \
@@ -42,7 +48,6 @@ Run `ruff` and make sure it is passing for each source file modified:
 ```bash
 (jds-dev) $ ruff check myfile.py
 ```
-
 
 ## Documentation
 

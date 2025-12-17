@@ -332,6 +332,7 @@ def add_dividers(df_str: str,
     width = max([len(row) for row in rows] + [len(title)])
     heading = title.center(width)
     divider = "-" * width
+    divider_half = "- " * (width // 2)
     if title and not units_row:
         rows.insert(0, heading)
         rows.insert(1, divider)
@@ -345,7 +346,7 @@ def add_dividers(df_str: str,
                     cluster_change.append(i + 4)
                     prev = curr
             for i, idx in enumerate(cluster_change):
-               rows.insert(idx + i, divider)
+               rows.insert(idx + i, divider_half)
     elif title and units_row:
         rows.insert(0, heading)
         rows.insert(1, divider)

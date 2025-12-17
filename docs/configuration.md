@@ -102,7 +102,7 @@ reply-to: support@institution.edu
 
 There are two methods for obtaining the email addresses of the users.
 
-#### Simple
+#### simple
 
 The most common choice is:
 
@@ -113,7 +113,7 @@ email-domain-name: "@institution.edu"
 
 For `simple`, usernames are concatenated with `email-domain-name` to make user email addresses. For example, for the settings above, if the username is `u12345` then the email address will be `u12345@institution.edu`.
 
-#### LDAP
+#### ldap
 
 The second choice is `ldap` which has the following required settings:
 
@@ -125,7 +125,7 @@ ldap-base-dn: "o=My University,c=US"
 ldap-password: "********"
 ```
 
-The additional optional settings are:
+The additional optional settings with their default values are:
 
 ```yaml
 ldap-uid: "uid"
@@ -169,7 +169,9 @@ If a username is found in `external-emails` then the associated email address wi
 
 ### Greeting Method for Emails
 
-The greeting is the first line of the email such as "Hello Alan (u12345)," where u12345 is the username. There are four choices for `greeting-method`: `basic`, `getent`, `ldap`, and `custom`.
+The greeting is the first line of the email such as "Hello Alan (u12345)," where u12345 is the username. There are four choices for `greeting-method`: `basic`, `getent`, `ldap` and `custom`.
+
+#### basic
 
 If the choice is `basic`:
 
@@ -183,20 +185,37 @@ Then the greeting will be the username only, for example:
 Hello u12345,
 ```
 
-The `getent` method (recommended) will call `getent passwd` on the username to find the first name of the user. This produces a greeting such as:
+#### getent
+
+The `getent` method (recommended) will call `getent passwd` on the username to find the first name of the user:
+
+```yaml
+greeting-method: getent
+```
+
+This produces a greeting such as:
 
 ```
 Hi Alan (u12345),
 ```
 
+#### ldap
+
 The choice of `ldap` produces a greeting with the same format as `getent`. The following settings are required for `ldap`:
 
-
-```
+```yaml
+greeting-method: ldap
 ldap-server: ldap.institution.edu
 ldap-dn: "uid=rc,o=My University,c=US"
 ldap-base-dn: "o=My University,c=US"
 ldap-password: "********"
+```
+
+The additional optional settings with their default values are:
+
+```yaml
+ldap-uid: "uid"
+ldap-displayname: "displayname"
 ```
 
 For the settings above, the command below would be ran to find the first name of the user:
@@ -220,7 +239,9 @@ ldapsearch -x -LLL -H ldaps://ldap.institution.edu -D "uid=rc,o=My University,c=
 -b "o=My University,c=US" -w '********' '(netid=<username>)' fullname
 ```
 
-To use `custom` one must modify the source code.
+#### custom
+
+To use `custom` one must modify the source code (see `greeting.py`). Consider [contributing](contributions.md) your code.
 
 ### Reports for Administrators
 

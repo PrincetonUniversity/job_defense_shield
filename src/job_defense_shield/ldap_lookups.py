@@ -11,8 +11,8 @@ def ldap_lookup(user: str,
                 attribute: str) -> str:
     """
     Function to take a username and perform an ldaps query to get either the
-    first name of the user or the user email address. This is useful for
-    institutions which do not use standardized email addresses. The ldap3 Python
+    first name of the user or the user email address. The latter is useful for
+    institutions that do not use standardized email addresses. The ldap3 Python
     module is not used to avoid a dependency.
 
     Options for ldapsearch:
@@ -42,12 +42,21 @@ def ldap_lookup(user: str,
         cmd += f" {ldap_displayname}"
     elif attribute == "mail":
         cmd += f" {ldap_mail}"
-    output = subprocess.run(cmd,
-                            stdout=subprocess.PIPE,
-                            shell=True,
-                            timeout=5,
-                            text=True,
-                            check=True)
+    try:
+        output = subprocess.run(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                shell=True,
+                                timeout=5,
+                                text=True,
+                                check=True)
+    except subprocess.TimeoutExpired:
+        return f"Hello {user}," if attribute == "name" else ""
+    except subprocess.CalledProcessError:
+        return f"Hello {user}," if attribute == "name" else ""
+    except Exception:
+        return f"Hello {user}," if attribute == "name" else ""
+
     lines = output.stdout.split('\n')
     if attribute == "mail":
         email = ""

@@ -80,7 +80,7 @@ $ job_defense_shield --usage-overview
 Job Defense Shield (1.x.y)
 github.com/PrincetonUniversity/job_defense_shield
 
-INFO: Fri May 9, 2025 at 5:00 PM
+INFO: Fri Jan 9, 2026 at 5:00 PM
 INFO: Python 3.11.11 (main, Dec 11 2024, 16:28:39) [GCC 11.2.0]
 INFO: Pandas 2.2.3
 INFO: Configuration file is /home/aturing/software/jds/config.yaml
@@ -121,6 +121,7 @@ Cluster  Partition  Users  CPU-Hours      GPU-Hours
    della     gpu-ee    2       173   (0%)    23   (0%)
    della      grace    1        11   (0%)    11   (0%)
    della      salik    1         2   (0%)     0   (0%)
+- - - - - - - - - - - - - - - - - - - - - - - - - - -
  stellar      cimes   21   2941001  (44%)     0   (0%)
  stellar         pu   56   2426873  (36%)     0   (0%)
  stellar       pppl   33   1340776  (20%)     0   (0%)
@@ -128,10 +129,11 @@ Cluster  Partition  Users  CPU-Hours      GPU-Hours
  stellar        all   48     12377   (0%)     0   (0%)
  stellar        gpu   20     11044   (0%)  1926 (100%)
  stellar     bigmem    1        66   (0%)     0   (0%)
+- - - - - - - - - - - - - - - - - - - - - - - - - - -
 traverse        all    1    189987 (100%) 47497 (100%)
 ------------------------------------------------------
-     Start: Fri May 02, 2025 at 05:00 PM
-       End: Fri May 09, 2025 at 05:00 PM
+     Start: Fri Jan 02, 2026 at 05:00 PM
+       End: Fri Jan 09, 2026 at 05:00 PM
 ```
 
 You can go further back in time by using the `--days` option:

@@ -3,7 +3,6 @@
 
 from abc import ABC, abstractmethod
 from typing import Dict
-from typing import Union
 from datetime import datetime
 import pandas as pd
 

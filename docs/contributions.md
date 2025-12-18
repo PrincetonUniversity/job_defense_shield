@@ -1,8 +1,9 @@
 # Contributions
 
 Contributions to Job Defense Shield are welcome. The software has benefitted from these code submissions:
-- using LDAP for obtaining user email addresses (T. Langford, Yale Univ.)
-- handling `Partition_Limit` in sacct data (P. Edmon, Harvard Univ.)
+
+- improved cleaning of `sacct` data (P. Edmon, Harvard Univ.)
+- querying LDAP for user email addresses (T. Langford, Yale Univ.)
 
 ## Development Environment
 

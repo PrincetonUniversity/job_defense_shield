@@ -109,7 +109,7 @@ def main():
                         help='Only include usage during the time window and not before')
     args = parser.parse_args()
 
-    head = "\nJob Defense Shield (1.2.4)\n"
+    head = "\nJob Defense Shield (1.2.5)\n"
     head += "github.com/PrincetonUniversity/job_defense_shield\n\n"
     fmt = "%a %b %-d, %Y at %-I:%M %p"
     head += f"INFO: {datetime.now().strftime(fmt)}\n"

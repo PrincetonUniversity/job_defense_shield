@@ -223,8 +223,9 @@ class SacctCleaner(BaseCleaner):
                                         "-1" if row["state"] == "PENDING"
                                              else row["start"], axis="columns")
         num_rows = len(self.raw)
-        #if self.raw.start.dtype == 'object':
-        #    self.raw = self.raw[self.raw.start.str.isnumeric()]
+        # next 2 lines useful when reading raw data from file
+        if self.raw.start.dtype == 'object':
+            self.raw = self.raw[self.raw.start.str.isnumeric()]
         num_dropped = num_rows - len(self.raw)
         if num_dropped:
             print(f"{self.indent}{num_dropped} rows dropped while cleaning start")

@@ -21,7 +21,9 @@ class RawJobData(ABC):
 
 class SlurmSacct(RawJobData):
 
-    """Call sacct to get the raw job data from the Slurm database."""
+    """Call sacct to get the raw job data from the Slurm database. Jobnames
+       containing pipe or newline characters are handled. Newline characters
+       are handled by checking the count of the number of pipe characters."""
 
     def __init__(self,
                  start: datetime,
@@ -66,11 +68,10 @@ class SlurmSacct(RawJobData):
             msg = f"Error running sacct.\n{error.stderr}"
             raise RuntimeError(msg) from error
         print(f"done ({round(time() - start)} seconds).", flush=True)
-        rows = result.stdout.split('\n')
-        if rows != [] and rows[-1] == "":
-            rows = rows[:-1]
+        rows = result.stdout.strip().split('\n')
         cols = self.fields.split(",")
-        raw = pd.DataFrame([row.split("|")[:len(cols)] for row in rows])
+        raw = pd.DataFrame([row.split("|")[:len(cols)]
+                           for row in rows if row.count("|") > len(cols) - 2])
         if raw.empty:
             msg = ("\nCall to sacct resulted in no job data. If this is surprising\n"
                    "then check the spelling of your cluster and/or partition names\n"

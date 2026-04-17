@@ -22,7 +22,7 @@ $ conda create --name jds-dev python=3.12     \
                               -c conda-forge -y
 $ conda activate jds-dev
 # clone from your fork of the repo
-(jds-dev) $ git clone git@github.com:<YourUserName>/job_defense_shield.git
+(jds-dev) $ git clone git@github.com:PrincetonUniversity/job_defense_shield.git
 (jds-dev) $ cd job_defense_shield
 (jds-dev) $ pip install -e .
 ```

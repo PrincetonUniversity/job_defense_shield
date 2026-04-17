@@ -31,7 +31,7 @@ class MostGPUs(Alert):
                 "elapsedraw"]
         self.df = self.df[(self.df.gpus > 0) & (self.df.elapsedraw > 0)]
         major, minor, _ = map(int, pd.__version__.split("."))
-        if major >= 2 and minor >= 2:
+        if (major >= 2 and minor >= 2) or major >= 3:
             self.gp = self.df[cols].groupby("user").apply(lambda d:
                                                           d.iloc[d["gpus"].argmax()],
                                                           include_groups=False)

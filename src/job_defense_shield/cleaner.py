@@ -176,7 +176,7 @@ class SacctCleaner(BaseCleaner):
         """Convert the nodes and cores datatype to int64 while
            removing nulls."""
         for col in ["nodes", "cores"]:
-            if self.raw[col].dtype == "object":
+            if self.raw[col].dtype == "object" or self.raw[col].dtype == "string":
                 myseries = self.raw[(~self.raw[col].str.isnumeric()) &
                                     self.raw["cpu-seconds"].str.isnumeric()]["cpu-seconds"]
                 cpu_seconds = myseries.astype("int64").sum()
@@ -205,7 +205,7 @@ class SacctCleaner(BaseCleaner):
             self.raw[col] = self.raw[col].astype("str")
             num_rows = len(self.raw)
             self.raw = self.raw[pd.notna(self.raw[col])]
-            if self.raw[col].dtype == 'object':
+            if self.raw[col].dtype == 'object' or self.raw[col].dtype == 'string':
                 self.raw = self.raw[self.raw[col].str.isnumeric()]
             num_dropped = num_rows - len(self.raw)
             if num_dropped:
@@ -224,8 +224,9 @@ class SacctCleaner(BaseCleaner):
                                              else row["start"], axis="columns")
         num_rows = len(self.raw)
         # next 2 lines useful when reading raw data from file
-        if self.raw.start.dtype == 'object':
-            self.raw = self.raw[self.raw.start.str.isnumeric()]
+        if self.raw.start.dtype == 'object' or self.raw.start.dtype == 'string':
+            self.raw = self.raw[self.raw.start.str.isnumeric() |
+                                (self.raw.start == "-1")]
         num_dropped = num_rows - len(self.raw)
         if num_dropped:
             print(f"{self.indent}{num_dropped} rows dropped while cleaning start")
@@ -264,7 +265,8 @@ class SacctCleaner(BaseCleaner):
            with specific instances of UNLIMITED and Partition_Limit which were
            not handled by their respective methods above."""
         self.raw = self.raw[pd.notna(self.raw["limit-minutes"])]
-        if self.raw["limit-minutes"].dtype == 'object':
+        if self.raw["limit-minutes"].dtype == 'object' or \
+           self.raw["limit-minutes"].dtype == 'string':
             num_rows = len(self.raw)
             self.raw = self.raw[self.raw["limit-minutes"].str.isnumeric() |
                                 (self.raw["limit-minutes"] == "-1")]
@@ -280,8 +282,9 @@ class SacctCleaner(BaseCleaner):
         print("INFO: Cleaning sacct data")
         if self.raw.isnull().sum().sum():
             print(f"{self.indent}WARNING: There are null values in self.raw")
-        if not all(self.raw[col].dtype == 'object' for col in self.raw.columns):
-            print(f"{self.indent}WARNING: All columns are not strings")
+        if not all(self.raw[col].dtype == 'object' or
+                   self.raw[col].dtype == 'string' for col in self.raw.columns):
+            print(f"{self.indent}WARNING: All columns are not objects or strings")
         print(f"{self.indent}{len(self.raw)} jobs in the raw dataframe")
         myseries = self.raw[pd.notna(self.raw.cputimeraw) &
                             self.raw.cputimeraw.str.isnumeric()].cputimeraw

@@ -30,7 +30,7 @@ class MostCores(Alert):
                 "admincomment",
                 "elapsedraw"]
         major, minor, _ = map(int, pd.__version__.split("."))
-        if major >= 2 and minor >= 2:
+        if (major >= 2 and minor >= 2) or major >= 3:
             self.gp = self.df[cols].groupby("user").apply(lambda d:
                                                           d.iloc[d["cores"].argmax()],
                                                           include_groups=False)

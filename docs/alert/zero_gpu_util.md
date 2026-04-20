@@ -43,7 +43,7 @@ per alert.
 - `max_num_jobid`: (Optional) Maximum number of JobID's to show for a given user. If the number of
 jobs per user is greater than this value then a "+" character is appended to the end of the list. Default: 4
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -59,6 +59,8 @@ when the `--email` option is used.
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 For this alert, a GPU is said to have 0% utilization if all of the measurements made by the NVIDIA exporter over the entire job are zero. Measurements are typically made every 30 seconds or so.
 

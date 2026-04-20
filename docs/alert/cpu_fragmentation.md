@@ -67,6 +67,8 @@ The parameters are explained below:
 
 - `report_title`: (Optional) Title of the report to system administrators.
 
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
+
 Below is an entry appropriate for a heterogeneous cluster:
 
 ```yaml

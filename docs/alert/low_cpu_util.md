@@ -37,7 +37,7 @@ per alert.
 
 - `num_top_users`: (Optional) After sorting all users by CPU-hours, only consider this number of users for all remaining calculations and emails. This is used to limit the number of users that receive emails and appear in reports. Default: 15
 
-- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low efficiency. Default: False
+- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low efficiency. Default: `False`
 
 - `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
 
@@ -56,6 +56,8 @@ per alert.
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 !!! info "How is CPU efficiency calculated?"
     The CPU efficiency is weighted by the number of CPU-cores per job. Jobs with 0% utilization on a node are ignored since they are captured by another alert.

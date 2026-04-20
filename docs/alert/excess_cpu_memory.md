@@ -55,11 +55,11 @@ and 1.
 
 - `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by "unused TB-hours". Default: 15
 
-- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low memory usage. Default: False
+- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low memory usage. Default: `False`
 
 - `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -74,6 +74,8 @@ and 1.
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 !!! info
     When `cores_per_node` and `mem_per_node` are defined, only jobs using more memory per core than `mem_per_node` divided by `cores_per_node` are included. For instance, if a node provides 64 cores and 512 GB of memory, only jobs allocating more than 8 GB/core are considered.

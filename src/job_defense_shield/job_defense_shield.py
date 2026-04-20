@@ -319,6 +319,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "cancel-zero-gpu-jobs" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             params.update({"num_cancel_alerts":len(alerts)})
             cancel_gpu = CancelZeroGpuJobs(df,
@@ -339,6 +341,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "zero-util-gpu-hours" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             zero_gpu_hours = ZeroUtilGPUHours(df,
                                    days_between_emails=args.days,
@@ -361,6 +365,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "low-gpu-efficiency" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             low_gpu = LowEfficiencyGPU(df,
                                        days_between_emails=args.days,
@@ -383,6 +389,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "too-much-cpu-mem-per-gpu" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             mpg = TooMuchCpuMemPerGpu(df,
                                       days_between_emails=args.days,
@@ -405,6 +413,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "too-many-cores-per-gpu" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             cpg = TooManyCoresPerGpu(df,
                                      days_between_emails=args.days,
@@ -427,6 +437,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "gpu-model-too-powerful" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             too_power = GpuModelTooPowerful(df,
                                             days_between_emails=args.days,
@@ -449,6 +461,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "multinode-gpu-fragmentation" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             gpu_frag = MultinodeGpuFragmentation(df,
                                    days_between_emails=args.days,
@@ -471,6 +485,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "excessive-time-gpu" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             time_limits = ExcessiveTimeLimitsGPU(
                                               df,
@@ -494,6 +510,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "zero-cpu-utilization" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             zero_cpu = ZeroCPU(df,
                                days_between_emails=args.days,
@@ -516,6 +534,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "excess-cpu-memory" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             mem_hours = ExcessCPUMemory(df,
                                         days_between_emails=args.days,
@@ -538,6 +558,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "low-cpu-efficiency" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             low_cpu = LowEfficiencyCPU(df,
                                        days_between_emails=args.days,
@@ -560,6 +582,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "serial-allocating-multiple" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             serial = SerialAllocatingMultipleCores(df,
                                      days_between_emails=args.days,
@@ -582,6 +606,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "multinode-cpu-fragmentation" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             cpu_frag = MultinodeCpuFragmentation(df,
                                    days_between_emails=args.days,
@@ -604,6 +630,8 @@ def main():
         alerts = [alert for alert in cfg.keys() if "excessive-time-cpu" in alert]
         for alert in alerts:
             params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
             params.update(sys_cfg)
             time_limits = ExcessiveTimeLimitsCPU(
                                               df,

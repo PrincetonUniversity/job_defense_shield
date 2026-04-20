@@ -95,6 +95,8 @@ The settings are explained below:
 
 - `admin_emails`: (Optional) List of administrator email addresses that should receive the warning and cancellation emails that are sent to users.
 
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
+
 !!! note "Times are Not Exact"
     Jobs are not cancelled after exactly `cancel_minutes` or `sliding_cancel_minutes` since Slurm jobs can start at any time and the alert is only called every N minutes via `cron` or another scheduler. The same is true for warning emails.
 

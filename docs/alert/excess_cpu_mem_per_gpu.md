@@ -48,7 +48,7 @@ The available settings are listed below:
 
 - `mem_eff_thres`: (Optional) Ignore jobs where the ratio of used to allocated CPU memory is greater than or equal to this value. Default: 1.0
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -63,6 +63,8 @@ The available settings are listed below:
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 ## Report for System Administrators
 

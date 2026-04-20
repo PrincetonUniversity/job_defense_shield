@@ -40,7 +40,7 @@ The available settings are listed below:
 
 - `min_run_time`: (Optional) The number of minutes that a job must have ran to be considered. This can be used to exclude test jobs and experimental jobs. Default: 0
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -55,6 +55,8 @@ The available settings are listed below:
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 ## Report for System Administrators
 

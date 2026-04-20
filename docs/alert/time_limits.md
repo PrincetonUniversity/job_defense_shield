@@ -43,7 +43,7 @@ The parameters are explained below:
 
 - `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by unused CPU-hours. Default: 10
 
-- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low time efficiency. Default: False
+- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low time efficiency. Default: `False`
 
 - `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
@@ -60,6 +60,8 @@ The parameters are explained below:
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 ## Report for System Administrators
 

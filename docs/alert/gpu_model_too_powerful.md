@@ -53,7 +53,7 @@ The available settings are listed below:
 - `min_run_time`: (Optional) The minimum run time of a job for it to be considered. Jobs that did not run longer
 than this limit will be ignored. Default: 0
 
-- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: False
+- `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -68,6 +68,8 @@ than this limit will be ignored. Default: 0
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 !!! tip "Nodelist"
     Be aware that a `nodelist` can be specified. This makes it possible to isolate jobs that ran on certain nodes within a partition.

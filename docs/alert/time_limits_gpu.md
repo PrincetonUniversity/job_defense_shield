@@ -44,7 +44,7 @@ The available settings are listed below:
 
 - `num_top_users`: (Optional) Only consider the number of users equal to `num_top_users` after sorting by unused GPU-hours. Default: 10
 
-- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low time efficiency. Default: False
+- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low time efficiency. Default: `False`
 
 - `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
 
@@ -61,6 +61,8 @@ The available settings are listed below:
 - `email_subject`: (Optional) Subject of the email message to users.
 
 - `report_title`: (Optional) Title of the report to system administrators.
+
+- `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 ## Report for System Administrators
 

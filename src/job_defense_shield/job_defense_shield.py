@@ -15,6 +15,7 @@ from .efficiency import get_stats_dict
 from .workday import WorkdayFactory
 from .raw_job_data import SlurmSacct
 from .cleaner import SacctCleaner
+from .db_handler import ShieldDBHandler
 
 from .alert.cancel_zero_gpu_jobs import CancelZeroGpuJobs
 from .alert.gpu_model_too_powerful import GpuModelTooPowerful
@@ -250,6 +251,20 @@ def main():
     start_date, end_date = prepare_datetimes(args.starttime,
                                              args.endtime,
                                              args.days)
+
+    if "use-external-db" in cfg and cfg["use-external-db"] and \
+       "jobstats-config-path" in cfg:
+        sys.path.insert(0, cfg["jobstats-config-path"])
+        from config import EXTERNAL_DB_CONFIG
+        use_external_db = EXTERNAL_DB_CONFIG.get("enabled", False)
+        if use_external_db:
+            print("INFO: Using external database for summary statistics")
+        else:
+            msg = "'use-external-db' is True but 'enabled' is False in config.py"
+            print(f"WARNING: {msg}")
+    else:
+        use_external_db = False
+ 
     fields = ["jobid",
               "user",
               "cluster",
@@ -267,8 +282,9 @@ def main():
               "end",
               "qos",
               "state",
-              "admincomment",
               "jobname"]
+    if not use_external_db:
+        fields.insert(-1, "admincomment")
     # jobname must be last in list below to catch "|" characters in jobname
     assert fields[-1] == "jobname"
     raw = SlurmSacct(start_date,
@@ -299,6 +315,18 @@ def main():
     if args.strict_start:
         df = apply_strict_start(df, start_date)
     df = add_new_and_derived_fields(df)
+
+    if use_external_db:
+        ext = ShieldDBHandler(EXTERNAL_DB_CONFIG,
+                              args.clusters,
+                              start_date,
+                              cfg["verbose"])
+        ext.get_external_connection()
+        df_ext = ext.get_summary_stats()
+        df_ext.jobid = df_ext.jobid.astype("str")
+        df = pd.merge(df, df_ext, on=['jobid', 'cluster'], how="left")
+        df.rename(columns={"admin_comment": "admincomment"}, inplace=True)
+
     # next line should be in utils.py but need resolve pytest path issues
     # with import of: from .efficiency import get_stats_dict
     df["admincomment"] = df["admincomment"].apply(get_stats_dict)

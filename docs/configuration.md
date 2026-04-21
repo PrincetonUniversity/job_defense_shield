@@ -325,6 +325,21 @@ workday-method: always
 
 The `cron` setting can be used to avoid weekends so really this section is about dealing with holidays.
 
+### (Optional) External MySQL/MariaDB Database
+
+By default, Jobstats will use the Slurm database to store the [summary statistics](https://princetonuniversity.github.io/jobstats/setup/summaries/) for each completed job. In this case, Job Defense Shield will automatically find the data.
+
+Jobstats can also be configured to use an [external database](https://princetonuniversity.github.io/jobstats/setup/external-database/). When an external database is used then one must add the following entries to the  global settings of the Job Defense Shield configuration file (`config.yaml`):
+
+```yaml
+use-external-db: True
+jobstats-config-path: /path/to/jobstats/config/  # config.py
+```
+
+The `config.py` file found in the directory specified by `jobstats-config-path` provides the database connection parameters for both Jobstats and Job Defense Shield. For more information, see the Jobstats documentation on using an [external database](https://princetonuniversity.github.io/jobstats/setup/external-database/).
+
+To troubleshoot connection issues, use `verbose: True` in the global settings of `config.yaml`.
+
 ### Other Settings
 
 Partition names can be renamed:

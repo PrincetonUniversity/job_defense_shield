@@ -336,7 +336,7 @@ use-external-db: True
 jobstats-config-path: /path/to/jobstats/config/  # config.py
 ```
 
-The `config.py` file found in the directory specified by `jobstats-config-path` provides the database connection parameters for both Jobstats and Job Defense Shield. For more information, see the Jobstats documentation on using an [external database](https://princetonuniversity.github.io/jobstats/setup/external-database/).
+The `config.py` file found in the directory specified by `jobstats-config-path` provides the database connection parameters for both Jobstats and Job Defense Shield. One must also install the Python packages `mysqlclient` and `sqlalchemy`. For more information, see the Jobstats documentation on using an [external database](https://princetonuniversity.github.io/jobstats/setup/external-database/).
 
 To troubleshoot connection issues, use `verbose: True` in the global settings of `config.yaml`.
 

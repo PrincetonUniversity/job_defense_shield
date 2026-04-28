@@ -283,7 +283,9 @@ def main():
               "qos",
               "state",
               "jobname"]
-    if not use_external_db:
+    if use_external_db:
+        fields.insert(1, "jobidraw")
+    else:
         fields.insert(-1, "admincomment")
     # jobname must be last in list below to catch "|" characters in jobname
     assert fields[-1] == "jobname"
@@ -298,6 +300,11 @@ def main():
         dg.user = dg.user.map(private_users)
         dg.to_csv("DEBUG_RAW.csv", index=False)
         del dg
+
+    if False:
+        # comment out SlurmSacct(...).get_job_data() above to use this
+        raw = pd.read_csv("/path/to/DEBUG_RAW.csv", dtype=str, low_memory=False)
+        raw.info()
 
     # clean the raw data
     field_renamings = {"cputimeraw":"cpu-seconds",
@@ -324,8 +331,15 @@ def main():
         ext.get_external_connection()
         df_ext = ext.get_summary_stats()
         df_ext.jobid = df_ext.jobid.astype("str")
-        df = pd.merge(df, df_ext, on=['jobid', 'cluster'], how="left")
-        df.rename(columns={"admin_comment": "admincomment"}, inplace=True)
+        df.jobidraw = df.jobidraw.astype("str")
+        df = pd.merge(df,
+                      df_ext,
+                      left_on=['jobidraw', 'cluster'],
+                      right_on=['jobid', 'cluster'],
+                      how="left")
+        df.drop(columns="jobid_y", inplace=True)
+        df.rename(columns={"admin_comment": "admincomment",
+                           "jobid_x": "jobid"}, inplace=True)
 
     # next line should be in utils.py but need resolve pytest path issues
     # with import of: from .efficiency import get_stats_dict

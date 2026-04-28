@@ -4,7 +4,7 @@ from ..efficiency import cpu_efficiency
 from ..efficiency import gpu_efficiency
 from ..efficiency import gpu_memory_usage_mean_pct
 from ..utils import SECONDS_PER_HOUR as sph
-from ..utils import MINUTES_PER_HOUR as mph
+from ..utils import SECONDS_PER_MINUTE as spm
 from ..utils import add_dividers
 from ..greeting import GreetingFactory
 from ..email_translator import EmailTranslator
@@ -61,7 +61,7 @@ class LowEfficiency(Alert):
                           (~self.df.user.isin(self.excluded_users)) &
                           (~self.df.qos.isin(self.excluded_qos)) &
                           (~self.df.partition.isin(self.excluded_partitions)) &
-                          (self.df["elapsedraw"] >= self.min_run_time / mph) &
+                          (self.df["elapsedraw"] >= self.min_run_time * spm) &
                           (self.df.admincomment != {})].copy()
         if "*" not in self.partitions:
             self.ce = self.ce[self.ce.partition.isin(self.partitions)]

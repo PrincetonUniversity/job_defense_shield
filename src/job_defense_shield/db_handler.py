@@ -4,7 +4,9 @@ except ImportError:
     MySQLdb = None
 
 try:
-    import sqlalchemy
+    from sqlalchemy import create_engine
+    from sqlalchemy import engine_from_config
+    from sqlalchemy.engine import URL
 except ImportError:
     sqlalchemy = None
 
@@ -15,9 +17,6 @@ from typing import Any
 from typing import Optional
 import configparser
 import pandas as pd
-from sqlalchemy import create_engine
-from sqlalchemy import engine_from_config
-from sqlalchemy.engine import URL
 
 
 class ShieldDBHandler:

@@ -252,7 +252,7 @@ class Alert:
 
     def format_email_counts(self, counts: pd.Series) -> pd.Series:
         """Return the email sent counts with proper alignment of the two
-           different quantities."""
+           different quantities. This also used for proportions."""
         if counts.empty:
             return counts
         if counts.tolist() == ["0 (-)"] * len(counts):

@@ -271,9 +271,11 @@ def max_cpu_memory_used_per_node(ss: dict,
 def num_gpus_with_zero_util(ss: dict,
                             jobid: str,
                             cluster: str,
+                            util_thres: float=0,
                             verbose: bool=True) -> Tuple[int, int]:
-    """Return the number of GPUs with zero utilization. The error code is needed
-       since the summary statistics (ss) may be malformed."""
+    """Return the number of GPUs with with a mean utilization less than or
+       equal to util_thres. The error code is needed since the summary
+       statistics (ss) may be malformed."""
     if 'nodes' not in ss:
         if verbose:
             msg = "Warning: nodes not in ss for num_gpus_with_zero_util."
@@ -293,10 +295,49 @@ def num_gpus_with_zero_util(ss: dict,
         else:
             for gpu in gpus:
                 util = ss['nodes'][node]['gpu_utilization'][gpu]
-                if float(util) == 0:
+                if float(util) <= util_thres:
                     ct += 1
     error_code = 0
     return (ct, error_code)
+
+
+def zero_gpus_from_response(response: dict,
+                            jobid: str,
+                            cluster: str,
+                            util_thres: float=0,
+                            verbose: bool=True) -> Tuple[int, int]:
+    """Return the number of GPUs with a mean utilization of less than or equal
+       to util_thres. The error code is needed since the response dictionary
+       may be malformed."""
+    if "data" not in response or "result" not in response["data"]:
+        if verbose:
+            msg = "WARNING: malformed 'response' in zero_gpus_from_response"
+            print(f"{msg} ({jobid}, {cluster})")
+        error_code = 1
+        return (-1, error_code)
+    results = response["data"]["result"]
+    if results == []:
+        if verbose:
+            msg = "WARNING: empty 'results' in zero_gpus_from_response"
+            print(f"{msg} ({jobid}, {cluster})")
+        error_code = 2
+        return (-1, error_code)
+    else:
+        ct = 0
+        try:
+            for result in results:
+                util = result["value"][1]
+                if float(util) <= util_thres:
+                    ct += 1
+        except Exception as e:
+            if verbose:
+                msg = f"WARNING: util not found in zero_gpus_from_response ({e})"
+                print(f"{msg} [{jobid}, {cluster}]")
+            error_code = 3
+            return (-1, error_code)
+        else:
+            error_code = 0
+            return (ct, error_code)
 
 
 def cpu_nodes_with_zero_util(ss: dict,
@@ -331,11 +372,13 @@ def get_nodelist(ss: dict,
                  jobid: str,
                  cluster: str,
                  verbose: bool=True) -> Tuple[Set[str], int]:
-    """Return a Python set of the node names used by the job."""
+    """Return a tuple containing a Python set of the node names used by the
+       job and the error code."""
     if 'nodes' not in ss:
         if verbose:
             msg = "Warning: nodes not found in ss for get_nodelist."
             print(msg, jobid, cluster)
         error_code = 1
         return (set(), error_code)
-    return (set(ss['nodes'].keys()), 0)
+    error_code = 0
+    return (set(ss['nodes'].keys()), error_code)

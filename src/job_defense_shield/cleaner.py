@@ -52,7 +52,7 @@ class SacctCleaner(BaseCleaner):
     def remove_comma_partitions(self) -> pd.DataFrame:
         """A job can have a partition value that is a comma-separated list
            of partitions. This method checks that these jobs did not run."""
-        num_null = self.raw[pd.isna(self.raw.partition)]
+        num_null = len(self.raw[pd.isna(self.raw.partition)])
         if num_null:
             msg = f"{self.indent}Number of null partition rows is {num_null}"
             print(msg)

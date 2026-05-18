@@ -22,8 +22,8 @@ Below is an example report for 0% GPU utilization:
 ---------------------------------------------------------------------
    Cluster: della
 Partitions: gpu, llm
-     Start: Wed Feb 12, 2025 at 09:50 AM
-       End: Wed Feb 19, 2025 at 09:50 AM
+     Start: Wed June 10, 2026 at 09:50 AM
+       End: Wed June 17, 2026 at 09:50 AM
 ```
 
 Below is an example email to a user that is requesting too much CPU memory:

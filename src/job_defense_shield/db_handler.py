@@ -1,14 +1,11 @@
 try:
-    import MySQLdb
-except ImportError:
-    MySQLdb = None
-
-try:
     from sqlalchemy import create_engine
     from sqlalchemy import engine_from_config
     from sqlalchemy.engine import URL
 except ImportError:
-    sqlalchemy = None
+    found_sqlalchemy = False
+else:
+    found_sqlalchemy = True
 
 import sys
 from datetime import datetime
@@ -41,8 +38,8 @@ class ShieldDBHandler:
 
     def get_external_connection(self) -> None:
         """Get connection to external MySQL/MariaDB database."""
-        if MySQLdb is None or sqlalchemy is None:
-            msg = ("MySQLdb or sqlalchemy module not available. Install "
+        if not found_sqlalchemy:
+            msg = ("sqlalchemy (and/or MySQLdb) module not available. Install "
                    "mysqlclient and sqlalchemy to use the external database "
                    "functionality.")
             raise ImportError(msg)

@@ -37,7 +37,8 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=7"]
+test = ["pytest>=7", "pytest-mock"]
+database = ["mysqlclient", "sqlalchemy"]
 check = ["ruff>=0.6.0"]
 
 [project.urls]

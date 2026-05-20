@@ -219,7 +219,10 @@ class Alert:
                                 parse_dates=["Email-Sent"],
                                 date_format="mixed",
                                 dayfirst=False)
-            alert_partitions = ",".join(sorted(set(self.partitions)))
+            if "*" in self.partitions:
+                alert_partitions = "ALL-PARTITIONS"
+            else:
+                alert_partitions = ",".join(sorted(set(self.partitions)))
             vhist = vhist[(vhist["Cluster"] == self.cluster) &
                           (vhist["Alert-Partitions"] == alert_partitions)]
             if not vhist.empty:
@@ -240,7 +243,10 @@ class Alert:
                                 parse_dates=["Email-Sent"],
                                 date_format="mixed",
                                 dayfirst=False)
-            alert_partitions = ",".join(sorted(set(self.partitions)))
+            if "*" in self.partitions:
+                alert_partitions = "ALL-PARTITIONS"
+            else:
+                alert_partitions = ",".join(sorted(set(self.partitions)))
             vhist = vhist[(vhist["Cluster"] == self.cluster) &
                           (vhist["Alert-Partitions"] == alert_partitions)]
             if not vhist.empty:

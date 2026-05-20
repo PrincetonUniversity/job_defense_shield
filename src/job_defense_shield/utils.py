@@ -264,9 +264,12 @@ def display_alerts(cfg: dict) -> str:
                 count_fmt = count if count > 9 else f" {count}"
                 output += f"{4 * indent}{count_fmt}. {key}\n"
                 cluster = cfg[key]["cluster"]
+                enabled = cfg[key]["enabled"] if "enabled" in cfg[key] else True
                 partitions = ",".join(cfg[key]["partitions"])
                 output += f"{7 * indent}cluster: {cluster}\n"
                 output += f"{7 * indent}partitions: {partitions}\n"
+                if not enabled:
+                    output += f"{7 * indent}enabled: {enabled}\n"
     return f"{output}{4 * indent}None" if count == 0 else output[:-1]
 
 def prepare_datetimes(starttime: Optional[str],

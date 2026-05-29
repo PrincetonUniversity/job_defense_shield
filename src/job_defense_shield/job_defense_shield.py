@@ -266,6 +266,7 @@ def main():
         use_external_db = False
  
     fields = ["jobid",
+              "jobidraw",
               "user",
               "cluster",
               "account",
@@ -283,9 +284,7 @@ def main():
               "qos",
               "state",
               "jobname"]
-    if use_external_db:
-        fields.insert(1, "jobidraw")
-    else:
+    if not use_external_db:
         fields.insert(-1, "admincomment")
     # jobname must be last in list below to catch "|" characters in jobname
     assert fields[-1] == "jobname"

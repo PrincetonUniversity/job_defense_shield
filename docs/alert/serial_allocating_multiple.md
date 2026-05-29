@@ -28,7 +28,7 @@ The parameters are explained below:
 
 - `cpu_hours_threshold`: A user must have apparently wasted this number of CPU-hours to be considered.
 
-- `lower_ratio`: This alert works by comparing the CPU efficiency of the job to 100% divided by the number of allocated CPU-cores. If the ratio of these two numbers of greater than or equal to `lower_ratio` then the job is assumed to be a serial code wasting CPU-cores. For instance, if the CPU efficieny of a job that allocates 8 CPU-cores is 12.4% and `lower_ratio` is 0.85 then this job would be included since 12.4% / (100% / 8) is greater than 0.85. Default: 0.85
+- `lower_ratio`: This alert works by comparing the CPU efficiency of the job to 100% divided by the number of allocated CPU-cores. If the ratio of these two numbers is greater than or equal to `lower_ratio` then the job is assumed to be a serial code wasting CPU-cores. For instance, if the CPU efficieny of a job that allocates 8 CPU-cores is 12.4% and `lower_ratio` is 0.85 then this job would be included since 12.4% / (100% / 8) is greater than 0.85. Default: 0.85
 
 - `email_file`: The text file to be used for the email message to users.
 

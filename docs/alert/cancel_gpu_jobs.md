@@ -1,6 +1,6 @@
 # Automatically Cancel GPU Jobs at 0% Utilization
 
-This alert cancels GPU jobs at 0% utilization.
+This alert cancels GPU jobs at low or 0% utilization.
 
 !!! note "Elevated Privileges"
     This alert is different than the others in that it must be ran as
@@ -8,7 +8,7 @@ This alert cancels GPU jobs at 0% utilization.
 
 The software can be configured to cancel jobs based on GPU utilization during the first N minutes of a job (see `cancel_minutes`) and/or during the last N minutes (see `sliding_cancel_minutes`). Warning emails can be sent to the users before cancellation.
 
-The ability to automatically cancel GPU jobs is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
+The ability to automatically cancel inefficient GPU jobs is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 
 ## Configuration File
 
@@ -45,6 +45,7 @@ The settings are explained below:
 
 - `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
 
+
 - `sampling_period_minutes`: Number of minutes between executions of this alert. This number must be equal to the time between `cron` jobs for this alert (see [cron](#cron) section below). One reasonable choice for this setting is 15 minutes.
 
 - `first_warning_minutes`: (Optional) Send a warning email for 0% GPU utilization after this number of minutes from the start of the job.
@@ -66,6 +67,8 @@ The settings are explained below:
 - `email_file_sliding_warning`: (Optional/Required) File to be used for the warning email. If `sliding_cancel_minutes` is set then this setting and `sliding_warning_minutes` are required.
 
 - `email_file_sliding_cancel`: (Optional/Required) File to be used for the cancellation email. This setting is required if `sliding_cancel_minutes` is set.
+
+- `util_thres`: (Optional) GPU utilization threshold for cancellation. For example, if `util_thres: 5` then GPUs with a mean utilization of less than or equal to 5% will be considered idle. This parameter was introduced in version 1.3.2 so that jobs with a non-zero mean GPU utilization could be automatically cancelled. Default: 0
 
 - `email_subject`: (Optional) Subject of the email message to users.
 
@@ -95,12 +98,14 @@ The settings are explained below:
 
 - `admin_emails`: (Optional) List of administrator email addresses that should receive the warning and cancellation emails that are sent to users.
 
+- `unlimited`: (Optional) If Slurm jobs are not allowed to have a run time limit of `UNLIMITED` then use `unlimited: False`. There is a minor performance advantage in this case since there will be fewer Prometheus queries. Default: `True`
+
 - `enabled`: (Optional) If `False` then the alert is ignored. Default: `True`
 
 !!! note "Times are Not Exact"
     Jobs are not cancelled after exactly `cancel_minutes` or `sliding_cancel_minutes` since Slurm jobs can start at any time and the alert is only called every N minutes via `cron` or another scheduler. The same is true for warning emails.
 
-In Jobstats, a GPU is said to have 0% utilization if all of the measurements made by the NVIDIA exporter over a given time window are zero. Measurements are typically made every 30 seconds or so. For the actual value at your institution see `SAMPLING_PERIOD` in `config.py` for [Jobstats](https://github.com/PrincetonUniversity/jobstats).
+In Jobstats, a GPU is said to have 0% utilization if all of the measurements made by the NVIDIA exporter over a given time window are zero. Measurements are typically made every 30 seconds or so. For the actual value at your institution see `SAMPLING_PERIOD` in `config.py` for [Jobstats](https://github.com/PrincetonUniversity/jobstats). When `util_thres` is non-zero then it is compared to a time average the individual GPU utilization values.
 
 ### Example Configurations
 

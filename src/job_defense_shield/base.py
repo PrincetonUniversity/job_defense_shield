@@ -159,7 +159,7 @@ class Alert:
         s += f"       End: {end_date.strftime(fmt)}\n"
         return s
 
-    def get_admincomment_for_running_jobs(self) -> pd.Series:
+    def get_admincomment_for_running_jobs(self, verbose: bool=True) -> pd.Series:
         """Query the Prometheus server for the admincomment of
         jobs in a RUNNING state."""
         sys.path.append(self.jobstats_module_path)
@@ -167,9 +167,10 @@ class Alert:
         from jobstats import Jobstats
         from config import PROM_SERVER
         num_jobs = len(self.df[self.df.state == "RUNNING"])
-        print(f"INFO: Querying Prometheus server for data on {num_jobs} running jobs ... ",
-              end="",
-              flush=True)
+        if verbose:
+            msg = ("INFO: Querying Prometheus server for data on "
+                   f"{num_jobs} running jobs ... ")
+            print(msg, end="", flush=True)
         start = time()
         adminc = self.df.apply(lambda row:
                                eval(Jobstats(jobid=row["jobid"],
@@ -177,7 +178,8 @@ class Alert:
                                              prom_server=PROM_SERVER).report_job_json(False))
                                if row["state"] == "RUNNING"
                                else row["admincomment"], axis="columns")
-        print(f"done ({round(time() - start)} seconds).", flush=True)
+        if verbose:
+            print(f"done ({round(time() - start)} seconds).", flush=True)
         return adminc
 
     def filter_by_nodelist(self, jb: pd.DataFrame) -> pd.DataFrame:

@@ -3,12 +3,14 @@ import sys
 import subprocess
 import time
 import pickle
+import requests
 import pandas as pd
 from ..base import Alert
 from ..utils import SECONDS_PER_MINUTE as spm
 from ..utils import SECONDS_PER_HOUR as sph
 from ..utils import MINUTES_PER_HOUR as mph
 from ..efficiency import num_gpus_with_zero_util
+from ..efficiency import zero_gpus_from_response
 from ..greeting import GreetingFactory
 from ..email_translator import EmailTranslator
 
@@ -27,16 +29,18 @@ class CancelZeroGpuJobs(Alert):
     can be used on its own without the other if desired.
 
     Jobs with an elapsed time plus (sliding cancel - slide warning) that
-    are less than limit-minutes cannot be excluded since real limit may
-    be UNLIMITED or Partition_Limit. Would need to add new column to track
-    UNLIMITED and Partition_Limit jobs. Users still receive warnings in these
-    cases. Such jobs are also not excluded using the fixed window approach.
+    are less than limit-minutes will be excluded if 'unlimited: False'
+    is set. Such jobs are not always excluded since those with a run time limit
+    of UNLIMITED would need special attention.
 
     For fixed window approach or the first N minutes of the jobs,
     right now take jobs with run times of greater than warning and less than
     cancel but could only take those within the three time regions. Also,
     if no first or second warning then could make window even smaller.
     Although cache helps a lot.
+
+    Jobs with a run time limit of less than cancel_minutes are excluded from
+    warnings since they can never be automatically cancelled.
     """
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
@@ -57,35 +61,65 @@ class CancelZeroGpuJobs(Alert):
            (self.fraction_of_period >= 0.9 / self.num_cancel_alerts):
             self.fraction_of_period = 0.75 / self.num_cancel_alerts
             print(f"INFO: Forcing fraction_of_period to {self.fraction_of_period}")
+        if not hasattr(self, "unlimited"):
+            self.unlimited = True
+        if not hasattr(self, "util_thres"):
+            self.util_thres = 0
 
     def _filter_and_add_new_fields(self):
-        if "*" in self.partitions:
+        if "*" in self.partitions and self.excluded_partitions == []:
             clus_part = f"{self.cluster} (all partitions)"
+        elif "*" in self.partitions and self.excluded_partitions != []:
+            clus_part = f"{self.cluster} (all partitions minus exclusions)"
         else:
             clus_part = f"{self.cluster} ({','.join(sorted(set(self.partitions)))})"
-        print(f"INFO: Cancellation of GPU jobs at 0% utilization on {clus_part} is enabled.")
+        print(f"INFO: Cancellation of jobs with idle GPUs on {clus_part} is enabled.")
         start_time = time.time()
         self.lg = self.df.copy()
-        #########################################
-        ## FIXED WINDOW OVER THE FIRST N HOURS ##
-        #########################################
+        ###########################################
+        ## FIXED WINDOW OVER THE FIRST N MINUTES ##
+        ###########################################
         if hasattr(self, "cancel_minutes"):
-            if not hasattr(self, "first_warning_minutes") and \
-               not hasattr(self, "second_warning_minutes"):
-                lower = self.cancel_minutes * spm
-            else:
-                lower = self.first_warning_minutes * spm
-            upper = (self.cancel_minutes + self.sampling_period_minutes) * spm
             self.df = self.df[(self.df.state == "RUNNING") &
                               (self.df.gpus > 0) &
                               (self.df.cluster == self.cluster) &
-                              (self.df.elapsedraw >= lower) &
-                              (self.df.elapsedraw <  upper) &
                               (~self.df.qos.isin(self.excluded_qos)) &
                               (~self.df.partition.isin(self.excluded_partitions)) &
                               (~self.df.user.isin(self.excluded_users))].copy()
+            if not self.unlimited:
+                self.df = self.df[self.df["limit-minutes"] >= self.cancel_minutes]
             if "*" not in self.partitions:
                 self.df = self.df[self.df.partition.isin(self.partitions)]
+            def get_mask(lower: int) -> pd.Series:
+                """Return a mask where each element indicates if the job falls
+                   within the time range."""
+                upper = lower + self.sampling_period_minutes * spm
+                return (self.df.elapsedraw >= lower) & (self.df.elapsedraw < upper)
+            if hasattr(self, "first_warning_minutes") and \
+               hasattr(self, "second_warning_minutes"):
+                msk1 = get_mask(self.first_warning_minutes * spm)
+                msk2 = get_mask(self.second_warning_minutes * spm)
+                msk3 = get_mask(self.cancel_minutes * spm)
+                self.df = self.df[msk1 | msk2 | msk3]
+            elif hasattr(self, "first_warning_minutes") and not \
+                 hasattr(self, "second_warning_minutes"):
+                msk1 = get_mask(self.first_warning_minutes * spm)
+                msk2 = get_mask(self.cancel_minutes * spm)
+                self.df = self.df[msk1 | msk2]
+            elif not hasattr(self, "first_warning_minutes") and \
+                 not hasattr(self, "second_warning_minutes"):
+                msk1 = get_mask(self.cancel_minutes * spm)
+                self.df = self.df[msk1]
+            if hasattr(self, "max_interactive_hours") and \
+               hasattr(self, "max_interactive_gpus"):
+                self.df["interactive"] = self.df["jobname"].apply(lambda x: True
+                                                                  if x.startswith("sys/dashboard") or
+                                                                     x.startswith("interactive")
+                                                                  else False)
+                msk = (self.df["interactive"]) & \
+                      (self.df.gpus <= self.max_interactive_gpus) & \
+                      (self.df["limit-minutes"] <= self.max_interactive_hours * mph)
+                self.df = self.df[~msk]
             self.df.rename(columns={"user":"User"}, inplace=True)
             self.cancellations = []
 
@@ -103,6 +137,9 @@ class CancelZeroGpuJobs(Alert):
             jobs_using_gpus containing the jobid's of the new jobs that are using
             the GPUs. Add this list to pre_approved and write this to file. Note
             that the jobs in pre_approved and jobs_using_gpus do not overlap.
+
+            With the fixed window approach, it is assumed that the code finishes
+            before the next cron call.
             """
 
             # read cache file containing jobid's that are known to be using the gpus
@@ -120,23 +157,68 @@ class CancelZeroGpuJobs(Alert):
                     pre_approved = self.df[self.df.jobid.isin(jobs_using_gpus)].jobid.tolist()
                     self.df = self.df[~self.df.jobid.isin(pre_approved)]
             if not self.df.empty:
-                self.df.admincomment = Alert.get_admincomment_for_running_jobs(self)
+                """If nodelist then need to get nodes and GPU utilization. This is
+                   done by making a Jobstats object. If nodelist list is not used
+                   then can directly query Prometheus for only the GPU utilization."""
                 if hasattr(self, "nodelist"):
+                    msg = ("INFO: Fixed Window: Querying Prometheus server for full "
+                           f"objects on {len(self.df)} running jobs ... ")
+                    print(msg, end="", flush=True)
+                    start_jobstats_obj = time.time()
+                    self.df.admincomment = Alert.get_admincomment_for_running_jobs(self, verbose=False)
+                    print(f"done ({round(time.time() - start_jobstats_obj)} seconds).", flush=True)
                     self.df = self.filter_by_nodelist(self.df)
-                if not self.df.empty:
+                    if not self.df.empty:
+                        self.df["zero-tuple"] = self.df.apply(lambda row:
+                                                     num_gpus_with_zero_util(row["admincomment"],
+                                                                             row["jobid"],
+                                                                             row["cluster"],
+                                                                             util_thres=self.util_thres,
+                                                                             verbose=self.verbose),
+                                                                             axis="columns")
+                else:
+                    sys.path.append(self.jobstats_config_path)
+                    import config as c
+                    if not hasattr(c, "GPU_EXPORTER_JOBID"):
+                        c.GPU_EXPORTER_JOBID = False
+                    def get_gpu_util(row: pd.Series) -> dict:
+                        """Query the Prometheus server for the GPU utilization values
+                           and return the result in JSON."""
+                        now = round(time.time())
+                        look_back_seconds = now - row["start"]
+                        jobid = row["jobidraw"]
+                        cluster = row["cluster"]
+                        if c.GPU_EXPORTER_JOBID:
+                            q = f'avg_over_time(nvidia_gpu_duty_cycle{{cluster="{cluster}", ' \
+                                               f'jobid="{jobid}"}}[{look_back_seconds}s:])'
+                        else:
+                            q = f'avg_over_time((nvidia_gpu_duty_cycle{{cluster="{cluster}"}} and ' + \
+                                               f'nvidia_gpu_jobId == {jobid})[{look_back_seconds}s:])'
+                        params = {'query': q, 'time': now}
+                        response = requests.get(f'{c.PROM_SERVER}/api/v1/query', params)
+                        return response.json()
+                    msg = ("INFO: Fixed Window: Querying Prometheus server for "
+                           f"response on {len(self.df)} running jobs ... ")
+                    print(msg, end="", flush=True)
+                    start_response = time.time()
+                    self.df["admincomment"] = self.df.apply(get_gpu_util, axis="columns")
+                    print(f"done ({round(time.time() - start_response)} seconds).", flush=True)
                     self.df["zero-tuple"] = self.df.apply(lambda row:
-                                                 num_gpus_with_zero_util(row["admincomment"],
+                                                 zero_gpus_from_response(row["admincomment"],
                                                                          row["jobid"],
                                                                          row["cluster"],
+                                                                         util_thres=self.util_thres,
                                                                          verbose=self.verbose),
                                                                          axis="columns")
+                if not self.df.empty:
                     cols = ["GPUs-Unused", "error_code"]
                     self.df[cols] = pd.DataFrame(self.df["zero-tuple"].tolist(),
                                                  index=self.df.index)
                     self.df = self.df[self.df["error_code"] == 0]
+                    self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
                     # write cache file of jobid's that are known to be using the gpus
                     if hasattr(self, "jobid_cache_path"):
-                        jobs_using_gpus = self.df[self.df["GPUs-Unused"] == 0].jobid.tolist()
+                        jobs_using_gpus = self.df[self.df["gpu_frac"] >= self.gpu_frac_threshold].jobid.tolist()
                         if "*" in self.partitions:
                             prts = "all_partitions"
                         else:
@@ -145,19 +227,7 @@ class CancelZeroGpuJobs(Alert):
                                                         f".jobid_cache_{self.cluster}_{prts}.pkl")
                         with open(jobid_cache_file, "wb") as fp:
                             pickle.dump(pre_approved + jobs_using_gpus, fp)
-                    self.df["gpu_frac"] = (self.df["gpus"] - self.df["GPUs-Unused"]) / self.df["gpus"]
                     self.df = self.df[self.df["gpu_frac"] < self.gpu_frac_threshold]
-                    # filter interactive jobs if such settings are found in config.yaml
-                    if hasattr(self, "max_interactive_hours") and \
-                       hasattr(self, "max_interactive_gpus"):
-                        self.df["interactive"] = self.df["jobname"].apply(lambda x: True
-                                                                          if x.startswith("sys/dashboard") or
-                                                                             x.startswith("interactive")
-                                                                          else False)
-                        msk = (self.df["interactive"]) & \
-                              (self.df.gpus <= self.max_interactive_gpus) & \
-                              (self.df["limit-minutes"] <= self.max_interactive_hours * mph)
-                        self.df = self.df[~msk]
                     self.df = self.df[["jobid",
                                        "User",
                                        "cluster",
@@ -173,9 +243,9 @@ class CancelZeroGpuJobs(Alert):
                     self.df["GPU-Util"] = "0%"
                     self.df["Hours"] = self.df.elapsedraw.apply(lambda x: round(x / sph, 1))
 
-        ##########################################
-        ## SLIDING WINDOW OVER THE LAST N HOURS ##
-        ##########################################
+        ############################################
+        ## SLIDING WINDOW OVER THE LAST N MINUTES ##
+        ############################################
         if hasattr(self, "sliding_warning_minutes") and \
            hasattr(self, "sliding_cancel_minutes"):
             if hasattr(self, "cancel_minutes"):
@@ -219,7 +289,7 @@ class CancelZeroGpuJobs(Alert):
                     jobid_cache_file = os.path.join(self.jobid_cache_path,
                                                     f".sliding_cache_{self.cluster}_{prts}.csv")
                     if os.path.isfile(jobid_cache_file):
-                        # make jobid string since pandas will do this if array job is found
+                        # make jobid a string since pandas will do this if array job is found
                         cache = pd.read_csv(jobid_cache_file,
                                             dtype={"jobid":str,
                                                    "checked_time":"int64",
@@ -230,10 +300,7 @@ class CancelZeroGpuJobs(Alert):
                     def num_idle_gpus_sliding_window(jobid: str,
                                                      window_seconds: int) -> int:
                         """Calculate the number of idle GPUs during the period of the
-                           sliding window which is the last N seconds from now. Current
-                           version of call to get_job_stats() updates seven properties
-                           when only one is needed. Would be nice to pass list of
-                           properties that are needed."""
+                           sliding window which is the last N minutes from now."""
                         sys.path.append(self.jobstats_module_path)
                         sys.path.append(self.jobstats_config_path)
                         from jobstats import Jobstats
@@ -243,19 +310,20 @@ class CancelZeroGpuJobs(Alert):
                                          prom_server=PROM_SERVER)
                         stats.diff = window_seconds
                         stats.end = time.time()
-                        stats.get_job_stats()
+                        stats.get_job_stats("gpu_utilization")
                         admincomment = eval(stats.report_job_json(encode=False))
                         n, error_code = num_gpus_with_zero_util(admincomment,
                                                                 jobid,
                                                                 self.cluster,
+                                                                util_thres=self.util_thres,
                                                                 verbose=self.verbose)
                         return n if error_code == 0 else 0
-                        
+ 
                     """
                     If jobid is not in the cache then can only send warning even if GPUs
                     have been idle for sliding_cancel_minutes or longer. This ensures that
                     the user gets a warning before the cancellation. This case will be
-                    encountered when the code is first ran and the cache does not exists or
+                    encountered when the code is first ran and the cache does not exist or
                     when a new job runs for longer than sliding_warning_minutes.
 
                     To make sure that the code does not run longer than the cron sampling
@@ -266,7 +334,7 @@ class CancelZeroGpuJobs(Alert):
                     Note that n is set to 0 if the fraction of active GPUs was greater than
                     or equal to gpu_frac_threshold. This allows us to use n_prev == 0 later.
 
-                    The loop below runs on jobs from lowest jobid to highest. This is good
+                    The loop below runs over jobs from lowest jobid to highest. This is good
                     because the oldest jobs (lowest jobid) have already been cached. Do not
                     want to lose cache data in rare cases when code does not finish before
                     break is reached.
@@ -282,13 +350,15 @@ class CancelZeroGpuJobs(Alert):
                     start_time_sliding = time.time()
                     prom_query = 0
                     num_cached_jobs = 0
-                    print(f"INFO: Looking for idle GPUs for {len(self.lg)} jobs ... ",
+                    print(f"INFO: Sliding Window: Looking for idle GPUs for {len(self.lg)} jobs ... ",
                           end="",
                           flush=True)
                     self.id_time_gpus = []
                     warning_seconds = self.sliding_warning_minutes * spm
                     cancel_seconds = self.sliding_cancel_minutes * spm
                     early_break = False
+                    # sort by elapsed time (added May 2026 -- in conflicit with notes above)
+                    self.lg.sort_values(by="elapsedraw", inplace=True)
                     for jobid, num_gpus in zip(self.lg.jobid, self.lg.gpus):
                         jobid = str(jobid)
                         now = round(time.time())

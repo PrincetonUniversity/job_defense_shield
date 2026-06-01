@@ -305,38 +305,51 @@ def zero_gpus_from_response(response: dict,
                             jobid: str,
                             cluster: str,
                             util_thres: float=0,
-                            verbose: bool=True) -> Tuple[int, int]:
+                            return_nodes: bool=False,
+                            verbose: bool=True) -> Union[Tuple[int, int],
+                                                         Tuple[int, dict, int]]:
     """Return the number of GPUs with a mean utilization of less than or equal
-       to util_thres. The error code is needed since the response dictionary
-       may be malformed."""
+       to util_thres. Optionally the hostnames can be returned in a
+       dictionary that has the same structure as the Jobstats summary statistics.
+       That is, there is a 'nodes' key which stores a dictionary of the
+       hostnames. This allows for further processing by routines that expect
+       this structure. An error code is needed since the response dictionary may
+       be malformed."""
     if "data" not in response or "result" not in response["data"]:
         if verbose:
             msg = "WARNING: malformed 'response' in zero_gpus_from_response"
             print(f"{msg} ({jobid}, {cluster})")
         error_code = 1
-        return (-1, error_code)
+        return (-1, {}, error_code) if return_nodes else (-1, error_code)
     results = response["data"]["result"]
     if results == []:
         if verbose:
             msg = "WARNING: empty 'results' in zero_gpus_from_response"
             print(f"{msg} ({jobid}, {cluster})")
         error_code = 2
-        return (-1, error_code)
+        return (-1, {}, error_code) if return_nodes else (-1, error_code)
     else:
         ct = 0
+        nodenames = {}
         try:
             for result in results:
                 util = result["value"][1]
                 if float(util) <= util_thres:
                     ct += 1
+                if return_nodes:
+                    nodename = result["metric"]["instance"].split(":")[0]
+                    nodenames[nodename] = None
         except Exception as e:
             if verbose:
                 msg = f"WARNING: util not found in zero_gpus_from_response ({e})"
                 print(f"{msg} [{jobid}, {cluster}]")
             error_code = 3
-            return (-1, error_code)
+            return (-1, {}, error_code) if return_nodes else (-1, error_code)
         else:
             error_code = 0
+            if return_nodes:
+                admincomment_partial = {"nodes": nodenames}
+                return (ct, admincomment_partial, error_code)
             return (ct, error_code)
 
 

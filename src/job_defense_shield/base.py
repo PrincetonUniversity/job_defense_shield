@@ -141,6 +141,18 @@ class Alert:
         heading = "  ".join(df_empty)
         return heading + "\n" + "no entries".center(len(heading))
 
+    def partitions_str(self, join_char: str=",", underscores: bool=False) -> str:
+        """Return a string of the unique sorted partitions. If the
+           asterisk is encountered then return a varient of all partitions."""
+        if "*" in self.partitions and self.excluded_partitions == []:
+            txt = "all partitions"
+            return txt.replace(" ", "_") if underscores else txt
+        elif "*" in self.partitions and self.excluded_partitions != []:
+            txt = "all partitions minus exclusions"
+            return txt.replace(" ", "_") if underscores else txt
+        else:
+            return f"{join_char}".join(sorted(set(self.partitions)))
+
     def add_report_metadata(self,
                             start_date: datetime,
                             end_date: datetime,
@@ -182,7 +194,7 @@ class Alert:
             print(f"done ({round(time() - start)} seconds).", flush=True)
         return adminc
 
-    def filter_by_nodelist(self, jb: pd.DataFrame) -> pd.DataFrame:
+    def filter_by_nodelist(self, jb: pd.DataFrame, mystring: str="") -> pd.DataFrame:
         """If the alert contains a nodelist then filter out the jobs
            that ran on nodes that are not in the nodelist. This function
            is useful when the cluster and partition do not provide
@@ -209,8 +221,12 @@ class Alert:
         cols = ["node-tuple", "job_nodes", "error_code", "num_other_nodes"]
         jb.drop(columns=cols, inplace=True)
         num_rm = num_jobs - len(jb)
-        pct = f"{round(100 * num_rm / num_jobs)}%" if num_jobs else "--%"
-        print(f"INFO: Applied nodelist (removed {num_rm} or {pct} of the {num_jobs} jobs)")
+        pct = f" or {round(100 * num_rm / num_jobs)}%" if num_rm else ""
+        numbers = f"(removed {num_rm}{pct} of {num_jobs} jobs)"
+        if mystring:
+            print(f"INFO: {mystring} {numbers}.")
+        else:
+            print(f"INFO: Applied nodelist {numbers}.")
         return jb
 
     def has_sufficient_time_passed_since_last_email(self, vfile: str) -> bool:

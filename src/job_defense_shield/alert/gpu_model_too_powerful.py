@@ -2,6 +2,7 @@ import pandas as pd
 from ..base import Alert
 from ..utils import add_dividers
 from ..utils import MINUTES_PER_HOUR as mph
+from ..efficiency import cpu_efficiency
 from ..efficiency import cpu_memory_usage
 from ..efficiency import gpu_memory_usage_eff_tuples
 from ..greeting import GreetingFactory
@@ -26,6 +27,8 @@ class GpuModelTooPowerful(Alert):
             self.gpu_util_target = 50
         if not hasattr(self, "gpu_hours_threshold"):
             self.gpu_hours_threshold = 0
+        if not hasattr(self, "cpu_util_threshold"):
+            self.cpu_util_threshold = 100
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df.cluster == self.cluster) &
@@ -57,8 +60,9 @@ class GpuModelTooPowerful(Alert):
                                                                row["cluster"],
                                                                verbose=self.verbose),
                                                                axis="columns")
-            self.df["error_code"] = self.df["gpu-tuple"].apply(lambda x: x[1])
-            self.df = self.df[self.df["error_code"] == 0]
+            self.df["error-code"] = self.df["gpu-tuple"].apply(lambda x: x[1])
+            self.df = self.df[self.df["error-code"] == 0]
+            self.df.drop(columns="error-code", inplace=True)
             def max_gpu_mem(tpl):
                 items, error_code = tpl
                 return max([item[0] for item in items])
@@ -67,17 +71,35 @@ class GpuModelTooPowerful(Alert):
                 items, error_code = tpl
                 return sum([item[2] for item in items]) / len(items)
             self.df["GPU-Util"] = self.df["gpu-tuple"].apply(mean_gpu_util)
+            # add CPU efficiency
+            if self.df.empty:
+                return
+            self.df["cpu-tuple"] = self.df.apply(lambda row:
+                                                 cpu_efficiency(row["admincomment"],
+                                                                row["elapsedraw"],
+                                                                row["jobid"],
+                                                                row["cluster"],
+                                                                single=True,
+                                                                verbose=self.verbose),
+                                                                axis="columns")
+            cols = ["CPU-Util", "error-code"]
+            self.df[cols] = pd.DataFrame(self.df["cpu-tuple"].tolist(), index=self.df.index)
+            self.df = self.df[self.df["error-code"] == 0]
+            self.df.drop(columns="error-code", inplace=True)
+            self.df = self.df[(self.df["CPU-Util"] <= self.cpu_util_threshold) &
+                              (self.df["CPU-Util"] != 0)]
+            # add CPU memory usage
             if not self.df.empty:
-                # add CPU memory usage
                 self.df["memory-tuple"] = self.df.apply(lambda row:
                                           cpu_memory_usage(row["admincomment"],
                                                            row["jobid"],
                                                            row["cluster"],
                                                            verbose=self.verbose),
                                                            axis="columns")
-                cols = ["CPU-Mem-Used", "mem-alloc", "error_code-cpu"]
+                cols = ["CPU-Mem-Used", "mem-alloc", "error-code"]
                 self.df[cols] = pd.DataFrame(self.df["memory-tuple"].tolist(), index=self.df.index)
-                self.df = self.df[self.df["error_code-cpu"] == 0]
+                self.df = self.df[self.df["error-code"] == 0]
+                self.df.drop(columns="error-code", inplace=True)
                 self.df["CPU-Mem-Used-per-GPU"] = self.df["CPU-Mem-Used"] / self.df["gpus"]
                 # find jobs that could have used less powerful gpus
                 self.df = self.df[(self.df["GPU-Util"] <= self.gpu_util_threshold) &
@@ -93,7 +115,6 @@ class GpuModelTooPowerful(Alert):
                 # space added to end of CPU-Mem-Used/GPU to help readability of emails
                 renamings = {"elapsed-hours":"Hours",
                              "jobid":"JobID",
-                             "user":"User",
                              "partition":"Partition",
                              "cores":"Cores",
                              "gpus":"GPUs",

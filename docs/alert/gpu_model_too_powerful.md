@@ -42,6 +42,8 @@ The available settings are listed below:
 
 - `gpu_mem_usage_max`: (Optional) Threshold for GPU memory usage in units of GB. Jobs with a GPU memory usage of less than or equal to `gpu_mem_usage_max` will be selected. For multi-GPU jobs, the maximum of the individual GPU memory usage values is used.
 
+- `cpu_util_threshold`: (Optional) Jobs with a mean CPU utilization of less than or equal to this value will be included. Default: 100
+
 - `cpu_mem_usage_per_gpu`: (Optional) Threshold for CPU memory usage per GPU in units of GB. Jobs with a CPU memory usage per GPU of less than or equal to `cpu_mem_usage_per_gpu` will be selected. For multi-GPU jobs, this is calculated as total CPU memory usage of the job divided by the total number of allocated GPUs.
 
 - `num_gpus`: (Optional) Jobs with a number of allocated GPUs of less than or equal to `num_gpus` will be selected.

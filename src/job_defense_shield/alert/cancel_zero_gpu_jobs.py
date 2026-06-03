@@ -36,6 +36,12 @@ class CancelZeroGpuJobs(Alert):
     Jobs with a run time limit of less than cancel_minutes are excluded from
     warnings since they can never be automatically cancelled.
 
+    One improvement would be to add each jobid to the cache for jobs running on
+    nodes outside of the nodelist. The nodes are obtained for all jobs when
+    calling Prometheus even if a nodelist is not used. This means the nodelist
+    is applied after the call so the code is getting GPU utilization info for
+    jobs outside of the nodelist.
+
     Instead of making full Jobstats objects for each job, here the
     Prometheus server is queried for only what is needed.
     """

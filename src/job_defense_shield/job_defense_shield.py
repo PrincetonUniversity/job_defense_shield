@@ -302,7 +302,8 @@ def main():
 
     if False:
         # comment out SlurmSacct(...).get_job_data() above to use this
-        raw = pd.read_csv("/path/to/DEBUG_RAW.csv", dtype=str, low_memory=False)
+        myfile = "/path/to/DEBUG_RAW.csv"
+        raw = pd.read_csv(myfile, dtype=str, low_memory=False)
         raw.info()
 
     # clean the raw data

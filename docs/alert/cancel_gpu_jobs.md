@@ -253,6 +253,7 @@ The following placeholders can be used in the email file:
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+- `<UTIL-THRES>`: GPU utilization threshold for cancellation (`util_thres`).
 
 ## Second Warning Email (Fixed Window at Start of Job)
 
@@ -286,6 +287,7 @@ The following placeholders can be used in the email file:
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+- `<UTIL-THRES>`: GPU utilization threshold for cancellation (`util_thres`).
 
 ## Cancellation Email (Fixed Window at Start of Job)
 
@@ -322,6 +324,7 @@ The following placeholders can be used in the email file:
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+- `<UTIL-THRES>`: GPU utilization threshold for cancellation (`util_thres`).
 
 ## Warning Email (Sliding Window Over Last N Minutes)
 
@@ -362,6 +365,7 @@ The following placeholders can be used in the email file:
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+- `<UTIL-THRES>`: GPU utilization threshold for cancellation (`util_thres`).
 
 ## Cancellation Email (Sliding Window Over Last N Minutes)
 
@@ -396,6 +400,7 @@ The following placeholders can be used in the email file:
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: `jobstats` command for the first JobID (`$ jobstats 12345678`).
 - `<SCANCEL>`: `scancel` command for the first JobID (`$ scancel 12345678`).
+- `<UTIL-THRES>`: GPU utilization threshold for cancellation (`util_thres`).
 
 ## `cron`
 
@@ -406,7 +411,6 @@ Below is an example entry for `crontab`:
 ```
 
 Note that the alert is ran every 15 minutes. This must also be the value of `sampling_period_minutes`.
-
 
 ## Report
 

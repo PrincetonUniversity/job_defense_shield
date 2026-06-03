@@ -412,6 +412,7 @@ class CancelZeroGpuJobs(Alert):
                 tags["<SAMPLING>"] = str(self.sampling_period_minutes)
                 tags["<CANCEL-MIN>"] = str(self.cancel_minutes)
                 tags["<CANCEL-HRS>"] = f"{round(self.cancel_minutes / mph)}"
+                tags["<UTIL-THRES>"] = str(self.util_thres)
                 #################
                 # first warning #
                 #################
@@ -548,6 +549,7 @@ class CancelZeroGpuJobs(Alert):
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
                 tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                tags["<UTIL-THRES>"] = str(self.util_thres)
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file_sliding_warning,
                                              tags)
@@ -594,6 +596,7 @@ class CancelZeroGpuJobs(Alert):
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
                 tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
+                tags["<UTIL-THRES>"] = str(self.util_thres)
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file_sliding_cancel,
                                              tags)

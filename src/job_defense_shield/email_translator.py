@@ -18,6 +18,8 @@ class EmailTranslator:
 
     def _read_template_file(self) -> None:
         """Method to read email file."""
+        if self.template_file is None:
+            raise ValueError("ERROR: email_file is not defined.")
         email_file_abs = os.path.join(self.base_path, self.template_file)
         try:
             with open(email_file_abs, "r", encoding="utf-8") as fp:

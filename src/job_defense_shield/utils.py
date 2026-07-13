@@ -44,7 +44,7 @@ JOBSTATES = dict(zip(states.values(), states.keys()))
 
 def show_history_of_emails_sent(vpath, mydir, title, day_ticks) -> None:
     """Display the history of emails sent to users."""
-    files = sorted(glob.glob(f"{vpath}/{mydir}/*.csv"))
+    files = sorted(glob.glob(os.path.join(vpath, mydir, "*.csv")))
     if len(files) == 0:
         print(f"No underutilization files found in {vpath}/{mydir}")
         return None
@@ -84,7 +84,7 @@ def show_history_of_emails_sent(vpath, mydir, title, day_ticks) -> None:
     print("\n" + "=" * width)
     print(f"Number of X: {X}")
     print(f"Number of users: {num_users}")
-    print(f"Violation files: {vpath}/{mydir}/\n")
+    print(f"Violation files: {os.path.join(vpath, mydir)}/\n")
     return None
 
 def seconds_to_slurm_time_format(seconds: int) -> str:

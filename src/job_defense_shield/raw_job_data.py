@@ -68,7 +68,7 @@ class SlurmSacct(RawJobData):
             msg = f"Error running sacct.\n{error.stderr}"
             raise RuntimeError(msg) from error
         print(f"done ({round(time() - start)} seconds).", flush=True)
-        rows = result.stdout.strip().split('\n')
+        rows = result.stdout.splitlines()
         cols = self.fields.split(",")
         raw = pd.DataFrame([row.split("|")[:len(cols)]
                            for row in rows if row.count("|") > len(cols) - 2])

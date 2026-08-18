@@ -23,9 +23,3 @@ repos:
     hooks:
       - id: codespell                # find common misspellings
         args: [-L, "shs,nd"]
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.2.0
-    hooks:
-      - id: mypy
-        args: [--ignore-missing-imports]

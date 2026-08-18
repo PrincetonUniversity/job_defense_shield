@@ -10,6 +10,10 @@ The software can be configured to cancel jobs based on GPU utilization during th
 
 The ability to automatically cancel inefficient GPU jobs is one of the most popular features of [Jobstats](https://github.com/PrincetonUniversity/jobstats).
 
+!!! tip "Policy Circumvention by Users"
+    Users are instructing AI agents to generate code to subvert auto-cancellation. The agent adds a code snippet
+    that runs on the GPU for a brief period. Site administrators may consider checking for this.
+
 ## Configuration File
 
 Below is an example entry for the configuration file:

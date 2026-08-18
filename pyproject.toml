@@ -54,3 +54,6 @@ version.path = "src/job_defense_shield/__init__.py"
 
 [tool.pytest.ini_options]
 pythonpath = ["src/job_defense_shield/"]
+
+[tool.mypy]
+strict = false

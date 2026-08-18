@@ -10,19 +10,23 @@ Contributions to Job Defense Shield are welcome. The software has benefitted fro
 To work with the code, build a Conda environment:
 
 ```bash
-$ conda create --name jds-dev python=3.12     \
+$ conda create --name jds-dev python=3.14     \
                               pandas          \
                               pyarrow         \
-                              pytest-mock     \
-                              ruff            \
                               blessed         \
                               requests        \
                               pyyaml          \
+                              pytest          \
+                              pytest-mock     \
+                              ruff            \
+                              mypy            \
+                              pre-commit      \
                               mkdocs-material \
+                              cffconvert      \
                               -c conda-forge -y
 $ conda activate jds-dev
 # clone from your fork of the repo
-(jds-dev) $ git clone git@github.com:PrincetonUniversity/job_defense_shield.git
+(jds-dev) $ git clone git@github.com:<YourFork>/job_defense_shield.git
 (jds-dev) $ cd job_defense_shield
 (jds-dev) $ pip install -e .
 ```
@@ -48,6 +52,32 @@ Run `ruff` and make sure it is passing for each source file modified:
 
 ```bash
 (jds-dev) $ ruff check myfile.py
+```
+
+Run `mypy` to check type hints:
+
+```bash
+(jds-dev) $ mypy myfile.py
+```
+
+## Pre-commit Hooks
+
+Set up the backend script to intercept your commits by executing the installation command inside your repository:
+
+```bash
+(jds-dev) $ pre-commit install
+```
+
+When it makes sense to ignore the hooks:
+
+```
+(jds-dev) $ git commit -m "Message" --no-verify
+```
+
+Or on push:
+
+```
+(jds-dev) $ git push --no-verify
 ```
 
 ## Documentation

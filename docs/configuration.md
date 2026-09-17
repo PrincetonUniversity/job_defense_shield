@@ -153,6 +153,20 @@ ldapsearch -x -LLL -H ldaps://ldap.institution.edu -D "uid=rc,o=My University,c=
 -b "o=My University,c=US" -w '********' '(netid=<username>)' emailaddress
 ```
 
+An LDAP StartTLS configuration might look like:
+
+```yaml
+ldap-server: ldap.institution.edu
+ldap_uri: ldap://ldap.institution.edu
+ldap_starttls: True
+```
+
+which would result in:
+
+```bash
+ldapsearch -x -LLL -ZZ -H ldap://ldap.institution.edu ...
+```
+
 The `ldap3` Python module is not used to avoid a dependency.
 
 ### Email Address Overrides

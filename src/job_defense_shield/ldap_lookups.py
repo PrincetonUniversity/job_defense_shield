@@ -36,8 +36,21 @@ def ldap_lookup(user: str,
     ldap_displayname = ldap["ldap_displayname"]
     ldap_mail        = ldap["ldap_mail"]
 
-    cmd = (f"ldapsearch -x -LLL -H ldaps://{ldap_server} -D \"{ldap_dn}\" "
-           f"-b \"{ldap_base_dn}\" -w '{ldap_password}' '({ldap_uid}={user})'")
+    ldap_uri = ldap.get("ldap_uri")
+    ldap_starttls = ldap.get("ldap_starttls", False)
+    
+    if not ldap_uri:
+        ldap_uri = f"ldaps://{ldap_server}"
+    cmd = (
+        f"ldapsearch -x -LLL "
+        f"-H {ldap_uri} "
+        f"-D \"{ldap_dn}\" "
+        f"-b \"{ldap_base_dn}\" "
+        f"-w '{ldap_password}' "
+    )
+    if ldap_starttls:
+        cmd += "-ZZ "
+    cmd += f"'({ldap_uid}={user})'"
     if attribute == "name":
         cmd += f" {ldap_displayname}"
     elif attribute == "mail":

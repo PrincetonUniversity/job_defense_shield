@@ -84,29 +84,35 @@ def gpu_efficiency(ss: dict,
         return (-1, error_code) if single else (-1, -1, error_code)
     total = 0
     total_used = 0
+    total_gpus = 0
     error_code = 0
-    for node in ss['nodes']:
+    for node_data in ss['nodes'].values():
         try:
-            gpus = list(ss['nodes'][node]['gpu_utilization'].keys())
-        except Exception as e:
+            for util in node_data['gpu_utilization'].values():
+                total      += elapsedraw
+                total_used += elapsedraw * (float(util) / 100)
+                total_gpus += 1
+        except (KeyError, TypeError, ValueError) as e:
             if verbose:
                 msg = f"Warning: probably missing keys in gpu_efficiency ({e})."
                 print(msg, jobid, cluster)
             error_code = 2
             return (-1, error_code) if single else (-1, -1, error_code)
-        else:
-            for gpu in gpus:
-                util = ss['nodes'][node]['gpu_utilization'][gpu]
-                total      += elapsedraw
-                total_used += elapsedraw * (float(util) / 100)
     if total_used > total:
-        error_code = 3
         if verbose:
             msg = "Warning: total_used > total in gpu_efficiency."
             print(msg, jobid, cluster, total_used, total)
+        error_code = 3
+        return (-1, error_code) if single else (-1, -1, error_code)
+    if "gpus" in ss and ss["gpus"] != total_gpus:
+        if verbose:
+            msg = "Warning: gpus not equal to total_gpus."
+            print(msg, jobid, cluster, ss["gpus"], total_gpus)
+        error_code = 4
+        return (-1, error_code) if single else (-1, -1, error_code)
     if single:
         if total == 0:
-            error_code = 4
+            error_code = 5
             return (-1, error_code)
         return (round(100 * total_used / total, precision), error_code)
     return (total_used, total, error_code)
@@ -186,6 +192,7 @@ def gpu_memory_usage_eff_tuples(ss: dict,
         error_code = 1
         return ([], error_code)
     all_gpus = []
+    total_gpus = 0
     error_code = 0
     for node in ss['nodes']:
         try:
@@ -212,6 +219,13 @@ def gpu_memory_usage_eff_tuples(ss: dict,
                     if verbose:
                         print("GPU util erroneous:", jobid, cluster, util[g])
                     error_code = 3
+                total_gpus += 1
+    if "gpus" in ss and ss["gpus"] != total_gpus:
+        if verbose:
+            msg = "Warning: gpus not equal to total_gpus."
+            print(msg, jobid, cluster, ss["gpus"], total_gpus)
+        error_code = 4
+        return ([], error_code) if op is None else (-1, error_code)
     if op == "max":
         return (max([round(item[0], precision) for item in all_gpus]), error_code)
     if op == "max-percent":
@@ -283,20 +297,31 @@ def num_gpus_with_zero_util(ss: dict,
         error_code = 1
         return (-1, error_code)
     ct = 0
-    for node in ss['nodes']:
-        try:
-            gpus = list(ss['nodes'][node]['gpu_utilization'].keys())
-        except Exception as e:
+    total_gpus = 0
+    for node_name, node_data in ss['nodes'].items():
+        if 'gpu_utilization' not in node_data:
             if verbose:
-                msg = f"gpu_utilization not found: node is {node} for num_gpus_with_zero_util ({e})."
+                msg = f"gpu_utilization not found: node is {node_name} for num_gpus_with_zero_util."
                 print(msg, jobid, cluster)
             error_code = 2
             return (-1, error_code)
-        else:
-            for gpu in gpus:
-                util = ss['nodes'][node]['gpu_utilization'][gpu]
+        for gpu_id, util in node_data['gpu_utilization'].items():
+            try:
                 if float(util) <= util_thres:
                     ct += 1
+            except (ValueError, TypeError):
+                if verbose:
+                    msg = f"Invalid util value '{util}' on node {node_name}, gpu {gpu_id}."
+                    print(msg, jobid, cluster)
+                error_code = 3
+                return (-1, error_code)
+            total_gpus += 1
+    if "gpus" in ss and ss["gpus"] != total_gpus:
+        if verbose:
+            msg = "Warning: gpus not equal to total_gpus."
+            print(msg, jobid, cluster, ss["gpus"], total_gpus)
+        error_code = 4
+        return (-1, error_code)
     error_code = 0
     return (ct, error_code)
 

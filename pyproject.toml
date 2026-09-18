@@ -9,7 +9,7 @@ description = "Identify and reduce instances of underutilization by the users of
 readme = "README.md"
 authors = [{name="Jonathan Halverson", email="halverson@princeton.edu"}]
 license = {file = 'LICENSE'}
-keywords = ["alert", "monitoring", "HPC", "Slurm", "underutilization", "Jobstats"]
+keywords = ["alerts", "monitoring", "HPC", "Slurm", "underutilization", "Jobstats"]
 requires-python = ">=3.7"
 dependencies = [
   "pandas>=2.1.0",
@@ -33,6 +33,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: System :: Monitoring",
   "Typing :: Typed",
 ]

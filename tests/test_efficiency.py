@@ -63,7 +63,7 @@ def test_cpu_efficiency():
     assert cpu_efficiency(ss, 100, 12345, "c1", verbose=False) == (42 + 42, 2 * 100 * 8, 0)
     eff = round(100 * 42 / 100 / 8, 1)
     assert cpu_efficiency(ss, 100, 12345, "c1", single=True, verbose=False) == (eff, 0)
- 
+
 
 def test_malformed_gpu_efficiency():
     # empty summary statistics
@@ -72,9 +72,30 @@ def test_malformed_gpu_efficiency():
     # missing gpu_utilization key
     ss = {"nodes":{"node1":{"total_time": 42}}}
     assert gpu_efficiency(ss, 100, 12345, "c1", single=True, verbose=False) == (-1, 2)
-    # efficiency greather than 100%
+    # failed float conversion
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 0},
+                            "gpu_utilization": {0: "N/A"}}}}
+    actual = gpu_efficiency(ss, 100, 12345, "c1", single=True, verbose=False)
+    expected = (-1, 2)
+    assert actual == expected
+    # efficiency greater than 100%
     ss = {"nodes":{"node1":{"gpu_utilization":{0: 101}}}}
-    assert gpu_efficiency(ss, 100, 12345, "c1", verbose=False) == (101, 100, 3)
+    assert gpu_efficiency(ss, 100, 12345, "c1", verbose=False) == (-1, -1, 3)
+    # preempted job
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 12345678},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: 12345678},
+                            "gpu_utilization": {3: 0}}},
+          "gpus": 1}
+    actual = gpu_efficiency(ss, 100, 12345, "c1", single=True, verbose=False)
+    expected = (-1, 4)
+    assert actual == expected
+    # total is zero and single is True
+    ss = {"nodes":{"node1":{"gpu_utilization":{0: 42}}}}
+    assert gpu_efficiency(ss, 0, 12345, "c1", single=True, verbose=False) == (-1, 5)
+    # total is zero and single is False
+    ss = {"nodes":{"node1":{"gpu_utilization":{0: 42}}}}
+    assert gpu_efficiency(ss, 0, 12345, "c1", single=False, verbose=False) == (0, 0, 0)
 
 
 def test_gpu_efficiency():
@@ -102,7 +123,7 @@ def test_malformed_cpu_memory_usage():
                             "total_memory": total}}}
     fac = 1024**3
     assert cpu_memory_usage(ss, 12345, "c1") == (round(used / fac), round(total / fac), 3)
-    
+
 
 def test_cpu_memory_usage():
     # one node
@@ -141,7 +162,22 @@ def test_malformed_gpu_memory_usage_eff_tuples():
     actual = gpu_memory_usage_eff_tuples(ss, 12345, "c1", verbose=False)
     expected = ([(81.0, 80.0, 95.0)], 3)
     assert actual == expected
- 
+    # preempted job
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 12345678},
+                            "gpu_total_memory": {0: 88888888},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {1: 12345678},
+                            "gpu_total_memory": {1: 88888888},
+                            "gpu_utilization": {1: 0}}},
+          "gpus": 1}
+    actual = gpu_memory_usage_eff_tuples(ss, 12345, "c1", verbose=False)
+    expected = ([], 4)
+    assert actual == expected
+    # preempted job with op is max
+    actual = gpu_memory_usage_eff_tuples(ss, 12345, "c1", op="max", verbose=False)
+    expected = (-1, 4)
+    assert actual == expected
+
 
 def test_gpu_memory_usage_eff_tuples():
     used = 42 * 1024**3
@@ -277,6 +313,7 @@ def test_max_cpu_memory_used_per_node():
                             "total_memory": 100 * 1024**3}}}
     assert max_cpu_memory_used_per_node(ss, 12345, "c1", verbose=False) == (43.0, 0)
 
+
 def test_malformed_num_gpus_with_zero_util():
     # empty summary statistics
     ss = {}
@@ -285,6 +322,21 @@ def test_malformed_num_gpus_with_zero_util():
     ss = {"nodes":{"node1":{"gpu_used_memory": {0: 0},
                             "gpu_total_memory": {0: 0}}}}
     assert num_gpus_with_zero_util(ss, 12345, "c1", verbose=False) == (-1, 2)
+    # failed float conversion
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 0},
+                            "gpu_utilization": {0: "N/A"}}}}
+    actual = num_gpus_with_zero_util(ss, 12345, "c1")
+    expected = (-1, 3)
+    assert actual == expected
+    # preempted job
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 12345678},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: 12345678},
+                            "gpu_utilization": {3: 0}}},
+          "gpus": 1}
+    actual = num_gpus_with_zero_util(ss, 12345, "c1")
+    expected = (-1, 4)
+    assert actual == expected
 
 
 def test_num_gpus_with_zero_util():

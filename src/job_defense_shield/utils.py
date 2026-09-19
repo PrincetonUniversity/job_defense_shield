@@ -207,7 +207,17 @@ def read_config_file(config_file: Optional[str],
         cfg["ldap-displayname"] = "displayname"
     if "ldap-mail" not in cfg:
         cfg["ldap-mail"] = "mail"
+    if "jobstats-url" not in cfg:
+        cfg["jobstats-url"] = ""
 
+    # optional JobStats URL from jobstats config.py
+    try:
+        sys.path.insert(0, cfg["jobstats-config-path"])
+        from config import JOBSTATS_URL
+        cfg["jobstats-url"] = JOBSTATS_URL
+    except Exception:
+        pass
+    
     # ldap parameters
     ldap_params = {"ldap_server":      cfg["ldap-server"],
                    "ldap_dn":          cfg["ldap-dn"],
@@ -222,6 +232,7 @@ def read_config_file(config_file: Optional[str],
                "no_emails_to_admins":  no_emails_to_admins,
                "jobstats_module_path": cfg["jobstats-module-path"],
                "jobstats_config_path": cfg["jobstats-config-path"],
+               "jobstats_url":         cfg["jobstats-url"],
                "email_files_path":     cfg["email-files-path"],
                "verbose":              cfg["verbose"],
                "sender":               cfg["sender"],

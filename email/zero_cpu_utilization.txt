@@ -1,23 +1,20 @@
 <GREETING>
 
-Below are your recent jobs that did not use all of the allocated nodes:
+Below are your recent jobs that showed zero CPU utilization on one or more allocated nodes:
 
 <TABLE>
 
-The CPU utilization was found to be 0% on each of the unused nodes. You can see
-this by running the "jobstats" command, for example:
+The CPU utilization was 0% on one or more allocated nodes. Review the affected jobs using JobStats:
 
+Command-line:
 <JOBSTATS>
+
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
+
+For guidance on requesting and using cluster resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs
 
 Please investigate this issue before submitting additional jobs.
 
-See the following webpage for information about Slurm:
-
-    https://your-institution.edu/KB/slurm
-
-Consider attending an in-person Research Computing help session for assistance:
-
-    https://your-institution.edu/support/help-sessions
-
-Replying to this automated email will open a support ticket with Research
-Computing.
+If you need assistance, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

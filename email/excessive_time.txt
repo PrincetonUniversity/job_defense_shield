@@ -1,40 +1,16 @@
 <GREETING>
 
-Below are <CASE> that ran on <CLUSTER> (<PARTITIONS>) in the past <DAYS> days:
+Below are <CASE> that ran on HPC Cluster (<PARTITIONS>) during the past <DAYS> days:
 
 <TABLE>
 
-It appears that you are requesting too much time for your jobs since you are
-only using on average <AVERAGE>% of the allocated time (for the <NUM-JOBS> jobs). This has
-resulted in <UNUSED-HOURS> <MODE-UPPER>-hours that you scheduled but did not use (it was made
-available to other jobs, however).
+It appears that you are requesting more time than your jobs require. On average, these jobs used only <AVERAGE>% of their allocated runtime.
 
-Please request less time by modifying the --time Slurm directive. This will
-lower your queue times and allow the Slurm job scheduler to work more
-effectively for all users. For instance, if your job requires 8 hours then use:
+Requesting a more accurate runtime can help reduce queue wait times and improve scheduling efficiency for all users.
 
-    #SBATCH --time=10:00:00
+A good target value for Percent-Used is 80% or higher. Consider adjusting the --time Slurm directive for future jobs.
 
-The value above includes an extra 20% for safety. This is important because jobs
-that exceed the run time limit are automatically canceled. A good target for
-Percent-Used is 80%.
+For guidance on requesting and using cluster resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs/
 
-Note that jobs with a run time limit of less than one hour will land in the test
-queue where only a small number of jobs can run simultaneously. In this case
-one should use a run time limit of sixty-one minutes.
-
-Time-Used is the time (wallclock) that the job needed. The total time allocated
-for the job is Time-Allocated. The format is DD-HH:MM:SS where DD is days,
-HH is hours, MM is minutes and SS is seconds. Percent-Used is Time-Used
-divided by Time-Allocated.
-
-For more information on allocating time via Slurm:
-
-    https://researchcomputing.princeton.edu/KB/slurm
-
-Consider attending an in-person Research Computing help session for assistance:
-
-    https://your-institution.edu/support/help-sessions
-
-Replying to this automated email will open a support ticket with Research
-Computing.
+If you need assistance estimating appropriate runtimes for your workloads, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

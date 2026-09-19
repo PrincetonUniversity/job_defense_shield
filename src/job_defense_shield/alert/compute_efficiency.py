@@ -210,7 +210,8 @@ class LowEfficiency(Alert):
                 tags["<EFFICIENCY>"] = usr['Efficiency'].values[0]
                 tags["<TARGET>"] = f"{str(self.eff_target_pct)}%"
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {jobid}"
+                jobid = jobs.JobID.values[0]
+                self.add_jobstats_tags(tags, indent, jobid)
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,
                                              tags)

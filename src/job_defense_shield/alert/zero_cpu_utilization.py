@@ -103,7 +103,8 @@ class ZeroCPU(Alert):
                 tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 tags["<NUM-JOBS>"] = str(len(usr))
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                jobid = jobs.JobID.values[0]
+                self.add_jobstats_tags(tags, indent, jobid)
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,
                                              tags)

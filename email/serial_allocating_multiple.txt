@@ -1,35 +1,18 @@
 <GREETING>
 
-Below are <CASE> that ran on <CLUSTER> (<PARTITIONS>) in the past <DAYS> days:
+Below are <CASE> that ran on HPC Cluster (<PARTITIONS>) during the past <DAYS> days:
 
 <TABLE>
 
-The CPU utilization (CPU-Util) of each of the <NUM-JOBS> jobs is approximately equal to
-100% divided by the number of allocated CPU-cores (100%/CPU-cores). This
-suggests that you may be running a code that can only use 1 CPU-core. If this is
-true then allocating more than 1 CPU-core is wasteful (these jobs may have
-wasted <CPU-HOURS> CPU-hours). A good target value for CPU utilization is 90%
-and above.
+The CPU utilization pattern of these jobs suggests that the application may be using fewer CPU cores than were allocated.
 
-Please consult the documentation of the software to see if it is parallelized.
-For a general overview of parallel computing:
+In some cases this is expected, particularly when additional CPU cores are requested to obtain sufficient memory for the workload. If this is not the case, consider reviewing your resource requests and application configuration.
 
-    https://your-institution.edu/KB/parallel-computing
-
-If the code cannot run in parallel then please use the following Slurm
-directives:
-
-    #SBATCH --nodes=1
-    #SBATCH --ntasks=1
-    #SBATCH --cpus-per-task=1
-
-You will experience shorter queue times by allocating only 1 CPU-core per job.
-In some cases this will also allow you run more jobs simultaneously.
-
-You can check the CPU utilization of completed and actively running jobs by using
-the "jobstats" command. For example:
+You can review CPU utilization using JobStats. For example:
 
 <JOBSTATS>
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+For guidance on requesting and using cluster resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs
+
+If you need assistance determining the appropriate CPU and memory resource requests for your workloads, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

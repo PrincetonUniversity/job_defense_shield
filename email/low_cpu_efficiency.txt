@@ -1,25 +1,29 @@
 <GREETING>
 
-Over the last <DAYS> days you have used <RANK> CPU-hours on <CLUSTER> (<PARTITIONS>) but
-your mean CPU efficiency is only <EFFICIENCY>:
+Over the last <DAYS> days, you have used <RANK> CPU-hours on HPC Cluster (<PARTITIONS>), but your mean CPU efficiency was only <EFFICIENCY>:
 
 <TABLE>
 
-A good target value for "Efficiency" is <TARGET> and above. Please investigate the reason
-for the low efficiency. Common reasons for low CPU efficiency are discussed here:
+A good target value for CPU efficiency is <TARGET> or higher.
 
-    https://your-institution.edu/KB/cpu-utilization
+Low CPU utilization often indicates one or more of the following:
 
-Consult the documentation or write to the mailing list of the software that you
-are using for additional reasons for low CPU efficiency. You may also consider
-attending an in-person Research Computing help session:
+  - The application is using fewer CPU cores than were requested.
+  - The application is waiting on data or external processes.
+  - More CPU cores were requested than the application can effectively use.
+  - An interactive session was allocated but spent significant time idle.
 
-    https://your-institution.edu/support/help-sessions
+You can review detailed job metrics, including CPU utilization, memory usage, and job timelines using RCC JobStats.
 
-You can check the efficiency of completed and actively running jobs by using the
-"jobstats" command on a given JobID:
-
+For command-line job statistics, use:
 <JOBSTATS>
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+For graphical job metrics and historical utilization data, use RCC JobStats through Open OnDemand:
+https://ondemand.rcc.mcw.edu/pun/sys/jobstats
+
+For guidance on requesting and using cluster resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs
+
+Reviewing your application's documentation may help identify configuration settings that improve CPU utilization.
+
+If you would like assistance interpreting JobStats output or improving performance, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

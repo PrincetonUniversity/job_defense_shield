@@ -1,27 +1,24 @@
 <GREETING>
 
-You have GPU job(s) that have been running for more than <MINUTES-1ST> minutes but appear to
-not be using the GPU(s):
+You have GPU job(s) that have been running for more than <MINUTES-1ST> minutes but appear to not be using the GPU(s):
 
-<TABLE> 
+<TABLE>
 
-Your jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
-GPUs for <CANCEL-HRS> hours. For more information see the utilization policies:
+These jobs will be AUTOMATICALLY CANCELLED if GPU activity is not detected by the configured cancellation threshold.
 
-    https://your-institution.edu/KB/utilization-policies
+Please review the affected jobs using JobStats:
 
-Please consider cancelling the job(s) listed above by using the "scancel" command:
+Command-line:
+<JOBSTATS>
+
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
+
+If these jobs are no longer needed, consider cancelling them manually:
 
 <SCANCEL>
 
-Run the "jobstats" command to see the GPU utilization:
+For information about RCC GPU utilization policies and automated monitoring, see:
+https://docs.rcc.mcw.edu/cluster/etiquette/#automated-gpu-utilization-monitoring
 
-<JOBSTATS>
-
-See our GPU Computing webpage for three common reasons for encountering zero GPU
-utilization:
-
-    https://your-institution.edu/KB/gpu-computing
-
-Replying to this automated email will open a support ticket with Research
-Computing.
+If you need assistance, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

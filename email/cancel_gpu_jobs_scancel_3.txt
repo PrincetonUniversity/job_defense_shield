@@ -1,13 +1,18 @@
 <GREETING>
 
-The jobs below have been cancelled because they ran for nearly <CANCEL-HRS> hours
-at 0% GPU utilization:
+The jobs below have been cancelled because they ran for nearly <CANCEL-HRS> hours with little or no GPU activity:
 
 <TABLE>
 
-For more information about job cancellations see our utilization policies:
+Please review the affected jobs using JobStats:
 
-    https://your-institution.edu/KB/utilization-policies
+Command-line:
+<JOBSTATS>
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
+
+For information about RCC GPU utilization policies and automated monitoring, see:
+https://docs.rcc.mcw.edu/cluster/etiquette/#automated-gpu-utilization-monitoring
+
+If you believe this cancellation occurred in error or you need assistance optimizing GPU utilization, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

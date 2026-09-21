@@ -1,3 +1,0 @@
-[flake8]
-select = ANN,B,B9,BLK,C,D,DAR,E,F,I,W
-ignore = E127,E221,E231,E252,E501,W504

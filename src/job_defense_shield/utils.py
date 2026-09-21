@@ -220,8 +220,8 @@ def read_config_file(config_file: Optional[str],
                    "ldap_uid":         cfg["ldap-uid"],
                    "ldap_displayname": cfg["ldap-displayname"],
                    "ldap_mail":        cfg["ldap-mail"],
-                   "ldap_uri": cfg.get("ldap_uri"),
-                   "ldap_starttls": cfg.get("ldap_starttls", False)}
+                   "ldap_uri":         cfg.get("ldap_uri"),
+                   "ldap_starttls":    cfg.get("ldap_starttls", False)}
 
     # system or global configuration settings
     sys_cfg = {"no_emails_to_users":   no_emails_to_users,

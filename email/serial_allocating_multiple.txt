@@ -10,7 +10,11 @@ In some cases this is expected, particularly when additional CPU cores are reque
 
 You can review CPU utilization using JobStats. For example:
 
+Command-line:
 <JOBSTATS>
+
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
 
 For guidance on requesting and using cluster resources efficiently, see:
 https://docs.rcc.mcw.edu/cluster/jobs/running-jobs

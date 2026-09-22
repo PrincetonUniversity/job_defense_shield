@@ -109,7 +109,7 @@ class TooManyCoresPerGpu(Alert):
                 tags["<GPUS>"] = str(self.gpus_per_node)
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                jobid = jobs.JobID.values[0]
+                jobid = usr.JobID.values[0]
                 self.add_jobstats_tags(tags, indent, jobid)
                 tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 translator = EmailTranslator(self.email_files_path,

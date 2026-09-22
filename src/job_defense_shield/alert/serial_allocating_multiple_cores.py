@@ -135,7 +135,7 @@ class SerialAllocatingMultipleCores(Alert):
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<NUM-JOBS>"] = str(total_jobs)
                 tags["<TABLE>"] = "\n".join([indent + row for row in tbl])
-                jobid = jobs.JobID.values[0]
+                jobid = usr.JobID.values[0]
                 self.add_jobstats_tags(tags, indent, jobid)
                 tags["<CPU-HOURS>"] = str(cpu_hours_wasted)
                 if hasattr(self, "cores_per_node"):

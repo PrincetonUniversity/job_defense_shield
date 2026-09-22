@@ -164,7 +164,7 @@ class GpuModelTooPowerful(Alert):
                     tags["<NUM-GPUS>"] = str(self.num_gpus)
                 tags["<NUM-JOBS>"] = str(len(usr))
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                jobid = jobs.JobID.values[0]
+                jobid = usr.JobID.values[0]
                 self.add_jobstats_tags(tags, indent, jobid)
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,

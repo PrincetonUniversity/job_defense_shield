@@ -1,9 +1,19 @@
 <GREETING>
 
-This is a second warning. The job(s) below will be cancelled in about <SAMPLING> minutes
-unless GPU activity is detected:
+This is a second warning. The job(s) below will be cancelled in approximately <SAMPLING> minutes unless GPU activity is detected:
 
 <TABLE>
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+Please review the affected jobs using JobStats:
+
+Command-line:
+<JOBSTATS>
+
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
+
+If these jobs are no longer needed, consider cancelling them manually:
+
+<SCANCEL>
+
+If you need assistance, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

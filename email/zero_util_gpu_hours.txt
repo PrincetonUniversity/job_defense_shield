@@ -1,25 +1,30 @@
 <GREETING>
 
-You have consumed <GPU-HOURS> GPU-hours at 0% GPU utilization in the past <DAYS> days
-on the <PARTITIONS> partition(s) of <CLUSTER>.
+Below are your recent jobs that showed zero GPU utilization on one or more allocated GPUs:
 
-See this webpage for three common reasons why a user may encounter 0% GPU
-utilization:
+<TABLE>
 
-    https://your-institution.edu/KB/gpu-computing
-
-Consider attending an in-person Research Computing help session for assistance:
-
-    https://your-institution.edu/support/help-sessions
+The GPU utilization was 0% on one or more allocated GPUs. A total of <GPU-HOURS> GPU-hours were consumed at 0% utilization during the past <DAYS> days.
 
 It is your responsibility to ensure that the GPUs and other resources are being
 used efficiently. Please monitor your jobs using the "jobstats" command:
 
+Command-line:
 <JOBSTATS>
 
-Below are the jobs that ran in the past <DAYS> days with 0% GPU utilization:
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
 
-<TABLE>
+For guidance on requesting and using GPU resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+Common causes of zero GPU utilization include:
+
+  - The application was not configured to use the allocated GPU(s).
+  - Required GPU libraries or modules were not loaded.
+  - The application failed early and never reached GPU execution.
+  - CPU-only code was executed on a GPU allocation.
+
+Please investigate this issue before submitting additional GPU jobs.
+
+If you need assistance, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

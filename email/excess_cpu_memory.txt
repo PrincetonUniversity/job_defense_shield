@@ -1,29 +1,24 @@
 <GREETING>
 
-Below are <CASE> that ran on <CLUSTER> (<PARTITIONS>) in the past <DAYS> days:
+Below are <CASE> that ran on HPC Cluster (<PARTITIONS>) during the past <DAYS> days:
 
 <TABLE>
 
-It appears that you are requesting too much CPU memory for your jobs since you
-are only using on average <PERCENT> of the allocated memory (for the <NUM-JOBS> jobs). This
-has resulted in <UNUSED> TB-hours of unused memory which is equivalent to making
-<NUM-WASTED-NODES> nodes unavailable to all users (including yourself) for one week! A TB-hour is
-the allocation of 1 terabyte of memory for 1 hour.
+It appears that you are requesting more CPU memory than your jobs require. On average, these jobs used only <PERCENT> of the allocated memory across <NUM-JOBS> jobs.
 
-Please request less memory by modifying the --mem-per-cpu or --mem Slurm
-directive. A good target value for Percent-Used is 80% and above. For more
-on allocating CPU memory with Slurm:
+This resulted in <UNUSED> TB-hours of unused memory, reducing the amount of memory available to other jobs on the cluster.
 
-    https://your-institution.edu/KB/cpu-memory
+A good target value for Percent-Used is 80% or higher. Please consider requesting less memory by adjusting the --mem-per-cpu or --mem Slurm directive.
 
-You can check the CPU memory utilization of completed and actively running jobs
-by using the "jobstats" command. For example:
+Please review the affected jobs using JobStats:
 
+Command-line:
 <JOBSTATS>
 
-Consider attending an in-person Research Computing help session for assistance:
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
 
-    https://your-institution.edu/support/help-sessions
+For guidance on requesting and using cluster resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+If you need assistance determining appropriate memory requirements, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

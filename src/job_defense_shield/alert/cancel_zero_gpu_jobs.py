@@ -426,7 +426,8 @@ class CancelZeroGpuJobs(Alert):
                         tags["<MINUTES-1ST>"] = str(self.first_warning_minutes)
                         tags["<HOURS-1ST>"] = f"{round(self.first_warning_minutes / mph)}"
                         tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                        tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                        jobid = usr.JobID.values[0]
+                        self.add_jobstats_tags(tags, indent, jobid)
                         tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
                         translator = EmailTranslator(self.email_files_path,
                                                      self.email_file_first_warning,
@@ -450,7 +451,8 @@ class CancelZeroGpuJobs(Alert):
                         tags["<MINUTES-1ST>"] = str(self.first_warning_minutes)
                         tags["<MINUTES-2ND>"] = str(self.second_warning_minutes)
                         tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                        tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                        jobid = usr.JobID.values[0]
+                        self.add_jobstats_tags(tags, indent, jobid)                      
                         tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
                         translator = EmailTranslator(self.email_files_path,
                                                      self.email_file_second_warning,
@@ -475,7 +477,8 @@ class CancelZeroGpuJobs(Alert):
                                "Hours"]].copy()
                     table = tbl.to_string(index=False, justify="center").split("\n")
                     tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                    tags["<JOBSTATS>"] = f"{indent}$ jobstats {tbl.JobID.values[0]}"
+                    jobid = tbl.JobID.values[0]
+                    self.add_jobstats_tags(tags, indent, jobid)
                     tags["<SCANCEL>"] = f"{indent}$ scancel {tbl.JobID.values[0]}"
                     translator = EmailTranslator(self.email_files_path,
                                                  self.email_file_cancel,
@@ -547,7 +550,8 @@ class CancelZeroGpuJobs(Alert):
                 tags["<CANCEL-MIN>"] = str(self.sliding_cancel_minutes)
                 tags["<CANCEL-HRS>"] = f"{round(self.sliding_cancel_minutes / mph)}"
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                jobid = usr.JobID.values[0]
+                self.add_jobstats_tags(tags, indent, jobid)
                 tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
                 tags["<UTIL-THRES>"] = str(self.util_thres)
                 translator = EmailTranslator(self.email_files_path,
@@ -594,7 +598,8 @@ class CancelZeroGpuJobs(Alert):
                 tags["<CANCEL-MIN>"] = str(self.sliding_cancel_minutes)
                 tags["<CANCEL-HRS>"] = f"{round(self.sliding_cancel_minutes / mph)}"
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {usr.JobID.values[0]}"
+                jobid = usr.JobID.values[0]
+                self.add_jobstats_tags(tags, indent, jobid)
                 tags["<SCANCEL>"] = f"{indent}$ scancel {usr.JobID.values[0]}"
                 tags["<UTIL-THRES>"] = str(self.util_thres)
                 translator = EmailTranslator(self.email_files_path,

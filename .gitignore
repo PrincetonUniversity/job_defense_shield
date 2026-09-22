@@ -7,6 +7,10 @@ holidays.txt
 jds-env/
 .venv/
 .conda_envs_dir_test
+email/orig/
+
+# Don't upload prod config.yaml with ldap password
+config.yaml
 
 ##################################################################
 # Everything below is taken from                                 #

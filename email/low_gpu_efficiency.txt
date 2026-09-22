@@ -1,25 +1,29 @@
 <GREETING>
 
-Over the last <DAYS> days you have used <RANK> GPU-hours on <CLUSTER> (<PARTITIONS>) but
-your mean GPU efficiency is only <EFFICIENCY>:
+Over the last <DAYS> days, you have used <RANK> GPU-hours on HPC Cluster (<PARTITIONS>), but your mean GPU efficiency was only <EFFICIENCY>:
 
 <TABLE>
 
-A good target value for "Efficiency" is <TARGET> and above. Please investigate the reason
-for the low efficiency. Common reasons for low GPU efficiency are discussed here:
+A good target value for GPU efficiency is <TARGET> or higher.
 
-    https://researchcomputing.princeton.edu/support/knowledge-base/gpu-computing#low-util
+Low GPU utilization often indicates one or more of the following:
 
-Consult the documentation or write to the mailing list of the software that you
-are using for additional reasons for low GPU efficiency. You may also consider
-attending an in-person Research Computing help session:
+  - The GPU is waiting on CPU processing.
+  - The workload is too small to efficiently utilize the allocated GPU resources.
+  - The application is not configured to fully utilize the GPU.
+  - An interactive session was allocated but spent significant time idle.
 
-    https://researchcomputing.princeton.edu/support/help-sessions
+You can review detailed job metrics, including GPU utilization, CPU utilization, memory usage, and job timelines using RCC JobStats.
 
-You can check the efficiency of completed and actively running jobs by using the
-"jobstats" command on a given JobID:
-
+Command-line:
 <JOBSTATS>
 
-Replying to this automated email will open a support ticket with Research
-Computing.
+Graphical JobStats dashboard with CPU, memory, GPU, and runtime utilization charts:
+<JOBSTATSURL>
+
+For guidance on requesting and using cluster resources efficiently, see:
+https://docs.rcc.mcw.edu/cluster/jobs/running-jobs
+
+Reviewing your application's documentation may help identify configuration settings that improve GPU utilization.
+
+If you would like assistance interpreting JobStats output or improving performance, simply reply to this email. Your reply will automatically create a Research Computing Center support ticket.

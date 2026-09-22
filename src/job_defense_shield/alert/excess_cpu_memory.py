@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 import pandas as pd
 from ..base import Alert
 from ..efficiency import cpu_memory_usage
@@ -136,6 +138,7 @@ class ExcessCPUMemory(Alert):
                 self.admin = self.gp[filters].copy()
             self.gp = self.gp[filters]
 
+    @abstractmethod
     def create_emails(self, method):
         g = GreetingFactory(self.ldap).create_greeting(method)
         for user in self.gp.User.unique():
@@ -186,7 +189,8 @@ class ExcessCPUMemory(Alert):
                 tags["<UNUSED>"] = str(usr["Mem-Hrs-Unused"].values[0])
                 table = jobs.to_string(index=False, justify="center").split("\n")
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {jobs.JobID.values[0]}"
+                jobid = jobs.JobID.values[0]
+                self.add_jobstats_tags(tags, indent, jobid)
                 # need a way to send a stern message at times
                 # if x > self.some_threshold and os.path.exists(stern_version) then self.email_file += "_stern"
                 translator = EmailTranslator(self.email_files_path,

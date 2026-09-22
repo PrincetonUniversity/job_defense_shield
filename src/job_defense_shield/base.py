@@ -74,6 +74,27 @@ class Alert:
             None
         """
 
+    def add_jobstats_tags(self,
+                     tags: dict,
+                     indent: str,
+                     jobid: str) -> None:
+        """Add JobStats-related template tags.
+        
+        <JOBSTATS>
+            Command-line JobStats command.
+
+        <JOBSTATSURL>
+            Direct link to the graphical JobStats dashboard for the
+            specified job. The URL is obtained from the JobStats
+            configuration file if JOBSTATS_URL is defined.
+        """
+        tags["<JOBSTATS>"] = f"{indent}$ jobstats {jobid}"
+        tags["<JOBSTATSURL>"] = (
+            f"{indent}{self.jobstats_url}/{jobid}"
+            if self.jobstats_url
+            else ""
+        )
+
     def send_emails_to_users(self) -> None:
         """Send emails to users and administrators. Update the violation
            log file of each user. The value of usr can be None in

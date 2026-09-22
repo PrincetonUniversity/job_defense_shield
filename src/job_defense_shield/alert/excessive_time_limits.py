@@ -131,6 +131,8 @@ class ExcessiveTimeLimits(Alert):
                 tags["<NUM-JOBS>"] = str(total_jobs)
                 tags["<NUM-JOBS-DISPLAY>"] = str(total_jobs)
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
+                jobid = jobs.JobID.values[0]
+                self.add_jobstats_tags(tags, indent, jobid)
                 tags["<UNUSED-HOURS>"] = str(round(usr[f"{xpu.upper()}-Hours-Unused"].values[0]))
                 translator = EmailTranslator(self.email_files_path,
                                              self.email_file,

@@ -118,7 +118,7 @@ class TooMuchCpuMemPerGpu(Alert):
                 tags["<GPUS>"] = str(self.gpus_per_node)
                 tags["<DAYS>"] = str(self.days_between_emails)
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
-                tags["<JOBSTATS>"] = f"{indent}$ jobstats {jobid}"
+                self.add_jobstats_tags(tags, indent, jobid)
                 tags["<JOBID>"] = str(jobid)
                 tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 translator = EmailTranslator(self.email_files_path,

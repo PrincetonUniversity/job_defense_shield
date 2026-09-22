@@ -3,6 +3,7 @@ from abc import abstractmethod
 import pandas as pd
 from ..base import Alert
 from ..efficiency import cpu_memory_usage
+from ..efficiency import cpu_efficiency
 from ..utils import add_dividers
 from ..utils import MINUTES_PER_HOUR as mph
 from ..greeting import GreetingFactory
@@ -87,6 +88,62 @@ class ExcessCPUMemory(Alert):
                  "mean-ratio":"mean",
                  "median-ratio":"median",
                  "user":"size"}
+            if hasattr(self, "cpu_eff_pct"):
+                d["cpu-eff-pct"] = "mean"
+            if hasattr(self, "cpu_eff_pct"):
+                num_jobs = len(self.df)
+                self.df["cpu-tuple"] = self.df.apply(
+                    lambda row:
+                        cpu_efficiency(
+                            row["admincomment"],
+                            row["elapsedraw"],
+                            row["jobid"],
+                            row["cluster"],
+                            verbose=self.verbose
+                        ),
+                    axis="columns"
+                )
+                cols = [
+                    "cpu-seconds-used",
+                    "cpu-seconds-total",
+                    "cpu-error"
+                ]
+                self.df[cols] = pd.DataFrame(
+                    self.df["cpu-tuple"].tolist(),
+                    index=self.df.index
+                )
+                self.df = self.df[
+                    self.df["cpu-error"] == 0
+                ]
+                self.df = self.df[
+                    self.df["cpu-seconds-total"] > 0
+                ]
+                self.df["cpu-eff-pct"] = (
+                    100.0 *
+                    self.df["cpu-seconds-used"] /
+                    self.df["cpu-seconds-total"]
+                )
+                self.df["cpu-eff-pct"] = self.df["cpu-eff-pct"].apply(
+                    lambda x: round(x)
+                )
+                self.df = self.df[
+                    self.df["cpu-eff-pct"] <= self.cpu_eff_pct
+                ]
+                num_rm = num_jobs - len(self.df)
+                if num_rm:
+                    clus_part = (
+                        f"{self.cluster} "
+                        f"({','.join(sorted(set(self.partitions)))})"
+                    )
+                    msg = (
+                        f"INFO: Removed {num_rm} of {num_jobs} jobs "
+                        f"in excess-cpu-memory with "
+                        f"cpu efficiency > "
+                        f"{self.cpu_eff_pct}(%) "
+                        f"for {clus_part}."
+                    )
+                    print(msg)
+            
             self.gp = self.df.groupby(["cluster", "partition", "user"]).agg(d)
             self.gp = self.gp.rename(columns={"user":"jobs"})
             self.gp.reset_index(drop=False, inplace=True)
@@ -107,6 +164,7 @@ class ExcessCPUMemory(Alert):
                     "Ratio",
                     "median-ratio",
                     "mean-ratio",
+                    "cpu-eff-pct",
                     "elapsed-hours",
                     "cores",
                     "cpu-hours",
@@ -124,6 +182,10 @@ class ExcessCPUMemory(Alert):
             self.gp[cols] = self.gp[cols].apply(round).astype("int64")
             cols = ["proportion", "Ratio", "mean-ratio", "median-ratio"]
             self.gp[cols] = self.gp[cols].apply(lambda x: round(x, 2))
+            if "cpu-eff-pct" in self.gp.columns:
+                self.gp["cpu-eff-pct"] = self.gp["cpu-eff-pct"].apply(
+                    lambda x: round(x)
+                )
             self.gp["avg-cores"] = self.gp["avg-cores"].apply(lambda x: round(x, 1))
             self.gp.reset_index(drop=True, inplace=True)
             self.gp.index += 1
@@ -221,6 +283,7 @@ class ExcessCPUMemory(Alert):
                             "Ratio",
                             "Mean-Ratio",
                             "Median-Ratio",
+                            "CPU-Eff(%)",
                             "CPU-Hrs",
                             "Jobs",
                             "Emails"]
@@ -232,6 +295,7 @@ class ExcessCPUMemory(Alert):
                 "Ratio",
                 "mean-ratio",
                 "median-ratio",
+                "cpu-eff-pct",
                 "proportion",
                 "cpu-hrs",
                 "jobs"]
@@ -245,6 +309,7 @@ class ExcessCPUMemory(Alert):
                                                   ('Ratio', 'Overall'),
                                                   ('Ratio ', 'Mean'),
                                                   (' Ratio', 'Median'),
+                                                  ('CPU-Eff', '(%)'),
                                                   ('Proportion', ''),
                                                   ('CPU-Hrs', ''),
                                                   ('Jobs', ''),

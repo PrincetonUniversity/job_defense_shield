@@ -1,6 +1,7 @@
 import pandas as pd
 from ..base import Alert
 from ..efficiency import cpu_efficiency
+from ..efficiency import cpu_memory_usage
 from ..efficiency import gpu_efficiency
 from ..efficiency import gpu_memory_usage_mean_pct
 from ..utils import SECONDS_PER_HOUR as sph
@@ -113,6 +114,54 @@ class LowEfficiency(Alert):
                        f"with gpu_mem_eff_pct > {self.gpu_mem_eff_pct}(%) for {clus_part}.")
                 print(msg)
 
+        if self.xpu == "cpu" and hasattr(self, "cpu_mem_eff_pct"):
+            num_jobs = len(self.ce)
+            self.ce["cpu-mem-triple"] = self.ce.apply(
+                lambda row:
+                    cpu_memory_usage(
+                        row["admincomment"],
+                        row["jobid"],
+                        row["cluster"],
+                        verbose=self.verbose
+                    ),
+                axis="columns"
+            )
+            cols = [
+                "cpu-mem-used",
+                "cpu-mem-alloc",
+                "cpu-mem-error"
+            ]
+            self.ce[cols] = pd.DataFrame(
+                self.ce["cpu-mem-triple"].tolist(),
+                index=self.ce.index
+            )
+            self.ce = self.ce[
+                self.ce["cpu-mem-error"] == 0
+            ]
+            self.ce = self.ce[self.ce["cpu-mem-alloc"] > 0]
+            self.ce["cpu-mem-pct"] = (
+                100.0 *
+                self.ce["cpu-mem-used"] /
+                self.ce["cpu-mem-alloc"]
+            )
+            self.ce = self.ce[
+                self.ce["cpu-mem-pct"] <= self.cpu_mem_eff_pct
+            ]
+            num_rm = num_jobs - len(self.ce)
+            if num_rm:
+                clus_part = (
+                    f"{self.cluster} "
+                    f"({','.join(sorted(set(self.partitions)))})"
+                )
+                msg = (
+                    f"INFO: Removed {num_rm} of {num_jobs} jobs "
+                    f"in low-cpu-efficiency with "
+                    f"memory utilization > "
+                    f"{self.cpu_mem_eff_pct}(%) "
+                    f"for {clus_part}."
+                )
+                print(msg)
+
         self.ce["interactive"] = self.ce["jobname"].apply(lambda x:
                                                           1 if x.startswith("sys/dashboard") or
                                                                x.startswith("interactive") else 0)
@@ -124,6 +173,9 @@ class LowEfficiency(Alert):
              f"{self.xpu}-seconds-all":"first",
              "cores":"mean",
              "interactive":"sum"}
+        if self.xpu == "cpu" and "cpu-mem-pct" in self.ce.columns:
+            d["cpu-mem-pct"] = "mean"
+        d["jobid"] = "first"
         self.ce = self.ce.groupby("user").agg(d).rename(columns={"user":"jobs"})
         self.ce = self.ce.sort_values(by=f"{self.xpu}-seconds-total", ascending=False)
         self.ce = self.ce.reset_index(drop=False)
@@ -143,6 +195,8 @@ class LowEfficiency(Alert):
         self.ce["coverage"] = self.ce["coverage"].apply(lambda x: round(x, 2))
         self.ce["eff(%)"] = self.ce["eff(%)"].apply(lambda x: round(x))
         self.ce["cores"] = self.ce["cores"].apply(lambda x: round(x, 1))
+        if "cpu-mem-pct" in self.ce.columns:
+            self.ce["cpu-mem-pct"] = self.ce["cpu-mem-pct"].apply(lambda x: round(x))
         self.ce.index += 1
         filters = (self.ce["eff(%)"] <= self.eff_thres_pct) & \
                   (self.ce["proportion(%)"] >= self.proportion_thres_pct) & \
@@ -158,6 +212,8 @@ class LowEfficiency(Alert):
                 "interactive",
                 "cores",
                 "coverage"]
+        if self.xpu == "cpu" and "cpu-mem-pct" in self.ce.columns:
+            cols.insert(6, "cpu-mem-pct")
         if self.show_all_users:
             self.admin = self.ce[cols].copy()
         else:
@@ -173,7 +229,7 @@ class LowEfficiency(Alert):
                 usr = self.ce[self.ce.user == user].copy()
                 rank = self.ce.index[self.ce.user == user].tolist()[0]
                 myrank = f"the {rank}th most" if rank > 3 else rank_text[rank]
-                jobid = self.df[self.df.user == user].jobid.values[0]
+                jobid = usr["jobid"].values[0]
                 usr[f"{self.xpu}-rank"] = f"{rank}/{self.pr.shape[0]}"
                 usr["eff(%)"] = usr["eff(%)"].apply(lambda x: f"{x}%")
                 usr["cores"] = usr["cores"].apply(lambda x: str(x).replace(".0", ""))
@@ -240,14 +296,18 @@ class LowEfficiency(Alert):
             if not self.show_empty_reports:
                 return ""
             column_names = ["User",
-                            f"{self.xpu.upper()}-Hours",
-                            "Proportion(%)",
-                            "Eff(%)",
-                            "Jobs",
-                            "Interactive",
-                            "Cores",
-                            "Coverage",
-                            "Emails"]
+                f"{self.xpu.upper()}-Hours",
+                "Proportion(%)",
+                "Eff(%)"]
+            if self.xpu == "cpu":
+                column_names.append("Mem(%)")
+            column_names.extend([
+                "Jobs",
+                "Interactive",
+                "Cores",
+                "Coverage",
+                "Emails"
+            ])
             self.admin = pd.DataFrame(columns=column_names)
             return add_dividers(self.create_empty_report(self.admin), self.report_title)
         self.admin = self.admin.drop(columns=["cluster", "partition"])
@@ -260,6 +320,7 @@ class LowEfficiency(Alert):
                      f"{self.xpu}-hours":f"{self.xpu.upper()}-Hours",
                      "proportion(%)":"Proportion(%)",
                      "eff(%)":"Eff(%)",
+                     "cpu-mem-pct":"Mem(%)",
                      "jobs":"Jobs",
                      "interactive":"Interactive",
                      "cores":"Cores",

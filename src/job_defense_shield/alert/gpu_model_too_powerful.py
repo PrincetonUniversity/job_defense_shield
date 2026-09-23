@@ -40,6 +40,22 @@ class GpuModelTooPowerful(Alert):
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
         if "*" not in self.partitions:
             self.df = self.df[self.df.partition.isin(self.partitions)]
+        if hasattr(self, "excluded_jobname_patterns"):
+            num_jobs = len(self.df)
+            pats = "|".join(self.excluded_jobname_patterns)
+            self.df = self.df[
+                ~self.df.jobname.str.contains(
+                    pats,
+                    case=False,
+                    na=False
+                )
+            ]
+            num_rm = num_jobs - len(self.df)
+            if num_rm:
+                print(
+                    f"INFO: Removed {num_rm} jobs matching "
+                    f"excluded_jobname_patterns."
+                )
         self.df["GPU-Hours"] = self.df.gpus * self.df["elapsed-hours"]
         self.df["Cores/GPU"] = self.df.cores / self.df.gpus
         if hasattr(self, "num_gpus"):

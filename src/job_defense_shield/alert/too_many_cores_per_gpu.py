@@ -37,6 +37,22 @@ class TooManyCoresPerGpu(Alert):
                           (self.df["elapsed-hours"] >= self.min_run_time / mph)].copy()
         if "*" not in self.partitions:
             self.df = self.df[self.df.partition.isin(self.partitions)]
+        if hasattr(self, "excluded_jobname_patterns"):
+            num_jobs = len(self.df)
+            pats = "|".join(self.excluded_jobname_patterns)
+            self.df = self.df[
+                ~self.df.jobname.str.contains(
+                    pats,
+                    case=False,
+                    na=False
+                )
+            ]
+            num_rm = num_jobs - len(self.df)
+            if num_rm:
+                print(
+                    f"INFO: Removed {num_rm} jobs matching "
+                    f"excluded_jobname_patterns."
+                )
         if not self.df.empty and self.include_running_jobs:
             self.df.admincomment = self.get_admincomment_for_running_jobs()
         self.df = self.df[self.df.admincomment != {}]

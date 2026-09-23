@@ -88,6 +88,23 @@ class CancelZeroGpuJobs(Alert):
                 self.df = self.df[self.df["limit-minutes"] >= self.cancel_minutes]
             if "*" not in self.partitions:
                 self.df = self.df[self.df.partition.isin(self.partitions)]
+            if hasattr(self, "excluded_jobname_patterns"):
+                num_jobs = len(self.df)
+                pats = "|".join(self.excluded_jobname_patterns)
+                self.df = self.df[
+                    ~self.df.jobname.str.contains(
+                        pats,
+                        case=False,
+                        na=False
+                    )
+                ]
+                num_rm = num_jobs - len(self.df)
+                if num_rm:
+                    print(
+                        f"INFO: Removed {num_rm} jobs matching "
+                        f"excluded_jobname_patterns."
+                    )
+                    
             def get_mask(lower: int) -> pd.Series:
                 """Return a mask where each element indicates if the job falls
                    within the time range."""
@@ -247,6 +264,22 @@ class CancelZeroGpuJobs(Alert):
                               (~self.lg.user.isin(self.excluded_users))].copy()
             if "*" not in self.partitions:
                 self.lg = self.lg[self.lg.partition.isin(self.partitions)]
+            if hasattr(self, "excluded_jobname_patterns"):
+                num_jobs = len(self.lg)
+                pats = "|".join(self.excluded_jobname_patterns)
+                self.lg = self.lg[
+                    ~self.lg.jobname.str.contains(
+                        pats,
+                        case=False,
+                        na=False
+                    )
+                ]
+                num_rm = num_jobs - len(self.lg)
+                if num_rm:
+                    print(
+                        f"INFO: Removed {num_rm} sliding-window jobs matching "
+                        f"excluded_jobname_patterns."
+                    )
             self.sliding_warnings = []
             self.sliding_cancellations = []
             if not self.lg.empty:

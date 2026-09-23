@@ -42,6 +42,23 @@ class LowEfficiency(Alert):
                           pd.notna(self.df[f"{self.xpu}-seconds"])].copy()
         if "*" not in self.partitions:
             self.pr = self.pr[self.pr.partition.isin(self.partitions)]
+        if hasattr(self, "excluded_jobname_patterns"):
+            num_jobs = len(self.pr)
+            pats = "|".join(self.excluded_jobname_patterns)
+            self.pr = self.pr[
+                ~self.pr.jobname.str.contains(
+                    pats,
+                    case=False,
+                    na=False
+                )
+            ]
+            num_rm = num_jobs - len(self.pr)
+            if num_rm:
+                print(
+                    f"INFO: Removed {num_rm} jobs matching "
+                    f"excluded_jobname_patterns from "
+                    f"proportion calculations."
+                )
         if not self.pr.empty and hasattr(self, "nodelist"):
             self.pr = self.filter_by_nodelist(self.pr)
         self.pr = self.pr.groupby("user").agg({f"{self.xpu}-seconds":"sum"})
@@ -66,6 +83,22 @@ class LowEfficiency(Alert):
                           (self.df.admincomment != {})].copy()
         if "*" not in self.partitions:
             self.ce = self.ce[self.ce.partition.isin(self.partitions)]
+        if hasattr(self, "excluded_jobname_patterns"):
+            num_jobs = len(self.ce)
+            pats = "|".join(self.excluded_jobname_patterns)
+            self.ce = self.ce[
+                ~self.ce.jobname.str.contains(
+                    pats,
+                    case=False,
+                    na=False
+                )
+            ]
+            num_rm = num_jobs - len(self.ce)
+            if num_rm:
+                print(
+                    f"INFO: Removed {num_rm} jobs matching "
+                    f"excluded_jobname_patterns."
+                )
         if not self.ce.empty and hasattr(self, "nodelist"):
             self.ce = self.filter_by_nodelist(self.ce)
         if self.ce.empty:

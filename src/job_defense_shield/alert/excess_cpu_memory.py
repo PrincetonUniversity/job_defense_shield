@@ -90,6 +90,7 @@ class ExcessCPUMemory(Alert):
             self.gp.reset_index(drop=False, inplace=True)
             total_mem_hours = self.gp["mem-hrs-alloc"].sum()
             if total_mem_hours == 0:
+                self.gp = pd.DataFrame({"User":[]})
                 return None
             self.gp["proportion"] = self.gp["mem-hrs-alloc"] / total_mem_hours
             self.gp["Ratio"] = self.gp["mem-hrs-used"] / self.gp["mem-hrs-alloc"]

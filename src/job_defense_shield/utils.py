@@ -396,14 +396,17 @@ def send_email(email_body: str,
         if verbose:
             print(f"INFO: SMTP server: {smtp_server}")
             print(f"INFO: SMTP user: {smtp_user}")
-            passwd = smtp_password[0] + (len(smtp_password) - 1) * "*"
+            passwd = None
+            if smtp_password is not None:
+                passwd = smtp_password[0] + (len(smtp_password) - 1) * "*"
             print(f"INFO: SMTP password: {passwd}")
             print(f"INFO: SMTP port: {smtp_port}")
         try:
             context = ssl.create_default_context()
             with smtplib.SMTP(smtp_server, smtp_port) as server:
                 server.starttls(context=context)
-                server.login(smtp_user, smtp_password)
+                if smtp_user is not None and smtp_password is not None:
+                    server.login(smtp_user, smtp_password)
                 server.sendmail(sender, addressee, msg.as_string())
         except Exception as e:
             print(f"ERROR: Failed to send email using external SMTP server: {e}")

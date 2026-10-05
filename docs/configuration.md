@@ -259,7 +259,7 @@ To use `custom` one must modify the source code (see `greeting.py`). Consider [c
 
 ### Reports for Administrators
 
-One can create reports and have those sent to administrators by email when the `--report` flag is used. Specify the email adresses of the administrators that should receive the reports:
+One can create reports and have those sent to administrators by email when the `--report` flag is used. Specify the email addresses of the administrators that should receive the reports:
 
 ```yaml
 report-emails:
@@ -293,6 +293,8 @@ smtp-user: username
 smtp-password: ********
 smtp-port: 587
 ```
+
+For anonymous sending, omit `smtp-user` and `smtp-password` from the configuration.
 
 ### Workdays
 
@@ -427,7 +429,7 @@ zero-cpu-utilization-1:
     - admin@institution.edu
 
 zero-cpu-utilization-2:
-  cluster: della      
+  cluster: della  
   partitions:
     - physics
   email_file: "zero_cpu_utilization.txt"

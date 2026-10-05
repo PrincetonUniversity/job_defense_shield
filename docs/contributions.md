@@ -5,6 +5,8 @@ Contributions to Job Defense Shield are welcome. The software has benefitted fro
 - improved cleaning of `sacct` data (P. Edmon, Harvard Univ.)
 - querying LDAP for user email addresses (T. Langford, Yale Univ.)
 - support for LDAP StartTLS deployments (B. Gizelar, Medical College of Wisc.)
+- allow anonymous email sending using external SMTP server (L. Sala, Paul Scherrer Institute)
+- bug fix to `--excess-cpu-memory` when all jobs filtered out (G. Gibb)
 
 ## Development Environment
 

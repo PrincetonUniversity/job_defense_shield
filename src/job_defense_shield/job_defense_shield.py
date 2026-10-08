@@ -92,6 +92,8 @@ def main():
                         help='Specify cluster(s) (e.g., --clusters=frontier,summit)')
     parser.add_argument('-r', '--partition', type=str, default="",
                         help='Specify partition(s) (e.g., --partition=cpu,bigmem)')
+    parser.add_argument('-A', '--accounts', type=str, default="",
+                        help='Specify Slurm account(s) (e.g., --accounts=cpu,bigmem)')
     parser.add_argument('--config-file', type=str, default=None,
                         help='Absolute path to the configuration file')
     parser.add_argument('--email', action='store_true', default=False,
@@ -288,11 +290,16 @@ def main():
         fields.insert(-1, "admincomment")
     # jobname must be last in list below to catch "|" characters in jobname
     assert fields[-1] == "jobname"
-    raw = SlurmSacct(start_date,
-                     end_date,
-                     fields,
-                     args.clusters,
-                     args.partition).get_job_data()
+    try:
+        raw = SlurmSacct(start_date,
+                         end_date,
+                         fields,
+                         args.clusters,
+                         args.partition,
+                         args.accounts).get_job_data()
+    except RuntimeError as e:
+        print(f"\nERROR: {e}(HINT: maybe --days is too large)")
+        sys.exit(1)
     if args.dump_files:
         dg = raw.copy()
         private_users = {key:f"u{i}" for i, key in enumerate(dg.user.unique())}
@@ -364,7 +371,7 @@ def main():
             if "enabled" in params and not params["enabled"]:
                 continue
             params.update(sys_cfg)
-            params.update({"num_cancel_alerts":len(alerts)})
+            params.update({"num_cancel_alerts": len(alerts)})
             cancel_gpu = CancelZeroGpuJobs(df,
                                            days_between_emails=1,
                                            violation="cancel_zero_gpu_jobs",

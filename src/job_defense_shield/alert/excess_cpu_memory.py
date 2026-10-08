@@ -10,7 +10,7 @@ from ..email_translator import EmailTranslator
 class ExcessCPUMemory(Alert):
 
     """Find users that are allocating too much CPU memory."""
- 
+
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
 
@@ -117,8 +117,8 @@ class ExcessCPUMemory(Alert):
                          "cores":"avg-cores",
                          "cpu-hours":"cpu-hrs"}
             self.gp = self.gp.rename(columns=renamings)
-            self.gp["emails"] = self.gp["User"].apply(lambda user:
-                                     self.get_emails_sent_count(user, self.violation))
+            #self.gp["emails"] = self.gp["User"].apply(lambda user:
+            #                         self.get_emails_sent_count(user, self.violation))
             cols = ["Mem-Hrs-Unused", "mem-hrs-used", "mem-hrs-alloc", "cpu-hrs"]
             self.gp[cols] = self.gp[cols].apply(round).astype("int64")
             cols = ["proportion", "Ratio", "mean-ratio", "median-ratio"]

@@ -30,12 +30,14 @@ class SlurmSacct(RawJobData):
                  end: datetime,
                  fields: List[str],
                  clusters: str,
-                 partitions: str) -> None:
+                 partitions: str,
+                 accounts: str) -> None:
         self.start_datetime = start
         self.end_datetime = end
         self.fields = ",".join(fields)
         self.clusters = clusters
         self.partitions = partitions
+        self.accounts = accounts
 
     @staticmethod
     def datetime_to_sacct(dt: datetime) -> str:
@@ -54,18 +56,24 @@ class SlurmSacct(RawJobData):
         cmd += f"-M {self.clusters} -o {self.fields}"
         if self.partitions:
             cmd += f" -r {self.partitions}"
+        if self.accounts:
+            cmd += f" -A {self.accounts}"
         print("INFO: Calling sacct ... ", end="", flush=True)
         start = time()
         try:
             result = subprocess.run(cmd,
                                     stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
                                     encoding="utf8",
                                     check=True,
                                     text=True,
                                     shell=True)
             result.check_returncode()
+            combined_output = (result.stdout or "") + (result.stderr or "")
+            if "error:" in combined_output.lower():
+                raise RuntimeError(f"Error running sacct:\n{combined_output.strip()}")
         except subprocess.CalledProcessError as error:
-            msg = f"Error running sacct.\n{error.stderr}"
+            msg = f"Error running sacct (exit code {error.returncode}).\n{error.stderr}"
             raise RuntimeError(msg) from error
         print(f"done ({round(time() - start)} seconds).", flush=True)
         rows = result.stdout.splitlines()

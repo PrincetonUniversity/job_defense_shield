@@ -3,6 +3,7 @@
 import json
 import gzip
 import base64
+from typing import List
 from typing import Tuple
 from typing import Set
 from typing import Optional
@@ -405,6 +406,35 @@ def cpu_nodes_with_zero_util(ss: dict,
     error_code = 0
     return (counter, error_code)
 
+def get_detailed_metric(ss: dict,
+                        metric_name: str,
+                        jobid: str,
+                        cluster: str,
+                        verbose: bool=True) -> Union[Tuple[List[float], int],
+                                                     Tuple[List[int], int]]:
+    """Return a tuple containing a list of values of the specified metric
+       for each GPU and the error code. To see the possible metrics names
+       run 'jobstats <jobid> -j' on a completed job. This method only
+       applies to completed jobs (not running)."""
+    nodes = ss.get("nodes")
+    if not isinstance(nodes, dict) or not nodes:
+        if verbose:
+            msg = "Warning: nodes not in ss for get_detailed_metric."
+            print(msg, jobid, cluster)
+        error_code = 1
+        return ([], error_code)
+    values = []
+    for node_name, per_node in nodes.items():
+        metric_data = per_node.get(metric_name)
+        if not isinstance(metric_data, dict):
+            if verbose:
+                msg = f"Warning: {metric_name} not in AdminComment for get_detailed_metric."
+                print(msg, jobid, cluster)
+            error_code = 2
+            return ([], error_code)
+        values.extend(metric_data.values())
+    error_code = 0
+    return (values, error_code)
 
 def get_nodelist(ss: dict,
                  jobid: str,

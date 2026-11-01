@@ -10,6 +10,7 @@ from efficiency import gpu_memory_usage_mean_pct
 from efficiency import max_cpu_memory_used_per_node
 from efficiency import num_gpus_with_zero_util
 from efficiency import cpu_nodes_with_zero_util
+from efficiency import get_detailed_metric
 from efficiency import get_nodelist
 import numpy as np
 
@@ -312,6 +313,41 @@ def test_max_cpu_memory_used_per_node():
                             "used_memory": 43 * 1024**3,
                             "total_memory": 100 * 1024**3}}}
     assert max_cpu_memory_used_per_node(ss, 12345, "c1", verbose=False) == (43.0, 0)
+
+
+def test_malformed_get_detailed_metric():
+    # empty summary statistics
+    ss = {}
+    assert get_detailed_metric(ss, "dummy", 12345, "c1", verbose=False) == ([], 1)
+    # missing gpu_utilization key
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 0},
+                            "gpu_total_memory": {0: 0}}}}
+    assert get_detailed_metric(ss,
+                               "power_usage_milliwatts_avg",
+                               12345,
+                               "c1",
+                               verbose=False) == ([], 2)
+
+def test_get_detailed_metric():
+    # single GPU, single node
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 0},
+                            "power_usage_milliwatts_avg": {0: 42.0},
+                            "gpu_utilization": {0: 95}}}}
+    assert get_detailed_metric(ss,
+                               "power_usage_milliwatts_avg",
+                               12345,
+                               "c1") == ([42.0], 0)
+    ss = {"nodes":{"node1":{"gpu_used_memory": {0: 12345678},
+                            "power_usage_milliwatts_avg": {0: 42.0},
+                            "gpu_utilization": {0: 95}},
+                   "node2":{"gpu_used_memory": {3: 12345678},
+                            "power_usage_milliwatts_avg": {3: 42.42},
+                            "gpu_utilization": {3: 0}}},
+          "gpus": 2}
+    assert get_detailed_metric(ss,
+                               "power_usage_milliwatts_avg",
+                               12345,
+                               "c1") == ([42.0, 42.42], 0)
 
 
 def test_malformed_num_gpus_with_zero_util():

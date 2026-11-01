@@ -90,7 +90,7 @@ INFO: Cleaning sacct data
         258427 jobs in the cleaned dataframe
 
 
-           Usage Overview          
+           Usage Overview  
 -----------------------------------------
 Cluster   Users   CPU-Hours    GPU-Hours
 -----------------------------------------
@@ -101,7 +101,7 @@ traverse    1    189987  (2%) 47497 (34%)
 
 
 
-          Usage Overview by Partition           
+          Usage Overview by Partition  
 ------------------------------------------------------
 Cluster  Partition  Users  CPU-Hours      GPU-Hours
 ------------------------------------------------------
@@ -156,7 +156,7 @@ Or equivalently:
 $ job_defense_shield --usage-overview --clusters=della --partition=cpu,gpu
 ```
 
-The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to the Slurm command `sacct`. See `man sacct` for more information.
+The `-M` and `-r` options (or `--clusters` and `--partition`) can be used to reduce the load on the database server when an alert only applies to a particular cluster or particular partitions. These options are passed through to the Slurm command `sacct`. One can also use the `--accounts` option to filter by Slurm accounts. See `man sacct` for more information.
 
 ## Email Test
 
@@ -185,7 +185,7 @@ If the configuration file is not found then try specifying the full path:
 ```
 $ job_defense_shield --config-file=/path/to/config.yaml --usage-overview --report
 ```
- 
+
 ## Creating a Configuration File for Production
 
 See the [next section](configuration.md) to learn how to write a proper configuration file.

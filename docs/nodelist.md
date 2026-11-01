@@ -13,7 +13,7 @@ too-much-cpu-mem-per-gpu-1:
   cpu_mem_per_node:      1000  # GB
   cpu_mem_per_gpu_target: 240  # GB
   cpu_mem_per_gpu_limit:  250  # GB
-  email_file: "too_much_cpu_mem_per_gpu_2.txt"
+  email_file: "too_much_cpu_mem_per_gpu.txt"
   nodelist:
     - della-l01g1
     - della-l01g2

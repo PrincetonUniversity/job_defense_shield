@@ -1,5 +1,9 @@
 # Publications and Presentations
 
+**Getting the Most Out of Your GPUs: Automatic Cancellation of Low Efficiency Jobs, GPU Fractionalization, Detailed Metrics, and GPU Sharing**  
+PEARC 2026, Minneapolis, MN (July 29, 2026)  
+Paper: [PDF](https://researchcomputing.princeton.edu/document/6881) &nbsp; | &nbsp; ACM: [HTML](https://dl.acm.org/doi/10.1145/3785462.3815871)
+
 **Job Monitoring and Efficient GPU Cluster Utilization with Jobstats**  
 CISL Seminar, National Center for Atmospheric Research (NCAR)  
 Virtual Event (April 23, 2026)  
@@ -24,8 +28,8 @@ Slides: [PDF](https://tigress-web.princeton.edu/~jdh4/jobstats_pearc_2023.pdf)
 **Jobstats: A Slurm-Compatible Job Monitoring Platform for CPU and GPU Clusters**  
 PEARC '23: Practice and Experience in Advanced Research Computing 2023: Computing for the Common Good, Association for Computing Machinery, Pages 102-108, Year 2023  
 Paper: [PDF](https://doi.org/10.1145/3569951.3604396)  
-  
-  
+
+
 # Awards
 
 Job Defense Shield won "Best Poster Award" at [PEARC 2025](https://pearc.acm.org/proceedings-awards/).

@@ -28,7 +28,7 @@ The parameters are explained below:
 
 - `cpu_hours_threshold`: A user must have apparently wasted this number of CPU-hours to be considered.
 
-- `lower_ratio`: This alert works by comparing the CPU efficiency of the job to 100% divided by the number of allocated CPU-cores. If the ratio of these two numbers is greater than or equal to `lower_ratio` then the job is assumed to be a serial code wasting CPU-cores. For instance, if the CPU efficieny of a job that allocates 8 CPU-cores is 12.4% and `lower_ratio` is 0.85 then this job would be included since 12.4% / (100% / 8) is greater than 0.85. Default: 0.85
+- `lower_ratio`: This alert works by comparing the CPU efficiency of the job to 100% divided by the number of allocated CPU-cores. If the ratio of these two numbers is greater than or equal to `lower_ratio` then the job is assumed to be a serial code wasting CPU-cores. For instance, if the CPU efficiency of a job that allocates 8 CPU-cores is 12.4% and `lower_ratio` is 0.85 then this job would be included since 12.4% / (100% / 8) is greater than 0.85. Default: 0.85
 
 - `email_file`: The text file to be used for the email message to users.
 
@@ -38,9 +38,12 @@ The parameters are explained below:
 
 - `num_top_users`: (Optional) Only consider up to this number of users after sorting by "wasted CPU-hours".
 
+
 - `ignore_job_arrays`: (Optional) Ignore jobs in a job array. Default: False
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
+
+- `max_num_jobid_admin`: (Optional) Maximum number of JobID's to list in the report to administrators. Default: 3
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -65,12 +68,12 @@ Below is an example report:
 ```
 $ job_defense_shield --serial-allocating-multiple
 
-               Serial Jobs Allocating Multiple CPU-Cores                        
+               Serial Jobs Allocating Multiple CPU-Cores  
 ------------------------------------------------------------------------
     User   CPU-Hours-Wasted AvgCores  Jobs        JobID           Emails
 ------------------------------------------------------------------------
 1  u74805       10248           8      96   62829596,62834509+    2 (3)
-2  u31448         906          30       2   62887370,62887407     0     
+2  u31448         906          30       2   62887370,62887407     0  
 3  u93676         783           3      20   62904738,62904739+    1 (10)
 4  u16959         325          15       6   62896573,62912383+    4 (17)
 5  u36725         164          12      11   62814801,62814802+    1 (10)
@@ -150,7 +153,7 @@ See which users have received emails and when:
 ```
 $ job_defense_shield --serial-allocating-multiple --check
 ```
-  
+
 ## cron
 
 Below is an example `crontab` entry:

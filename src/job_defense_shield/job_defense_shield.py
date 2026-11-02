@@ -37,6 +37,7 @@ from .alert.compute_efficiency import LowEfficiencyCPU
 from .alert.compute_efficiency import LowEfficiencyGPU
 from .alert.too_many_cores_per_gpu import TooManyCoresPerGpu
 from .alert.too_much_cpu_mem_per_gpu import TooMuchCpuMemPerGpu
+from .alert.high_util_but_low_sm import HighUtilButLowSM
 
 
 def main():
@@ -70,6 +71,8 @@ def main():
                         help='Indentify jobs allocating too many CPU-cores per GPU')
     parser.add_argument('--too-much-cpu-mem-per-gpu', action='store_true', default=False,
                         help='Indentify jobs allocating too much CPU memory per GPU')
+    parser.add_argument('--high-util-but-low-sm', action='store_true', default=False,
+                        help='Indentify users with high GPU utilization but low SM utilization')
     parser.add_argument('--usage-overview', action='store_true', default=False,
                         help='Generate a usage report by cluster and partition')
     parser.add_argument('--usage-by-slurm-account', action='store_true', default=False,
@@ -198,6 +201,11 @@ def main():
                                         "low_gpu_efficiency",
                                         "LOW GPU EFFICIENCY",
                                         args.days)
+        if args.high_util_but_low_sm:
+            show_history_of_emails_sent(violation_logs_path,
+                                        "high_util_but_low_sm",
+                                        "HIGH GPU UTILIZATION BUT LOW SM UTILIZATION",
+                                        args.days)
         if args.multinode_cpu_fragmentation:
             show_history_of_emails_sent(violation_logs_path,
                                         "multinode_cpu_fragmentation",
@@ -233,7 +241,6 @@ def main():
                                         "excessive_time_limits_cpu",
                                         "EXCESSIVE TIME LIMITS (CPU)",
                                         args.days)
-
         if args.excessive_time_gpu:
             show_history_of_emails_sent(violation_logs_path,
                                         "excessive_time_limits_gpu",
@@ -501,6 +508,30 @@ def main():
             if report:
                 s += report
                 s += too_power.add_report_metadata(start_date, end_date)
+
+
+    #################################################
+    ## HIGH GPU UTILIZATION BUT LOW SM UTILIZATION ##
+    #################################################
+    if args.high_util_but_low_sm:
+        alerts = [alert for alert in cfg.keys() if "high-util-but-low-sm" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
+            params.update(sys_cfg)
+            low_sm = HighUtilButLowSM(df,
+                                      days_between_emails=args.days,
+                                      violation="high_util_but_low_sm",
+                                      vpath=violation_logs_path,
+                                      **params)
+            if args.email and is_workday:
+                low_sm.create_emails(greeting_method)
+                low_sm.send_emails_to_users()
+            report = low_sm.generate_report_for_admins()
+            if report:
+                s += report
+                s += low_sm.add_report_metadata(start_date, end_date)
 
 
     #################################

@@ -55,6 +55,8 @@ The available settings are listed below:
 - `min_run_time`: (Optional) The minimum run time of a job for it to be considered. Jobs that did not run longer
 than this limit will be ignored. Default: 0
 
+- `max_num_jobid_admin`: (Optional) Maximum number of JobID's to list in the report to administrators. Default: 3
+
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
@@ -84,13 +86,13 @@ than this limit will be ignored. Default: 0
 ```
 $ job_defense_shield --gpu-model-too-powerful
 
-                       GPU Model Too Powerful                       
+                       GPU Model Too Powerful  
 ------------------------------------------------------------
   User   GPU-Hours  Jobs            JobID             Emails
 ------------------------------------------------------------
- u23157     321      5    2567707,62567708,62567709+   0   
+ u23157     321      5    2567707,62567708,62567709+   0  
  u55404     108      5   62520246,62520247,62861050+   1 (2)
- u89790      55      2            62560705,62669923    0   
+ u89790      55      2            62560705,62669923    0  
 ------------------------------------------------------------
    Cluster: della
 Partitions: gpu
@@ -108,9 +110,9 @@ Hello Alan (u23157),
 Below are jobs that ran on an A100 GPU on Della in the past 7 days:
 
    JobID   Cores  GPUs GPU-Util GPU-Mem-Used-Max CPU-Mem-Used/GPU  Hours
-  65698718   4     1      8%          4 GB             8 GB         120 
-  65698719   4     1     14%          1 GB             3 GB          30 
-  65698720   4     1      9%          2 GB             8 GB          90 
+  65698718   4     1      8%          4 GB             8 GB         120
+  65698719   4     1     14%          1 GB             3 GB          30
+  65698720   4     1      9%          2 GB             8 GB          90
 
 GPU-Mem-Used-Max is the maximum GPU memory usage of the individual allocated
 GPUs while CPU-Mem-Used/GPU is the total CPU memory usage of the job divided by
@@ -142,7 +144,7 @@ The following placeholders can be used in the email file:
 - `<PARTITIONS>`: A comma-separated list of partitions used by the user.
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<TARGET>`: The minimum acceptable GPU utilization (i.e., `gpu_util_target`).
-- `<GPU-UTIL>`: Threshold value for GPU utilization (i.e., `gpu_util_threshold`). 
+- `<GPU-UTIL>`: Threshold value for GPU utilization (i.e., `gpu_util_threshold`).
 - `<CORES-PER-GPU>`: Number of CPU-cores per GPU (i.e., `num_cores_per_gpu`).
 - `<GPU-MEM>`: Maximum GPU memory usage (i.e., `gpu_mem_usage_max`).
 - `<CPU-MEM>`: CPU memory usage per GPU (i.e., `cpu_mem_usage_per_gpu`).

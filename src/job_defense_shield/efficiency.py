@@ -66,20 +66,21 @@ def cpu_efficiency(ss: dict,
     return (total_used, total, error_code)
 
 
-def gpu_efficiency(ss: dict,
-                   elapsedraw: int,
-                   jobid: str,
-                   cluster: str,
-                   single: bool=False,
-                   precision: int=1,
-                   verbose: bool=True) -> Union[Tuple[Union[int, float], int],
-                                                Tuple[Union[int, float], int, int]]:
-    """Return a (GPU time used, GPU time allocated, error code)-tuple for a given job.
-       If single=True then return a (GPU time used / GPU time allocated, error code)-tuple.
+def metric_efficiency(ss: dict,
+                      elapsedraw: int,
+                      jobid: str,
+                      cluster: str,
+                      metric_name: str,
+                      single: bool=False,
+                      precision: int=1,
+                      verbose: bool=True) -> Union[Tuple[Union[int, float], int],
+                                                   Tuple[Union[int, float], int, int]]:
+    """Return a (<metric> time used, <metric> time allocated, error code)-tuple for a given job.
+       If single=True then return a (<metric> time used / <metric> time allocated, error code)-tuple.
        The error code is needed since the summary statistics (ss) may be malformed."""
     if 'nodes' not in ss:
         if verbose:
-            msg = "Warning: nodes not in ss for gpu_efficiency."
+            msg = "Warning: nodes not in ss for metric_efficiency."
             print(msg, jobid, cluster)
         error_code = 1
         return (-1, error_code) if single else (-1, -1, error_code)
@@ -89,19 +90,21 @@ def gpu_efficiency(ss: dict,
     error_code = 0
     for node_data in ss['nodes'].values():
         try:
-            for util in node_data['gpu_utilization'].values():
+            for util in node_data[metric_name].values():
+                if metric_name == "sm_util_percent_avg":
+                    util = 100 * util
                 total      += elapsedraw
                 total_used += elapsedraw * (float(util) / 100)
                 total_gpus += 1
         except (KeyError, TypeError, ValueError) as e:
             if verbose:
-                msg = f"Warning: probably missing keys in gpu_efficiency ({e})."
+                msg = f"Warning: probably missing keys in metric_efficiency ({e})."
                 print(msg, jobid, cluster)
             error_code = 2
             return (-1, error_code) if single else (-1, -1, error_code)
     if total_used > total:
         if verbose:
-            msg = "Warning: total_used > total in gpu_efficiency."
+            msg = "Warning: total_used > total in metric_efficiency."
             print(msg, jobid, cluster, total_used, total)
         error_code = 3
         return (-1, error_code) if single else (-1, -1, error_code)
@@ -117,6 +120,8 @@ def gpu_efficiency(ss: dict,
             return (-1, error_code)
         return (round(100 * total_used / total, precision), error_code)
     return (total_used, total, error_code)
+
+gpu_efficiency = partial(metric_efficiency, metric_name="gpu_utilization")
 
 
 def cpu_memory_usage(ss: dict,

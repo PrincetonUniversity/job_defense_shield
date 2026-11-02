@@ -15,6 +15,7 @@ nav:
     - Excess CPU Memory per GPU:   alert/excess_cpu_mem_per_gpu.md
     - Too Many Cores per GPU:      alert/too_many_cores_per_gpu.md
     - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
+    - High Util But Low SM:        alert/high_util_low_sm.md
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
     - Run Time Limits:             alert/time_limits_gpu.md
   - CPU Alerts:
@@ -79,4 +80,4 @@ extra:
       link: https://github.com/PrincetonUniversity/job_defense_shield
   generator: false
 
-copyright: "&copy;2025 Princeton University. All rights reserved."
+copyright: "&copy;2027 Princeton University. All rights reserved."

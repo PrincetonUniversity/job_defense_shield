@@ -16,14 +16,14 @@ Below is an example report for 0% GPU utilization:
     User   GPU-Hours-At-0%  Jobs             JobID             Emails
 ---------------------------------------------------------------------
 1  u12998        308         39   62285369,62303767,62317153+   1 (7)
-2  u9l487         84         14   62301737,62301738,62301742+   0         
-3  u39635         25          2            62184669,62187323    2 (4)         
-4  u24074         24         13   62303182,62303183,62303184+   0         
+2  u9l487         84         14   62301737,62301738,62301742+   0  
+3  u39635         25          2            62184669,62187323    2 (4)  
+4  u24074         24         13   62303182,62303183,62303184+   0  
 ---------------------------------------------------------------------
    Cluster: della
 Partitions: gpu, llm
-     Start: Wed June 10, 2026 at 09:50 AM
-       End: Wed June 17, 2026 at 09:50 AM
+     Start: Mon Jan 11, 2027 at 09:50 AM
+       End: Mon Jan 18, 2027 at 09:50 AM
 ```
 
 Below is an example email to a user that is requesting too much CPU memory:

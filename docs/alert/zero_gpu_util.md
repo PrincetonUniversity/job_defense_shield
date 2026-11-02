@@ -32,18 +32,20 @@ per alert.
 
 - `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`). The number of GPU-hours is summed over all partitions.
 
-- `min_run_time`: Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
-
 - `gpu_hours_threshold_user`: Only users with greater than or equal to this number of GPU-hours at 0% utilization will receive an email.
 
 - `gpu_hours_threshold_admin`: Only users with greater than or equal to this number of GPU-hours at 0% utilization will appear in the report for administrators.
 
 - `email_file`: The text file to be used as the email message to users.
 
+- `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
+
 - `max_num_jobid`: (Optional) Maximum number of JobID's to show for a given user. If the number of
 jobs per user is greater than this value then a "+" character is appended to the end of the list. Default: 4
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
+
+- `max_num_jobid_admin`: (Optional) Maximum number of JobID's to list in the report to administrators. Default: 4
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -53,7 +55,7 @@ jobs per user is greater than this value then a "+" character is appended to the
 
 - `excluded_users`: (Optional) List of users to exclude from receiving emails.
 
-- `admin_emails`: (Optional) The emails sent to users will also be sent to these administator emails. This applies
+- `admin_emails`: (Optional) The emails sent to users will also be sent to these administrator emails. This applies
 when the `--email` option is used.
 
 - `email_subject`: (Optional) Subject of the email message to users.
@@ -97,7 +99,7 @@ $ job_defense_shield --zero-util-gpu-hours
 
                            Zero Utilization GPU-Hours
 ------------------------------------------------------------------------
-     User   GPU-Hours-At-0%  Jobs                     JobID                    
+     User   GPU-Hours-At-0%  Jobs                     JobID  
 ------------------------------------------------------------------------
 1   u20461       397          16    60458831,60460188,60478799,60479839+
 2   u99704       196           8    60552976,60552983,60552984,60552985+
@@ -130,10 +132,10 @@ You have consumed 120 GPU-hours at 0% GPU utilization in the past 7 days
 on the pli-c partition(s) of della:
 
      JobID     GPUs  GPUs-Unused GPU-Unused-Util  Zero-Util-GPU-Hours
-    62399648    8          8           0%                 36         
-    62399649    8          8           0%                 36          
-    62400616    8          8           0%                 36          
-    62402931    6          3           0%                 12          
+    62399648    8          8           0%                 36  
+    62399649    8          8           0%                 36  
+    62400616    8          8           0%                 36  
+    62402931    6          3           0%                 12  
 
 Please address this issues before submitting new jobs. Replying to
 this automated email will open a support ticket with Research

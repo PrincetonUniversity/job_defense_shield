@@ -1,4 +1,4 @@
-# High GPU Utilization but Low SM Utilization
+# High GPU Utilization But Low SM Utilization
 
 This alert identifies users whose jobs exhibit high GPU utilization but low SM (Streaming Multiprocessor) utilization.
 
@@ -12,6 +12,10 @@ Occupancy is a third quantity that provides additional insight into GPU utilizat
 
 High occupancy allows an SM to have more warps available for execution, helping hide instruction and memory latency. Low occupancy can limit the GPU's ability to keep its execution resources busy. However, high occupancy does not necessarily translate into high performance.
 
+Jobs with high GPU utilization but low SM utilization are good candidates to run on less powerful GPUs.
+
+To identity users with low or intermediate GPU utilization, see the [Low GPU Utilization](low_gpu_util.md) alert.
+
 ## Configuration File
 
 Below is an example entry for `config.yaml`:
@@ -22,21 +26,19 @@ high-util-but-low-sm-1:
   partitions:
     - gpu
     - llm
-  min_run_time:       0  # minutes
-  util_thres_pct:    60  # percent
-  util_minus_sm_pct: 30  # percent
-  sm_thres_pct:      30  # percent
-  gpu_hours_thres_user: 24  # hours
-  gpu_hours_thres_admin: 0  # hours
-  email_file: "high_util_low_sm.txt"
+  util_thres_pct:         70  # percent
+  util_minus_sm_pct:      50  # percent
+  sm_thres_pct:           15  # percent
+  gpu_hours_thres_user:  100  # gpu-hours
+  gpu_hours_thres_admin: 100  # gpu-hours
+  email_file: "high_util_but_low_sm.txt"
   admin_emails:
     - admin@institution.edu
 ```
 
 The available settings are listed below:
 
-- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name
-per alert.
+- `cluster`: Specify the cluster name as it appears in the Slurm database. One cluster name per alert.
 
 - `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`). The number of GPU-hours is summed over all partitions.
 
@@ -54,11 +56,11 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by GPU-hours. Default: 10
+- `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by GPU-hours. Default: 15
 
-- `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low SM utilization. Default: `False`
+- `show_all_users`: (Optional) Flag to show all of the top users in the report. Default: `False`
 
-- `num_jobs_display`: (Optional) Maximum number of jobs to display in the email message to users. Default: 10
+- `num_jobs_display`: (Optional) Maximum number of jobs to display in the email message to users. Default: 5
 
 - `max_num_jobid_admin`: (Optional) Maximum number of JobID's to show in the report to administrators. If the number of
 jobs per user is greater than this value then a "+" character is appended to the end of the list. Default: 2
@@ -91,19 +93,16 @@ $ job_defense_shield --high-util-but-low-sm
 ------------------------------------------------------------------
  User   GPU-Hours GPU-Util SM-Util  Jobs       JobID        Emails
 ------------------------------------------------------------------
-u39403    811       72%      27%      6  16363102,16441427+   0  
-u20461    777       80%       7%    224  16219160,16219161+   0  
-u67029    522       95%      20%     27  16224617,16225709+   0  
-u32756    452       63%      19%    112  16149263,16149264+   0  
+u39403    811       72%      14%      6  16363102,16441427+   0  
+u12345    777       80%       7%    224  16219160,16219161+   0  
+u67029    522       95%      12%     27  16224617,16225709+   0  
+u32756    152       63%       9%    112  16149263,16149264+   0  
 ------------------------------------------------------------------
    Cluster: della
 Partitions: gpu,llm
      Start: Mon Oct 26, 2026 at 09:46 AM
        End: Mon Nov 02, 2026 at 09:46 AM
 ```
-
-The table above shows that user `u20461` consumed 777 GPU-hours at
-a GPU utilization of 80% but a very low SM utilization of 7%.
 
 ## Email Message to Users
 
@@ -112,7 +111,7 @@ Below is an example email message:
 ```
 Hi Alan (u12345),
 
-Below are 5 of your 202 jobs that ran on della in the past 7 days:
+Below are 5 of your 224 jobs that ran on della in the past 7 days:
 
      JobID   Cluster Partition  GPU-Hours GPU-Util SM-Util
     16492937  della    pli-c       24       89%       1%  
@@ -121,7 +120,7 @@ Below are 5 of your 202 jobs that ran on della in the past 7 days:
     16499763  della    pli-c       20       99%       1%  
     16323186  della    pli-c       23       83%       7%  
 
-For the 202 jobs, which consumed 591 GPU-hours, your mean GPU utilization
+For the 224 jobs, which consumed 777 GPU-hours, your mean GPU utilization
 is 80% but the mean SM utilization is only 7%. This suggests that the
 GPUs are not being used effectively.
 
@@ -137,14 +136,14 @@ attend an in-person Research Computing help session.
 The following placeholders can be used in the email file:
 
 - `<GREETING>`: The greeting generated by `greeting-method`.
-- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
-- `<PARTITIONS>`: A comma-separated list of partitions used by the user.
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<CASE>`: Helper text relating to the number of jobs.
-- `<NUM-JOBS>`: Total number of jobs with high GPU utilization but low SM utilization.
+- `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
+- `<PARTITIONS>`: A comma-separated list of partitions used by the user.
 - `<GPU-HOURS>`: Total GPU-hours of the jobs.
 - `<GPU-UTIL>`: Mean GPU utilization.
 - `<SM-UTIL>`: Mean SM utilization.
+- `<NUM-JOBS>`: Total number of jobs with high GPU utilization but low SM utilization.
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 

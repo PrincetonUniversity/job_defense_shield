@@ -51,3 +51,8 @@ Computing.
 ## Getting Started
 
 See the [documentation](https://princetonuniversity.github.io/job_defense_shield/) for installing and running the software.
+
+## News
+
+- Nov 2026: New alert for [high GPU utilization but low SM utilization](https://princetonuniversity.github.io/job_defense_shield/alert/high_util_but_low_sm/)
+- Oct 2026: [Jobstats](https://github.com/PrincetonUniversity/jobstats) version 1.1.0 has been released

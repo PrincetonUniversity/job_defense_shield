@@ -10,7 +10,8 @@ from ..email_translator import EmailTranslator
 
 class HighUtilButLowSM(Alert):
 
-    """Identify users with high GPU utilization and low SM utilization."""
+    """Identify users with high GPU utilization but low SM utilization. Jobs
+       with a sufficient SM utilization are ignored."""
 
     def __init__(self, df, days_between_emails, violation, vpath, **kwargs):
         super().__init__(df, days_between_emails, violation, vpath, **kwargs)
@@ -25,7 +26,7 @@ class HighUtilButLowSM(Alert):
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 15
         if not hasattr(self, "num_jobs_display"):
-            self.num_jobs_display = 10
+            self.num_jobs_display = 5
 
     def _filter_and_add_new_fields(self):
         self.df = self.df[(self.df["cluster"] == self.cluster) &
@@ -40,8 +41,8 @@ class HighUtilButLowSM(Alert):
         if not self.df.empty and hasattr(self, "nodelist"):
             self.df = self.filter_by_nodelist(self.df)
         # handle empty dataframe case
-        self.gp = pd.DataFrame({"User": []})
-        self.admin = pd.DataFrame()
+        self.admin = pd.DataFrame({"User": []})
+        self.admin_all = pd.DataFrame({"User": []})
         # add gpu utilization
         if self.df.empty:
             return None
@@ -92,16 +93,18 @@ class HighUtilButLowSM(Alert):
              "sm-seconds-total": "sum",
              "jobid": jobid_list}
         self.admin = self.df.groupby("user").agg(d).rename(columns={"user": "jobs"})
-        filters = (self.admin["GPU-Hours"] >= self.gpu_hours_thres_admin)
-        if not self.show_all_users:
-            self.admin = self.admin[filters]
-        self.admin.sort_values(by="GPU-Hours", inplace=True)
         self.admin.reset_index(drop=False, inplace=True)
+        self.admin.sort_values(by="GPU-Hours", ascending=False, inplace=True)
         self.admin = self.admin.head(self.num_top_users)
         self.admin = self.admin[self.admin["gpu-seconds-total"] > 0]
         self.admin = self.admin[self.admin["sm-seconds-total"]  > 0]
         self.admin["gpu-util"] = 100 * self.admin["gpu-seconds-used"] / self.admin["gpu-seconds-total"]
         self.admin["sm-util"]  = 100 * self.admin["sm-seconds-used"]  / self.admin["sm-seconds-total"]
+        # next line needed since different gpu-hours thresholds for user and admin
+        self.admin_all = self.admin.copy()
+        if not self.show_all_users:
+            filters = (self.admin["GPU-Hours"] >= self.gpu_hours_thres_admin)
+            self.admin = self.admin[filters]
         cols = ["user",
                 "GPU-Hours",
                 "gpu-util",
@@ -109,6 +112,7 @@ class HighUtilButLowSM(Alert):
                 "jobs",
                 "jobid"]
         self.admin = self.admin[cols]
+        self.admin_all = self.admin_all[cols]
         renamings = {"jobs": "Jobs",
                      "jobid": "JobID",
                      "user": "User",
@@ -118,17 +122,18 @@ class HighUtilButLowSM(Alert):
                      "gpu-util": "GPU-Util",
                      "sm-util": "SM-Util"}
         self.admin = self.admin.rename(columns=renamings)
+        self.admin_all = self.admin_all.rename(columns=renamings)
         self.df = self.df.rename(columns=renamings)
 
     def create_emails(self, method):
         g = GreetingFactory(self.ldap).create_greeting(method)
-        for user in self.admin.User.unique():
-            hrs_val = self.admin[self.admin.User == user]["GPU-Hours"].values[0]
+        for user in self.admin_all["User"].unique():
+            hrs_val = self.admin_all[self.admin_all["User"] == user]["GPU-Hours"].values[0]
             if hrs_val < self.gpu_hours_thres_user:
                 continue
             vfile = f"{self.vpath}/{self.violation}/{user}.csv"
             if self.has_sufficient_time_passed_since_last_email(vfile):
-                usr = self.df[self.df.User == user].copy()
+                usr = self.df[self.df["User"] == user].copy()
                 num_disp = self.num_jobs_display
                 total_jobs = usr.shape[0]
                 case = f"{num_disp} of your {total_jobs} jobs" if total_jobs > num_disp else "your jobs"
@@ -140,14 +145,15 @@ class HighUtilButLowSM(Alert):
                 tags["<CLUSTER>"] = self.cluster
                 tags["<PARTITIONS>"] = ",".join(sorted(set(usr.Partition)))
                 tags["<GPU-HOURS>"] = str(round(hrs_val))
-                util_val = self.admin[self.admin.User == user]["GPU-Util"].values[0]
+                util_val = self.admin_all[self.admin_all["User"] == user]["GPU-Util"].values[0]
                 tags["<GPU-UTIL>"] = str(round(util_val))
-                sm_val = self.admin[self.admin.User == user]["SM-Util"].values[0]
+                sm_val = self.admin_all[self.admin_all["User"] == user]["SM-Util"].values[0]
                 tags["<SM-UTIL>"] = str(round(sm_val))
                 tags["<NUM-JOBS>"] = str(total_jobs)
                 tbl = usr.drop(columns=["User"]).copy()
                 tbl = tbl[["JobID", "Cluster", "Partition", "GPU-Hours", "GPU-Util", "SM-Util"]]
                 tbl = tbl.head(num_disp)
+                tbl.sort_values(by="JobID", inplace=True)
                 tbl["GPU-Hours"] = tbl["GPU-Hours"].round().astype(int)
                 tbl["GPU-Util"] = tbl["GPU-Util"].apply(lambda x: f"{round(x)}%")
                 tbl["SM-Util"] = tbl["SM-Util"].apply(lambda x: f"{round(x)}%")
@@ -186,7 +192,7 @@ class HighUtilButLowSM(Alert):
                             "Emails"]
             self.admin = pd.DataFrame(columns=column_names)
             return add_dividers(self.create_empty_report(self.admin), self.report_title)
-        self.admin["Emails"] = self.admin.User.apply(lambda user:
+        self.admin["Emails"] = self.admin["User"].apply(lambda user:
                                     self.get_emails_sent_count(user, self.violation))
         self.admin["Emails"] = self.format_email_counts(self.admin.Emails)
         self.admin = self.admin.sort_values(by="GPU-Hours", ascending=False)

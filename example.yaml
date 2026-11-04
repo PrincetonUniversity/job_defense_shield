@@ -183,6 +183,25 @@ gpu-model-too-powerful-1:
     - admin@institution.edu
 
 
+#################################################
+## HIGH GPU UTILIZATION BUT LOW SM UTILIZATION ##
+#################################################
+high-util-but-low-sm-1:
+  cluster: della
+  partitions:
+    - gpu
+  min_run_time:           30  # minutes
+  util_thres_pct:         70  # percent
+  util_minus_sm_pct:      50  # percent
+  sm_thres_pct:           15  # percent
+  gpu_hours_thres_user:  100  # gpu-hours
+  gpu_hours_thres_admin: 100  # gpu-hours
+  num_jobs_display:        5  # count
+  email_file: "high_util_but_low_sm.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
 #######################################
 ## EXCESSIVE RUN TIME LIMITS (ALERT) ##
 #######################################

@@ -96,7 +96,7 @@ def main():
     parser.add_argument('-r', '--partition', type=str, default="",
                         help='Specify partition(s) (e.g., --partition=cpu,bigmem)')
     parser.add_argument('-A', '--accounts', type=str, default="",
-                        help='Specify Slurm account(s) (e.g., --accounts=cpu,bigmem)')
+                        help='Specify Slurm account(s) (e.g., --accounts=chem,physics)')
     parser.add_argument('--config-file', type=str, default=None,
                         help='Absolute path to the configuration file')
     parser.add_argument('--email', action='store_true', default=False,

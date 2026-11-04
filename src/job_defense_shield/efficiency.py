@@ -91,7 +91,15 @@ def metric_efficiency(ss: dict,
     for node_data in ss['nodes'].values():
         try:
             for util in node_data[metric_name].values():
-                if metric_name == "sm_util_percent_avg":
+                if metric_name.startswith("any_tensor_util_percent") or \
+                   metric_name.startswith("dram_bw_util_percent") or \
+                   metric_name.startswith("duty_cycle") or \
+                   metric_name.startswith("fp16_util_percent") or \
+                   metric_name.startswith("fp32_util_percent") or \
+                   metric_name.startswith("fp64_util_percent") or \
+                   metric_name.startswith("integer_util") or \
+                   metric_name.startswith("sm_occupancy_percent") or \
+                   metric_name.startswith("sm_util_percent"):
                     util = 100 * util
                 total      += elapsedraw
                 total_used += elapsedraw * (float(util) / 100)

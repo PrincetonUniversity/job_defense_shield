@@ -9,8 +9,8 @@ is <GPU-UTIL>% but the mean SM utilization is only <SM-UTIL>%. This suggests tha
 GPUs are not being used effectively. See the <a href="https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/">definitions</a> of these two
 metrics.
 
-Can changes be made to improve the SM utilization? For assistance please
-attend an in-person Research Computing help session:
+Can changes be made to improve the SM utilization? Consider attending
+an in-person Research Computing help session for assistance:
 
     https://your-institution.edu/support/help-sessions
 

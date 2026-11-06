@@ -8,13 +8,7 @@ SM utilization is the percentage of time that the Streaming Multiprocessors are 
 
 For reference, an NVIDIA B200 GPU has 148 active SMs, each containing 128 FP32 CUDA cores. SM utilization provides a more fine-grained view of GPU activity than overall GPU utilization. When a workload makes effective use of the GPU's computational resources, both GPU utilization and SM utilization are generally high.
 
-Occupancy is a third quantity that provides additional insight into GPU utilization. It is the ratio of the number of active warps on an SM to the maximum number of warps that the SM can support. Occupancy is typically expressed as a percentage.
-
-High occupancy allows an SM to have more warps available for execution, helping hide instruction and memory latency. Low occupancy can limit the GPU's ability to keep its execution resources busy. However, high occupancy does not necessarily translate into high performance.
-
 Jobs with high GPU utilization but low SM utilization are good candidates to run on less powerful GPUs.
-
-To identity users with low or intermediate GPU utilization, see the [Low GPU Utilization](low_gpu_util.md) alert.
 
 ## Configuration File
 
@@ -56,9 +50,9 @@ The available settings are listed below:
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by GPU-hours. Default: 15
+- `num_top_users`: (Optional) Only consider the number of users equal to this value after filtering and then sorting by GPU-hours. Default: 15
 
-- `show_all_users`: (Optional) Flag to show all of the top users in the report. Default: `False`
+- `show_all_users`: (Optional) Flag to show all of the top users in the report. Default: False
 
 - `num_jobs_display`: (Optional) Maximum number of jobs to display in the email message to users. Default: 5
 

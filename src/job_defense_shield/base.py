@@ -67,7 +67,7 @@ class Alert:
         """
 
     @abstractmethod
-    def create_emails(self) -> None:
+    def create_emails(self, method: str) -> None:
         """Create emails to the users.
 
         Returns:
@@ -143,7 +143,7 @@ class Alert:
 
     def partitions_str(self, join_char: str=",", underscores: bool=False) -> str:
         """Return a string of the unique sorted partitions. If the
-           asterisk is encountered then return a varient of all partitions."""
+           asterisk is encountered then return a variant of all partitions."""
         if "*" in self.partitions and self.excluded_partitions == []:
             txt = "all partitions"
             return txt.replace(" ", "_") if underscores else txt

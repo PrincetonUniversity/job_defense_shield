@@ -11,7 +11,6 @@ from .utils import display_alerts
 from .utils import read_config_file
 from .utils import add_new_and_derived_fields
 from .utils import apply_strict_start
-from .efficiency import get_stats_dict
 from .workday import WorkdayFactory
 from .raw_job_data import SlurmSacct
 from .cleaner import SacctCleaner
@@ -355,10 +354,6 @@ def main():
         df.rename(columns={"admin_comment": "admincomment",
                            "jobid_x": "jobid"}, inplace=True)
 
-    # next line should be in utils.py but need resolve pytest path issues
-    # with import of: from .efficiency import get_stats_dict
-    df["admincomment"] = df["admincomment"].apply(get_stats_dict)
-    df.reset_index(drop=True, inplace=True)
     if args.dump_files:
         dg = df.copy()
         dg.user = dg.user.map(private_users)

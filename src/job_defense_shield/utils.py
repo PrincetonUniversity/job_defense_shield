@@ -6,6 +6,7 @@ import smtplib
 import ssl
 from datetime import datetime
 from datetime import timedelta
+from .efficiency import get_stats_dict
 from typing import Tuple
 from typing import Optional
 from email.mime.multipart import MIMEMultipart
@@ -41,6 +42,7 @@ states = {
   'TO'  :'TIMEOUT'
   }
 JOBSTATES = dict(zip(states.values(), states.keys()))
+
 
 def show_history_of_emails_sent(vpath, mydir, title, day_ticks) -> None:
     """Display the history of emails sent to users."""
@@ -87,6 +89,7 @@ def show_history_of_emails_sent(vpath, mydir, title, day_ticks) -> None:
     print(f"Violation files: {os.path.join(vpath, mydir)}/\n")
     return None
 
+
 def seconds_to_slurm_time_format(seconds: int) -> str:
     """Convert the number of seconds to DD-HH:MM:SS"""
     hour = seconds // 3600
@@ -104,6 +107,7 @@ def seconds_to_slurm_time_format(seconds: int) -> str:
     minutes = seconds // 60
     seconds %= 60
     return "%s%02d:%02d" % (hour, minutes, seconds)
+
 
 def read_config_file(config_file: Optional[str],
                      jds_path: Optional[str],
@@ -252,6 +256,7 @@ def display_alerts(cfg: dict) -> str:
               "too-much-cpu-mem-per-gpu",
               "too-many-cores-per-gpu",
               "gpu-model-too-powerful",
+              "high-util-but-low-sm",
               "multinode-gpu-fragmentation",
               "excessive-time-gpu",
               "zero-cpu-utilization",
@@ -278,6 +283,7 @@ def display_alerts(cfg: dict) -> str:
                     output += f"{7 * indent}enabled: {enabled}\n"
     return f"{output}{4 * indent}None" if count == 0 else output[:-1]
 
+
 def prepare_datetimes(starttime: Optional[str],
                       endtime: Optional[str],
                       days: int) -> Tuple[datetime, datetime]:
@@ -302,10 +308,12 @@ def prepare_datetimes(starttime: Optional[str],
         start_date = end_date - timedelta(days=days)
         return start_date, end_date
 
+
 def gpus_per_job(tres: str) -> int:
     """Return the number of allocated GPUs."""
     gpus = re.findall(r"gres/gpu=\d+", tres)
     return int(gpus[0].replace("gres/gpu=", "")) if gpus else 0
+
 
 def apply_strict_start(df: pd.DataFrame,
                        start_date: datetime) -> pd.DataFrame:
@@ -318,6 +326,7 @@ def apply_strict_start(df: pd.DataFrame,
     df.drop(columns=["secs-from-start"], inplace=True)
     return df
 
+
 def add_new_and_derived_fields(df: pd.DataFrame) -> pd.DataFrame:
     """Add new fields to the dataframe."""
     df["cpu-seconds"] = df["elapsedraw"] * df["cores"]
@@ -329,7 +338,10 @@ def add_new_and_derived_fields(df: pd.DataFrame) -> pd.DataFrame:
                                                                     unit='s').dt.strftime("%a %-m/%d")
     df["cpu-hours"] = df["cpu-seconds"] / SECONDS_PER_HOUR
     df["gpu-hours"] = df["gpu-seconds"] / SECONDS_PER_HOUR
+    df["admincomment"] = df["admincomment"].apply(get_stats_dict)
+    df.reset_index(drop=True, inplace=True)
     return df
+
 
 def add_dividers(df_str: str,
                  title: str="",
@@ -365,6 +377,7 @@ def add_dividers(df_str: str,
         rows.insert(2, divider)
     rows.append(divider)
     return pre + "\n".join(rows) + "\n"
+
 
 def send_email(email_body: str,
                addressee: str,
@@ -413,6 +426,7 @@ def send_email(email_body: str,
     else:
         with smtplib.SMTP('localhost') as server:
             server.sendmail(sender, addressee, msg.as_string())
+
 
 def send_email_enhanced(email_body: str,
                         addressee: str,

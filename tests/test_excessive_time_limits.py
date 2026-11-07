@@ -1,6 +1,6 @@
 import pandas as pd
-from src.job_defense_shield.alert.excessive_time_limits import ExcessiveTimeLimitsCPU
-from src.job_defense_shield.alert.excessive_time_limits import ExcessiveTimeLimitsGPU
+from job_defense_shield.alert.excessive_time_limits import ExcessiveTimeLimitsCPU
+from job_defense_shield.alert.excessive_time_limits import ExcessiveTimeLimitsGPU
 
 def test_excessive_time_limits_cpu():
     n_jobs = 6

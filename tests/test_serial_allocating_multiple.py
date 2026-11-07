@@ -1,5 +1,5 @@
 import pandas as pd
-from src.job_defense_shield.alert.serial_allocating_multiple_cores import SerialAllocatingMultipleCores
+from job_defense_shield.alert.serial_allocating_multiple_cores import SerialAllocatingMultipleCores
 
 def test_serial_allocating_multiple_cores():
     n_jobs = 5

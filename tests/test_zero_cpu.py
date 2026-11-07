@@ -1,5 +1,5 @@
 import pandas as pd
-from src.job_defense_shield.alert.zero_cpu_utilization import ZeroCPU
+from job_defense_shield.alert.zero_cpu_utilization import ZeroCPU
 
 def test_zero_cpu_utilization():
     n_jobs = 5

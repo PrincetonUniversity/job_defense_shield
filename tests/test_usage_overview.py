@@ -1,11 +1,11 @@
 import pandas as pd
-from src.job_defense_shield.alert.usage_overview import UsageOverview
+from job_defense_shield.alert.usage_overview import UsageOverview
 
 def test_usage_overview():
     df = pd.DataFrame({"user":["user1", "user2", "user3", "user1", "user5", "user4"],
                        "cluster":["della", "stellar", "della", "della", "traverse", "traverse"],
                        "partition":["gpu", "gpu", "mig", "cli", "all", "all"],
-                       "cpu-hours":[10, 20, 10, 50, 30, 10], 
+                       "cpu-hours":[10, 20, 10, 50, 30, 10],
                        "gpu-hours":[10, 20, 10, 50, 30, 10],
                        "elapsedraw":[1, 1, 1, 1, 1, 1]})
     util = UsageOverview(df, 7, "", "")
@@ -27,7 +27,7 @@ def test_usage_overview_no_gpus():
     df = pd.DataFrame({"user":["user1", "user2", "user3", "user1", "user5", "user4"],
                        "cluster":["della", "stellar", "della", "della", "traverse", "traverse"],
                        "partition":["gpu", "gpu", "mig", "cli", "all", "all"],
-                       "cpu-hours":[10, 20, 10, 50, 30, 10], 
+                       "cpu-hours":[10, 20, 10, 50, 30, 10],
                        "gpu-hours":[0, 0, 0, 0, 0, 0],
                        "elapsedraw":[1, 1, 1, 1, 1, 1]})
     util = UsageOverview(df, 7, "", "")
@@ -64,7 +64,6 @@ def test_usage_overview_zero_sums():
     """The cpu-hours and gpu-hours round to zero. The jobs are are not ignored
        since the elapsed time was 1 second for each."""
     one_sec_hrs = 1 / 3600
-    n_jobs = 6
     df = pd.DataFrame({"user":["user1", "user2", "user3", "user1", "user5", "user4"],
                        "cluster":["della", "stellar", "della", "della", "traverse", "traverse"],
                        "partition":["gpu", "gpu", "mig", "cli", "all", "all"],

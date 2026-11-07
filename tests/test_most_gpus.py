@@ -1,5 +1,5 @@
 import pandas as pd
-from src.job_defense_shield.alert.most_gpus import MostGPUs
+from job_defense_shield.alert.most_gpus import MostGPUs
 
 def test_most_gpus():
     n_jobs = 6

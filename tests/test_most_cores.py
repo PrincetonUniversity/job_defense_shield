@@ -1,5 +1,5 @@
 import pandas as pd
-from src.job_defense_shield.alert.most_cores import MostCores
+from job_defense_shield.alert.most_cores import MostCores
 
 def test_most_cores():
     n_jobs = 6
@@ -58,18 +58,6 @@ def test_most_cores():
             "cpus": 0,
             "total_memory": -1,
             "total_time": 6120,
-            "used_memory": -1
-        }
-    },
-    "total_time": -1}
-    num_cores = 8
-    ss6 = {
-    "gpus": 0,
-    "nodes": {
-        "della-r2c2n12": {
-            "cpus": num_cores,
-            "total_memory": -1,
-            "total_time": 0.65 * num_cores * 88200,
             "used_memory": -1
         }
     },

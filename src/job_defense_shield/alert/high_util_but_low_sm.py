@@ -125,10 +125,10 @@ class HighUtilButLowSM(Alert):
     def create_emails(self, method: str) -> None:
         g = GreetingFactory(self.ldap).create_greeting(method)
         for _, row in self.admin.iterrows():
-            user = row["User"]
             hrs_val = row["GPU-Hours"]
             if hrs_val < self.gpu_hours_thres_user:
                 continue
+            user = row["User"]
             vfile = os.path.join(self.vbase, f"{user}.csv")
             if self.has_sufficient_time_passed_since_last_email(vfile):
                 usr = self.df[self.df["User"] == user].copy()

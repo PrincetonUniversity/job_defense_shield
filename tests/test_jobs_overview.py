@@ -1,5 +1,5 @@
 import pandas as pd
-from src.job_defense_shield.alert.jobs_overview import JobsOverview
+from job_defense_shield.alert.jobs_overview import JobsOverview
 
 def test_jobs_overview():
     n_jobs = 6

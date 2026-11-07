@@ -37,6 +37,7 @@ from .alert.compute_efficiency import LowEfficiencyGPU
 from .alert.too_many_cores_per_gpu import TooManyCoresPerGpu
 from .alert.too_much_cpu_mem_per_gpu import TooMuchCpuMemPerGpu
 from .alert.high_util_but_low_sm import HighUtilButLowSM
+from .alert.low_tc_utilization import LowTcUtilization
 
 
 def main():
@@ -65,13 +66,15 @@ def main():
     parser.add_argument('--excessive-time-gpu', action='store_true', default=False,
                         help='Identify users with excessive run time limits for GPU jobs')
     parser.add_argument('--serial-allocating-multiple', action='store_true', default=False,
-                        help='Indentify serial codes allocating multiple CPU-cores')
+                        help='Identify serial codes allocating multiple CPU-cores')
     parser.add_argument('--too-many-cores-per-gpu', action='store_true', default=False,
-                        help='Indentify jobs allocating too many CPU-cores per GPU')
+                        help='Identify jobs allocating too many CPU-cores per GPU')
     parser.add_argument('--too-much-cpu-mem-per-gpu', action='store_true', default=False,
-                        help='Indentify jobs allocating too much CPU memory per GPU')
+                        help='Identify jobs allocating too much CPU memory per GPU')
     parser.add_argument('--high-util-but-low-sm', action='store_true', default=False,
-                        help='Indentify users with high GPU utilization but low SM utilization')
+                        help='Identify users with high GPU utilization but low SM utilization')
+    parser.add_argument('--low-tc-utilization', action='store_true', default=False,
+                        help='Identify users with low Tensor Core utilization')
     parser.add_argument('--usage-overview', action='store_true', default=False,
                         help='Generate a usage report by cluster and partition')
     parser.add_argument('--usage-by-slurm-account', action='store_true', default=False,
@@ -204,6 +207,11 @@ def main():
             show_history_of_emails_sent(violation_logs_path,
                                         "high_util_but_low_sm",
                                         "HIGH GPU UTILIZATION BUT LOW SM UTILIZATION",
+                                        args.days)
+        if args.low_tc_utilization:
+            show_history_of_emails_sent(violation_logs_path,
+                                        "low_tc_utilization",
+                                        "LOW TENSOR CORE UTILIZATION",
                                         args.days)
         if args.multinode_cpu_fragmentation:
             show_history_of_emails_sent(violation_logs_path,
@@ -527,6 +535,30 @@ def main():
             if report:
                 s += report
                 s += low_sm.add_report_metadata(start_date, end_date)
+
+
+    #################################
+    ## LOW TENSOR CORE UTILIZATION ##
+    #################################
+    if args.low_tc_utilization:
+        alerts = [alert for alert in cfg.keys() if "low-tc-utilization" in alert]
+        for alert in alerts:
+            params = cfg[alert]
+            if "enabled" in params and not params["enabled"]:
+                continue
+            params.update(sys_cfg)
+            low_tc = LowTcUtilization(df,
+                                      days_between_emails=args.days,
+                                      violation="low_tc_utilization",
+                                      vpath=violation_logs_path,
+                                      **params)
+            if args.email and is_workday:
+                low_tc.create_emails(greeting_method)
+                low_tc.send_emails_to_users()
+            report = low_tc.generate_report_for_admins()
+            if report:
+                s += report
+                s += low_tc.add_report_metadata(start_date, end_date)
 
 
     #################################

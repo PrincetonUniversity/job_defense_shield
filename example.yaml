@@ -202,6 +202,24 @@ high-util-but-low-sm-1:
     - admin@institution.edu
 
 
+#################################
+## LOW TENSOR CORE UTILIZATION ##
+#################################
+low-tc-utilization-1:
+  cluster: della
+  partitions:
+    - gpu
+  min_run_time:           30  # minutes
+  util_thres_pct:         70  # percent
+  tc_thres_pct:           10  # percent
+  gpu_hours_thres_user:  100  # gpu-hours
+  gpu_hours_thres_admin: 100  # gpu-hours
+  num_jobs_display:        5  # count
+  email_file: "low_tc_utilization.txt"
+  admin_emails:
+    - admin@institution.edu
+
+
 #######################################
 ## EXCESSIVE RUN TIME LIMITS (ALERT) ##
 #######################################

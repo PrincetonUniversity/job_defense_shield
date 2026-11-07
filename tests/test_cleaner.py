@@ -1,5 +1,5 @@
 from datetime import datetime
-from cleaner import SacctCleaner
+from job_defense_shield.cleaner import SacctCleaner
 import pandas as pd
 
 def test_field_renamings():

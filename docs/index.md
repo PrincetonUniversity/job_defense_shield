@@ -13,6 +13,7 @@ Automated email alerts and reports are available for:
 - too much allocated CPU memory per GPU
 - GPU model was too powerful (i.e., use MIG instead)
 - high GPU utilization but low SM utilization
+- low Tensor Core utilization
 - multinode GPU fragmentation
 - excessive run time limits for GPU jobs
 - over-allocating CPU memory

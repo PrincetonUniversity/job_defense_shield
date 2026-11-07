@@ -16,6 +16,7 @@ nav:
     - Too Many Cores per GPU:      alert/too_many_cores_per_gpu.md
     - GPU Model Too Powerful:      alert/gpu_model_too_powerful.md
     - High Util But Low SM:        alert/high_util_but_low_sm.md
+    - Low Tensor Core Utilization: alert/low_tc_util.md
     - Multinode GPU Fragmentation: alert/gpu_fragmentation.md
     - Run Time Limits:             alert/time_limits_gpu.md
   - CPU Alerts:

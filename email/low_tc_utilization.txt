@@ -1,0 +1,16 @@
+<GREETING>
+
+Below are <CASE> that ran on <CLUSTER> in the past <DAYS> days:
+
+<TABLE>
+
+For the <NUM-JOBS> jobs, which consumed <GPU-HOURS> GPU-hours, your mean Tensor Core
+utilization was <TC-UTIL>%. See the <a href="https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/">definition</a> of this metric.
+
+Can changes be made to improve the Tensor Core utilization? Consider
+attending an in-person Research Computing help session for assistance:
+
+    https://your-institution.edu/support/help-sessions
+
+Replying to this automated email will open a support ticket with Research
+Computing.

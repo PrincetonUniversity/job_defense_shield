@@ -1,5 +1,5 @@
 import subprocess
-import ldap_lookups
+from job_defense_shield import ldap_lookups
 
 
 ldap = {"ldap_server":      "MOCKED",

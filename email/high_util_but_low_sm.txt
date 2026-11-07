@@ -14,5 +14,5 @@ an in-person Research Computing help session for assistance:
 
     https://your-institution.edu/support/help-sessions
 
-To open a support ticket with Research Computing, please forward this
-automated email to cses@princeton.edu.
+Replying to this automated email will open a support ticket with Research
+Computing.

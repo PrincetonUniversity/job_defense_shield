@@ -257,6 +257,7 @@ def display_alerts(cfg: dict) -> str:
               "too-many-cores-per-gpu",
               "gpu-model-too-powerful",
               "high-util-but-low-sm",
+              "low-tc-utilization",
               "multinode-gpu-fragmentation",
               "excessive-time-gpu",
               "zero-cpu-utilization",

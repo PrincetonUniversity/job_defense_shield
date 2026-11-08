@@ -10,6 +10,8 @@ For reference, an NVIDIA B200 GPU has 148 active SMs, each containing 128 FP32 C
 
 Jobs with high GPU utilization but low SM utilization are good candidates to run on less powerful GPUs.
 
+Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert.
+
 ## Configuration File
 
 Below is an example entry for `config.yaml`:
@@ -42,7 +44,7 @@ The available settings are listed below:
 
 - `gpu_hours_thres_admin`: Only users with greater than or equal to this threshold number of GPU-hours will appear in the report for administrators.
 
-- `util_thres_pct`: Consider jobs with a GPU utilization that is greater than or equal to this value.
+- `util_thres_pct`: Consider jobs where the GPU utilization is greater than or equal to this value.
 
 - `util_minus_sm_pct`: Consider jobs where the GPU utilization minus the SM utilization is greater than or equal to this value.
 

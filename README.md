@@ -54,5 +54,5 @@ See the [documentation](https://princetonuniversity.github.io/job_defense_shield
 
 ## News
 
-- Nov 2026: New alert for [high GPU utilization but low SM utilization](https://princetonuniversity.github.io/job_defense_shield/alert/high_util_but_low_sm/) coming in 1.4.0
+- Nov 2026: New alerts for [high GPU utilization but low SM utilization](https://princetonuniversity.github.io/job_defense_shield/alert/high_util_but_low_sm/) and [low Tensor Core utilization](https://princetonuniversity.github.io/job_defense_shield/alert/low_tc_util/) coming in 1.4.0
 - Oct 2026: [Jobstats](https://github.com/PrincetonUniversity/jobstats) version 1.1.0 has been released

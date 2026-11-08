@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -8,10 +8,12 @@ dynamic = ["version"]
 description = "Identify and reduce instances of underutilization by the users of high-performance computing systems"
 readme = "README.md"
 authors = [{name="Jonathan Halverson", email="halverson@princeton.edu"}]
-license = {file = 'LICENSE'}
+license = "GPL-2.0-only"
+license-files = ["LICENSE"]
 keywords = ["alerts", "monitoring", "HPC", "Slurm", "underutilization", "Jobstats"]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
+  "numpy>=1.22.4",
   "pandas>=2.1.0",
   "pyarrow>=15.0.0",
   "pyyaml>=6.0",
@@ -22,12 +24,9 @@ classifiers = [
   "Environment :: Console",
   "Intended Audience :: Information Technology",
   "Intended Audience :: System Administrators",
-  "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
-  "Operating System :: OS Independent",
+  "Operating System :: POSIX :: Linux",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
@@ -35,13 +34,13 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Topic :: System :: Monitoring",
-  "Typing :: Typed",
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=7", "pytest-mock"]
-database = ["mysqlclient", "sqlalchemy"]
+test = ["pytest>=7", "pytest-mock", "pytest-cov"]
+database = ["mysqlclient", "sqlalchemy>=2.0"]
 check = ["ruff>=0.6.0"]
+docs = ["mkdocs-material"]
 
 [project.urls]
 "Documentation" = "https://princetonuniversity.github.io/job_defense_shield"
@@ -50,11 +49,14 @@ check = ["ruff>=0.6.0"]
 [project.scripts]
 job_defense_shield = "job_defense_shield.job_defense_shield:main"
 
-[tool.hatch]
-version.path = "src/job_defense_shield/__init__.py"
+[tool.hatch.version]
+path = "src/job_defense_shield/__init__.py"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
-[tool.mypy]
-strict = false
+[tool.ruff]
+target-version = "py39"
+
+[tool.codespell]
+ignore-words-list = "shs,nd"

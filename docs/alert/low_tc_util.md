@@ -2,11 +2,13 @@
 
 This alert identifies users whose jobs exhibit low Tensor Core utilization.
 
-Tensor core utilization is the percentage of time that the Tensor Cores are active. Tensor Cores are specialized execution units designed to accelerate matrix multiply-accumulate operations, which are fundamental to deep learning and scientific computing workloads.
+Tensor Core utilization is the percentage of time that the Tensor Cores are active. Tensor Cores are specialized execution units designed to accelerate matrix multiply-accumulate operations, which are fundamental to deep learning and scientific computing workloads.
 
 When a workload can take advantage of mixed-precision or matrix operations (such as FP16, BF16, TF32, or FP8), utilizing Tensor Cores can provide a substantial speedup compared to standard CUDA cores.
 
 This alert is useful for clusters or partitions that are devoted to AI codes which should almost always use the Tensor Codes.
+
+Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert.
 
 ## Configuration File
 
@@ -35,13 +37,13 @@ The available settings are listed below:
 
 - `email_file`: The text file to be used as the email message to users.
 
+- `util_thres_pct`: Consider jobs where the GPU utilization is greater than or equal to this value.
+
+- `tc_thres_pct`: Consider jobs where the Tensor Core utilization is less than or equal to this value.
+
 - `gpu_hours_thres_user`: Only users with greater than or equal to this threshold number of GPU-hours will receive an email.
 
 - `gpu_hours_thres_admin`: Only users with greater than or equal to this threshold number of GPU-hours will appear in the report for administrators.
-
-- `util_thres_pct`: Consider jobs with a GPU utilization that is greater than or equal to this value.
-
-- `tc_thres_pct`: Consider jobs where the Tensor Core utilization is less than or equal to this value.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
@@ -82,10 +84,8 @@ $ job_defense_shield --low-tc-utilization
 ------------------------------------------------------------------
  User   GPU-Hours GPU-Util TC-Util  Jobs       JobID        Emails
 ------------------------------------------------------------------
-u39403    811       72%       4%      6  16363102,16441427+   0  
 u12345    777       80%       0%    224  16219160,16219161+   0  
-u67029    522       95%       2%      2  16224617,16225709    0  
-u32756    152       63%       0%    112  16149263,16149264+   0  
+u32756    152       73%       0%    112  16149263,16149264+   0  
 ------------------------------------------------------------------
    Cluster: della
 Partitions: gpu,llm

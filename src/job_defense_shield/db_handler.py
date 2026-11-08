@@ -48,7 +48,7 @@ class ShieldDBHandler:
             msg = "Did not try to make DB connection since not enabled in config.py."
             print(msg)
             return None
- 
+
         if self.external_conn is None:
             msg = "INFO: Connecting to external database for summary statistics"
             print(msg)

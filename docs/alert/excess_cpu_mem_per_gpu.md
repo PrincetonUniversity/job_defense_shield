@@ -41,7 +41,7 @@ The available settings are listed below:
 - `cpu_mem_per_gpu_limit`: Identify jobs with a CPU memory allocation per GPU greater than this value. It is reasonable to use the same value as `cpu_mem_per_gpu_target` for this setting.
 
 - `email_file`: The text file to be used for the email message to users.
- 
+
 - `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be considered. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
@@ -73,7 +73,7 @@ An example report is shown below:
 ```
 $ job_defense_shield --too-much-cpu-mem-per-gpu
 
-                         Too Much CPU Memory Per GPU                          
+                         Too Much CPU Memory Per GPU  
 -------------------------------------------------------------------------------
  JobID    User  Hours Mem-Eff GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit Emails
 -------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ $ job_defense_shield --too-much-cpu-mem-per-gpu
 6279179  u29427   31     2%     1       500 GB            240 GB          1 (4)
 6270434  u15404   48     6%     1       512 GB            240 GB          3 (2)
 6293177  u15404  1.4     1%     1       512 GB            240 GB          3 (2)
-6291411  u81448  3.8     0%     1       512 GB            240 GB          0    
+6291411  u81448  3.8     0%     1       512 GB            240 GB          0  
 6283444  u35452  1.8     0%     1       500 GB            240 GB          1 (5)
 -------------------------------------------------------------------------------
    Cluster: della
@@ -100,8 +100,8 @@ Hello Alan (u12345),
 Your Della (PLI) jobs appear to be allocating more CPU memory than necessary:
 
      JobID   Hours Mem-Eff CPU-Mem  GPUs CPU-Mem-per-GPU CPU-Mem-per-GPU-Limit
-    62733079  1.3    17%    512 GB   2        256 GB             115 GB       
-    62735106  1.4    12%    512 GB   2        256 GB             115 GB       
+    62733079  1.3    17%    512 GB   2        256 GB             115 GB  
+    62735106  1.4    12%    512 GB   2        256 GB             115 GB  
 
 Each node on Della (PLI) has 1000 GB of CPU memory and 8 GPUs. If possible
 please only allocate up to the soft limit of 115 GB of CPU memory per GPU. This

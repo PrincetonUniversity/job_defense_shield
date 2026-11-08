@@ -30,10 +30,10 @@ Each configuration parameter is explained below:
 - `cluster`: Specify the cluster name as it appears in the Slurm database.
 
 - `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
-      
+
 - `tb_hours_threshold`: The threshold value for (unused) memory-hours in units of TB-hours. A user must have this number or above to receive an email message. This quantity is the unused CPU memory of a job multiplied by the elapsed time (summed over all jobs).
 
-- `ratio_threshold`: This quantity is the sum of CPU memory used divded
+- `ratio_threshold`: This quantity is the sum of CPU memory used divided
 by the total memory allocated for all jobs of the user. This quantity varies between 0 and 1.
 
 - `median_ratio_threshold`: The median value of memory used divided by
@@ -87,10 +87,10 @@ Below is an example report:
 ```
 $ job_defense_shield --excess-cpu-memory
 
-                         Users Allocating Excess CPU Memory                         
+                         Users Allocating Excess CPU Memory  
 ------------------------------------------------------------------------------
  User   Unused    Used    Ratio  Ratio   Ratio Proportion CPU-Hrs  Jobs Emails
-       (TB-Hrs) (TB-Hrs) Overall  Mean  Median                                
+       (TB-Hrs) (TB-Hrs) Overall  Mean  Median  
 ------------------------------------------------------------------------------
 u34981    164      163     0.50   0.50   0.54     0.19      8370    310  0  
 u76237    135        0     0.00   0.00   0.00     0.08      5628    243  1 (5)
@@ -114,10 +114,10 @@ Hello Alan (u34981),
 Below are 10 of your 1725 jobs that ran on della (cpu) in the past 7 days:
 
      JobID   Memory-Used Memory-Allocated Percent-Used  Cores  Hours
-    62623577     0 GB         20 GB            0%        1     16.4 
-    62626492     1 GB         20 GB            5%        1     15.5 
-    62626494     1 GB         20 GB            5%        1     15.5 
-    62626495     1 GB         20 GB            5%        1     15.5 
+    62623577     0 GB         20 GB            0%        1     16.4
+    62626492     1 GB         20 GB            5%        1     15.5
+    62626494     1 GB         20 GB            5%        1     15.5
+    62626495     1 GB         20 GB            5%        1     15.5
 
 It appears that you are requesting too much CPU memory for your jobs since you
 are only using on average 3% of the allocated memory (for the 1725 jobs). This

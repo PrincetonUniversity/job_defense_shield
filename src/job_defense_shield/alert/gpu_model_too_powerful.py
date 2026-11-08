@@ -187,7 +187,7 @@ class GpuModelTooPowerful(Alert):
                            "CPU-Mem-Used/GPU ",
                            "Hours"]]
                 self.emails.append((user, email, usr))
- 
+
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         if self.df.empty:
             if not self.show_empty_reports:

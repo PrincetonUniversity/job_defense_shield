@@ -48,7 +48,7 @@ class SacctCleaner(BaseCleaner):
     def rename_columns(self) -> pd.DataFrame:
         """Rename certain columns of the dataframe."""
         return self.raw.rename(columns=self.field_renamings)
- 
+
     def remove_comma_partitions(self) -> pd.DataFrame:
         """A job can have a partition value that is a comma-separated list
            of partitions. This method checks that these jobs did not run."""
@@ -66,7 +66,7 @@ class SacctCleaner(BaseCleaner):
             print(msg)
         self.raw = self.raw[~self.raw.partition.str.contains(",")]
         return self.raw
- 
+
     def rename_partitions(self) -> pd.Series:
         """Rename the specified partitions."""
         return self.raw.partition.replace(self.partition_renamings)

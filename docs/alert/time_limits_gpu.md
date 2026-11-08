@@ -71,13 +71,13 @@ Below is an example report:
 ```
 $ job_defense_shield --excessive-time-gpu
 
-                      Excessive Run Time Limits                        
+                      Excessive Run Time Limits  
 -----------------------------------------------------------------------
  User   GPU-Hours  GPU-Hours  Ratio  Ratio   Ratio GPU-Rank Jobs Emails
-         (Unused)    (Used)  Overall  Mean  Median                     
+         (Unused)    (Used)  Overall  Mean  Median  
 -----------------------------------------------------------------------
-u14480    4088       184      0.04   0.04   0.04     15     60    0   
-u72284    2055       105      0.05   0.05   0.04     23     45    2 (3)   
+u14480    4088       184      0.04   0.04   0.04     15     60    0  
+u72284    2055       105      0.05   0.05   0.04     23     45    2 (3)  
 -----------------------------------------------------------------------
    Cluster: della
 Partitions: gpu, llm
@@ -95,7 +95,7 @@ Hello Alan (u14480),
 Below are 5 of your 60 jobs that ran on della (gpu) in the past 7 days:
 
      JobID    Time-Used  Time-Allocated  Percent-Used  GPUs
-    62776009   01:36:11    2-00:00:00         3%        4 
+    62776009   01:36:11    2-00:00:00         3%        4
     62776014   01:32:11    2-00:00:00         3%        4
     62776016   01:22:41    2-00:00:00         3%        4
     62776019   01:17:48    2-00:00:00         3%        4

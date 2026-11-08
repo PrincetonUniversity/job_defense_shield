@@ -68,7 +68,7 @@ class UsageOverview(Alert):
                          "gpu-hours":"GPU-Hours"}
             self.by_cluster.rename(columns=renamings, inplace=True)
             self.special.rename(columns=renamings, inplace=True)
- 
+
     def generate_report_for_admins(self, keep_index: bool=False) -> str:
         clus = self.by_cluster.to_string(index=keep_index, justify="center")
         part = self.special.to_string(index=False, justify="center")

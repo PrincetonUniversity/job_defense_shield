@@ -51,21 +51,21 @@ Next, run the alert without `--email` so that no emails are sent but the output 
 ```
 $ job_defense_shield --excessive-time-cpu
 
-                         Excessive Time Limits                          
+                         Excessive Time Limits  
 ------------------------------------------------------------------------
   User   CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs Emails
-          (Unused)    (Used)  Overall  Mean  Median                     
+          (Unused)    (Used)  Overall  Mean  Median  
 ------------------------------------------------------------------------
-  u18587   495341      13716    0.03   0.03   0.02     10     643   0   
-  u81279   105666      80061    0.43   0.43   0.38      2      41   0   
-  u45521   105509      21595    0.17   0.17   0.13      8     109   0   
-  u73275    89469       8475    0.09   0.14   0.09     16      86   0   
-  u43409    88689     125583    0.59   0.59   0.59      1     279   0   
-  u39889    81659       1002    0.01   0.01   0.01     46    1718   0   
-  u42091    74348      52606    0.41   0.33   0.31      3    1437   0   
-  u75621    63365      21265    0.25   0.22   0.21      9    3741   0   
-  u60876    53043      31705    0.37   0.38   0.35      6    4425   0   
-  u41590    51491       9565    0.16   0.16   0.15     15     318   0   
+  u18587   495341      13716    0.03   0.03   0.02     10     643   0  
+  u81279   105666      80061    0.43   0.43   0.38      2      41   0  
+  u45521   105509      21595    0.17   0.17   0.13      8     109   0  
+  u73275    89469       8475    0.09   0.14   0.09     16      86   0  
+  u43409    88689     125583    0.59   0.59   0.59      1     279   0  
+  u39889    81659       1002    0.01   0.01   0.01     46    1718   0  
+  u42091    74348      52606    0.41   0.33   0.31      3    1437   0  
+  u75621    63365      21265    0.25   0.22   0.21      9    3741   0  
+  u60876    53043      31705    0.37   0.38   0.35      6    4425   0  
+  u41590    51491       9565    0.16   0.16   0.15     15     318   0  
 ------------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
@@ -97,10 +97,10 @@ $ job_defense_shield --excessive-time-cpu
                         Excessive Time Limits
 ----------------------------------------------------------------------
  User  CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs Emails
-        (Unused)    (Used)  Overall  Mean  Median                     
+        (Unused)    (Used)  Overall  Mean  Median  
 ----------------------------------------------------------------------
-u18587   495341     13716     0.03   0.03   0.02     10    643    0   
-u45521   105509     21595     0.17   0.17   0.13      8    109    0   
+u18587   495341     13716     0.03   0.03   0.02     10    643    0  
+u45521   105509     21595     0.17   0.17   0.13      8    109    0  
 ----------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
@@ -180,7 +180,7 @@ u18587,della,cpu,497596,644,03/17/2025 18:35:58
 The violation file of a user is read when determining whether or not sufficient time has passed to send another email. This is the purpose of the `Email-Sent` column. The software is written so that users receive at most one email about any given job.
 
 !!! warning "Changing partitions"
-    When deciding if a user should receive an email, the software first filters the violation file by `Cluster` and `Alert-Partitions`. `Alert-Partitions` is a comma-seperated string of the list of partitions. If you add or remove a partition to an alert this will change `Alert-Partitions` which may cause the user to receive a second email in less than seven days. This is not true when all paritions are included using `"*"`. In that case, partitions can be added and removed without concern for duplicate emails.
+    When deciding if a user should receive an email, the software first filters the violation file by `Cluster` and `Alert-Partitions`. `Alert-Partitions` is a comma-seperated string of the list of partitions. If you add or remove a partition to an alert this will change `Alert-Partitions` which may cause the user to receive a second email in less than seven days. This is not true when all partitions are included using `"*"`. In that case, partitions can be added and removed without concern for duplicate emails.
 
 ## Step 6: Add Additional Alerts
 

@@ -70,7 +70,7 @@ Below is an example report:
 ```
 $ job_defense_shield --excessive-time-cpu
 
-                         Excessive Time Limits                          
+                         Excessive Time Limits  
 -------------------------------------------------------------------------
   User   CPU-Hours  CPU-Hours  Ratio  Ratio   Ratio CPU-Rank Jobs  Emails
           (Unused)    (Used)  Overall  Mean  Median
@@ -100,11 +100,11 @@ Hello Alan (u18587),
 Below are 5 of your 643 jobs that ran on della (cpu) in the past 7 days:
 
      JobID   Time-Used Time-Allocated Percent-Used  CPU-Cores
-    62776009  01:36:11   2-00:00:00        3%          32    
-    62776014  01:32:11   2-00:00:00        3%          32    
-    62776016  01:22:41   2-00:00:00        3%          32    
-    62776019  01:17:48   2-00:00:00        3%          32    
-    62776020  01:29:20   2-00:00:00        3%          32    
+    62776009  01:36:11   2-00:00:00        3%          32  
+    62776014  01:32:11   2-00:00:00        3%          32  
+    62776016  01:22:41   2-00:00:00        3%          32  
+    62776019  01:17:48   2-00:00:00        3%          32  
+    62776020  01:29:20   2-00:00:00        3%          32  
 
 It appears that you are requesting too much time for your jobs since you are
 only using on average 3% of the allocated time (for the 643 jobs). This has

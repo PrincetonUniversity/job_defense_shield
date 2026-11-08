@@ -121,7 +121,7 @@ class TooManyCoresPerGpu(Alert):
                 else:
                     usr["Alert-Partitions"] = ",".join(sorted(set(self.partitions)))
                 usr = usr[["User",
-                           "Cluster",      
+                           "Cluster",
                            "Alert-Partitions",
                            "JobID",
                            "Partition",

@@ -69,13 +69,13 @@ Below is an example report:
 ```
 $ job_defense_shield --low-cpu-efficiency
 
-                     Low CPU Efficiencies                                  
+                     Low CPU Efficiencies  
 -----------------------------------------------------------------
  User   CPU-Hours  Proportion(%)  CPU-Eff  Jobs  AvgCores  Emails
 -----------------------------------------------------------------
-u12345    16377         4           58%     998    15.8     0   
-u85632    12536         3           14%    1034    16.3     2 (6)   
-u39731    10227         2           50%    2477     2.0     0   
+u12345    16377         4           58%     998    15.8     0  
+u85632    12536         3           14%    1034    16.3     2 (6)  
+u39731    10227         2           50%    2477     2.0     0  
 -----------------------------------------------------------------
    Cluster: della
 Partitions: cpu
@@ -94,7 +94,7 @@ Over the last 7 days you have used the 3rd most CPU-hours on della (cpu) but
 your mean CPU efficiency is only 23%:
 
      User  Partition(s)  Jobs  CPU-Hours CPU-Rank Efficiency AvgCores
-    u12345     cpu        33     29062     3/250      23%       8    
+    u12345     cpu        33     29062     3/250      23%       8  
 
 A good target value for "Efficiency" is 90% and above. Please investigate the reason
 for the low efficiency. Common reasons for low CPU efficiency are discussed here:

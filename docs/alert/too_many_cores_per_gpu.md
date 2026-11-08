@@ -67,15 +67,15 @@ Below is an example report:
 ```
 $ job_defense_shield --too-many-cores-per-gpu
 
-                                Too Many CPU-Cores Per GPU                                   
+                                Too Many CPU-Cores Per GPU  
 -------------------------------------------------------------------------------
  JobID     User  Hours CPU-Eff  GPUs Cores-per-GPU  Cores-per-GPU-Target Emails
 -------------------------------------------------------------------------------
 62675166  u79355  1.8     5%      1         48                12          2 (1)
-62733079  u12345  1.3    15%      2         32                12          0   
-62735106  u12345  1.4    15%      2         32                12          0   
-62950436  u23992  1.2     7%      1         32                12          0   
-62952770  u23992  1.2     1%      1         32                12          0   
+62733079  u12345  1.3    15%      2         32                12          0  
+62735106  u12345  1.4    15%      2         32                12          0  
+62950436  u23992  1.2     7%      1         32                12          0  
+62952770  u23992  1.2     1%      1         32                12          0  
 -------------------------------------------------------------------------------
    Cluster: della
 Partitions: gpu
@@ -93,8 +93,8 @@ Hello Alan (u12345),
 Your Della (PLI) jobs may be using more CPU-cores per GPU than necessary:
 
     JobID   Hours CPU-Eff  Cores  GPUs Cores-per-GPU  Cores-per-GPU-Target
-   62733079  1.3    15%     64     2         32                12         
-   62735106  1.4    15%     64     2         32                12         
+   62733079  1.3    15%     64     2         32                12  
+   62735106  1.4    15%     64     2         32                12  
 
 Each node on Della (PLI) has 96 CPU-cores and 8 GPUs. If possible please try
 to use only up to 12 CPU-cores per GPU. This will prevent the situation

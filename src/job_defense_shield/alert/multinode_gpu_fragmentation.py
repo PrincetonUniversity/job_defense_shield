@@ -124,7 +124,7 @@ class MultinodeGpuFragmentation(Alert):
                             "Nodes",
                             "GPUs-per-Node",
                             "Hours",
-                            "State", 
+                            "State",
                             "GPU-Eff",
                             "Emails"]
             self.df = pd.DataFrame(columns=column_names)

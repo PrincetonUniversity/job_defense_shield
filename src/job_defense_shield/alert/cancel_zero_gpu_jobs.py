@@ -303,7 +303,7 @@ class CancelZeroGpuJobs(Alert):
                                                                 util_thres=self.util_thres,
                                                                 verbose=self.verbose)
                         return n if error_code == 0 else 0
- 
+
                     """
                     If jobid is not in the cache then can only send warning even if GPUs
                     have been idle for sliding_cancel_minutes or longer. This ensures that

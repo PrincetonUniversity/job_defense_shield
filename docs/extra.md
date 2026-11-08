@@ -1,13 +1,13 @@
 # Check Mode
 
-Use the `--check` flag to see which users have recevied emails for a given alert and when they received them.
+Use the `--check` flag to see which users have received emails for a given alert and when they received them.
 Here is an example for low CPU efficiencies:
 
 ```
 $ job_defense_shield --low-cpu-efficiency --check
 
 =====================================================================
-                   LOW CPU EFFICIENCY (EMAILS SENT)                  
+                   LOW CPU EFFICIENCY (EMAILS SENT)  
 =====================================================================
                                                                   today
                                                                     |

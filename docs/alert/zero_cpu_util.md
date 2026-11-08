@@ -59,14 +59,14 @@ Below is an example report:
 ```
 $ job_defense_shield --zero-cpu-utilization
 
-                     Jobs with Zero CPU Utilization                          
+                     Jobs with Zero CPU Utilization  
 ---------------------------------------------------------------------------
  JobID    User   Nodes  Nodes-Unused  CPU-Util-Unused  Cores  Hours  Emails
 ---------------------------------------------------------------------------
-1931133  u12345    11         11             0%        1056    48     3 (1)   
-1932935  u12345    11         11             0%        1056    48     0   
-1932937  u48726     8          4             0%         768     2     0   
-1933655  u52209     1          1             0%          96    24     0   
+1931133  u12345    11         11             0%        1056    48     3 (1)  
+1932935  u12345    11         11             0%        1056    48     0  
+1932937  u48726     8          4             0%         768     2     0  
+1933655  u52209     1          1             0%          96    24     0  
 ---------------------------------------------------------------------------
    Cluster: stellar
 Partitions: cpu, physics
@@ -84,8 +84,8 @@ Hello Alan (u12345),
 Below are your recent jobs that did not use all of the allocated nodes:
 
      JobID  Cluster  Nodes  Nodes-Unused CPU-Util-Unused  Cores Hours
-    1931133 stellar   11         11             0%        1056   48 
-    1932935 stellar   11         11             0%        1056   48 
+    1931133 stellar   11         11             0%        1056   48
+    1932935 stellar   11         11             0%        1056   48
 
 The CPU utilization was found to be 0% on each of the unused nodes. Please
 investigate this issue before running additional jobs.
@@ -108,7 +108,7 @@ The following placeholders can be used in the email file:
 
 ## Usage
 
-Generate a report for system adminstrators:
+Generate a report for system administrators:
 
 ```
 $ job_defense_shield --zero-cpu-utilization

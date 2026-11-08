@@ -54,8 +54,8 @@ Hello Alan (u12345),
 Below are your recent jobs that did not use all of the allocated nodes:
 
       JobID    Cluster  Nodes  Nodes-Unused CPU-Util-Unused  Cores  Hours
-    62734245    della     4          3             0%          12    2.3 
-    62734246    della     6          5             0%          12    2.4 
+    62734245    della     4          3             0%          12    2.3
+    62734246    della     6          5             0%          12    2.4
 
 The CPU utilization was found to be 0% on each of the unused nodes. You can see
 this by running the "jobstats" command, for example:

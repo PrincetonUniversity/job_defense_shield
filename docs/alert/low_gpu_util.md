@@ -69,12 +69,12 @@ Here is an example of the report:
 ```
 $ job_defense_shield --low-gpu-efficiency
 
-                    Low GPU Efficiencies                                      
+                    Low GPU Efficiencies  
 ------------------------------------------------------------
  User   GPU-Hours  Proportion(%)  GPU-Eff(%)  Jobs  AvgCores
 ------------------------------------------------------------
 u76174    3791         20             19       58     1.2  
-u64732    3201         17             15       43     1.0 
+u64732    3201         17             15       43     1.0
 u13301    2281         12              9       35     8.0
 ------------------------------------------------------------
    Cluster: della
@@ -94,7 +94,7 @@ Over the last 7 days you have used the 3rd most GPU-hours on della (pli-c) but
 your mean GPU efficiency is only 29%:
 
      User  Partition(s)  Jobs  GPU-hours GPU-rank Efficiency
-    jg9945    pli-c       65     2345      3/53      29%    
+    jg9945    pli-c       65     2345      3/53      29%  
 
 A good target value for "Efficiency" is 75% and above. Please investigate the
 reason for the low efficiency.

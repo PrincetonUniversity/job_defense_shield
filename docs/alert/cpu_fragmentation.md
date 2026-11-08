@@ -45,13 +45,13 @@ The parameters are explained below:
 
 - `mem_per_node`: CPU memory per node in units of GB.
 
-- `safety_frac`: The memory used by the job is multiplied by 1 + `safety_frac` and this number is compared against the product of the number of nodes and the memory per node in deciding whether or not sufficent memory was used to ignore the job independent of the number of allocated CPU-cores. The idea is to ignore jobs that are almost using all of the allocated CPU memory.
+- `safety_frac`: The memory used by the job is multiplied by 1 + `safety_frac` and this number is compared against the product of the number of nodes and the memory per node in deciding whether or not sufficient memory was used to ignore the job independent of the number of allocated CPU-cores. The idea is to ignore jobs that are almost using all of the allocated CPU memory.
 
 - `email_file`: The text file to be used for the email message to users.
 
 - `min_nodes_thres`: (Optional) Minimum number of allocated nodes for a job to be considered. For instance, if `min_nodes_thres: 4` then jobs that ran on 3 nodes or less will be ignored. Default: 2
 
-- `cores_per_node_thres`: (Optional) Only consider jobs with less than this number of cores per node. If this setting is used then the following settings will be ignored: `cores_per_node`, `mem_per_node`, and `safety_frac`. Additionally, the only placeholders that will be available are `<GREETING>`, `<DAYS>`, `<CLUSTER>`, `<PARTITIONS>`, `<TABLE>`, and `<JOBSTATS>`. The `<TABLE>` placeholder will not contain `Min-Nodes`. The `cores_per_node_thres` setting provides a simple way to address multinode CPU fragmentation on a cluster composed of hetergeneous nodes.
+- `cores_per_node_thres`: (Optional) Only consider jobs with less than this number of cores per node. If this setting is used then the following settings will be ignored: `cores_per_node`, `mem_per_node`, and `safety_frac`. Additionally, the only placeholders that will be available are `<GREETING>`, `<DAYS>`, `<CLUSTER>`, `<PARTITIONS>`, `<TABLE>`, and `<JOBSTATS>`. The `<TABLE>` placeholder will not contain `Min-Nodes`. The `cores_per_node_thres` setting provides a simple way to address multinode CPU fragmentation on a cluster composed of heterogeneous nodes.
 
 - `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
 
@@ -92,15 +92,15 @@ Below is an example report:
 ```
 $ job_defense_shield --multinode-cpu-fragmentation
 
-                     Multinode CPU Jobs with Fragmentation                         
+                     Multinode CPU Jobs with Fragmentation  
 -------------------------------------------------------------------------------
  JobID    User   Nodes  Cores Mem-per-Node-Used Cores-per-Node Min-Nodes Emails
 -------------------------------------------------------------------------------
-6286517  u45923   20     20          1 GB             1            1        0   
-6286840  u45923   10     10          1 GB             1            1        0   
-6287417  u45923   10     10          3 GB             1            1        0   
-6288471  u45923   10     10          4 GB             1            1        0   
-6289852  u45923    5     10         12 GB             2            1        0   
+6286517  u45923   20     20          1 GB             1            1        0  
+6286840  u45923   10     10          1 GB             1            1        0  
+6287417  u45923   10     10          3 GB             1            1        0  
+6288471  u45923   10     10          4 GB             1            1        0  
+6289852  u45923    5     10         12 GB             2            1        0  
 -------------------------------------------------------------------------------
    Cluster: della
 Partitions: cpu
@@ -121,11 +121,11 @@ Below are your jobs over the past 7 days on Della which appear to be using
 more nodes than necessary:
 
      JobID   Nodes  Mem-per-Node  Cores-per-Node  Hours  Nodes-Needed
-    62862517   20        1 GB            1         2.2        1      
-    62869840   10        1 GB            1         2.9        1      
-    62874417   10        3 GB            1          12        1      
-    62886471   10        4 GB            1          12        1      
-    62892852    5       12 GB            2          22        1      
+    62862517   20        1 GB            1         2.2        1  
+    62869840   10        1 GB            1         2.9        1  
+    62874417   10        3 GB            1          12        1  
+    62886471   10        4 GB            1          12        1  
+    62892852    5       12 GB            2          22        1  
 
 The "Nodes" column shows the number of nodes used to run the job. The
 "Nodes-Needed" column shows the minimum number of nodes needed to run the

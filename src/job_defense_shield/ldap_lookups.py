@@ -38,7 +38,7 @@ def ldap_lookup(user: str,
 
     ldap_uri = ldap.get("ldap_uri")
     ldap_starttls = ldap.get("ldap_starttls", False)
-    
+
     if not ldap_uri:
         ldap_uri = f"ldaps://{ldap_server}"
     cmd = (

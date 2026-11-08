@@ -2,7 +2,7 @@
 
 You have job(s) that have not used the GPU(s) for the last <WARNING-HRS> hours:
 
-<TABLE> 
+<TABLE>
 
 These jobs will be AUTOMATICALLY CANCELLED if they are found to not be using the
 GPU(s) for a period of <CANCEL-HRS> hours.

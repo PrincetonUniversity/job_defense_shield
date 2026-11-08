@@ -7,7 +7,7 @@ This report shows the jobs with the most allocated GPUs. Only one job per user i
 ```
 $ job_defense_shield --most-gpus
 
-                 Jobs with the Most GPUs (1 Job per User)                  
+                 Jobs with the Most GPUs (1 Job per User)  
 --------------------------------------------------------------------------
  JobID     User  Cluster  GPUs Nodes  Cores  State Partition Hours GPU-Eff
 --------------------------------------------------------------------------

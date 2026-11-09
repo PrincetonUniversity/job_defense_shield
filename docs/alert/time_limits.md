@@ -17,7 +17,7 @@ excessive-time-cpu-1:
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]
   num_top_users:            10  # count
-  num_jobs_display:         10  # count
+  num_jobs_display:          4  # count
   email_file: "excessive_time.txt"
   admin_emails:
     - admin@institution.edu
@@ -45,7 +45,7 @@ The parameters are explained below:
 
 - `show_all_users`: (Optional) Flag to show all of the top users in the report instead of only the top users with low time efficiency. Default: `False`
 
-- `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 10
+- `num_jobs_display`: (Optional) Number of jobs to display in the email message to users. Default: 4
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 

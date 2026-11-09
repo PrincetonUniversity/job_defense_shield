@@ -196,7 +196,7 @@ high-util-but-low-sm-1:
   sm_thres_pct:           15  # percent
   gpu_hours_thres_user:  100  # gpu-hours
   gpu_hours_thres_admin: 100  # gpu-hours
-  num_jobs_display:        5  # count
+  num_jobs_display:        4  # count
   email_file: "high_util_but_low_sm.txt"
   admin_emails:
     - admin@institution.edu
@@ -214,7 +214,7 @@ low-tc-utilization-1:
   tc_thres_pct:           10  # percent
   gpu_hours_thres_user:  100  # gpu-hours
   gpu_hours_thres_admin: 100  # gpu-hours
-  num_jobs_display:        5  # count
+  num_jobs_display:        4  # count
   email_file: "low_tc_utilization.txt"
   admin_emails:
     - admin@institution.edu
@@ -234,7 +234,7 @@ excessive-time-gpu-1:
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]
   num_top_users:             5  # count
-  num_jobs_display:         10  # count
+  num_jobs_display:          4  # count
   email_file: "excessive_time.txt"
   admin_emails:
     - admin@institution.edu
@@ -276,7 +276,7 @@ excess-cpu-memory-1:
   mean_ratio_threshold:   0.35  # [0.0, 1.0]
   median_ratio_threshold: 0.35  # [0.0, 1.0]
   num_top_users:            10  # count
-  num_jobs_display:         10  # count
+  num_jobs_display:          4  # count
   email_file: "excess_cpu_memory.txt"
   admin_emails:
     - admin@institution.edu
@@ -345,8 +345,8 @@ excessive-time-cpu-1:
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   mean_ratio_threshold:    0.2  # [0.0, 1.0]
   median_ratio_threshold:  0.2  # [0.0, 1.0]
-  num_top_users:            10
-  num_jobs_display:         10
+  num_top_users:            10  # count
+  num_jobs_display:          4  # count
   email_file: "excessive_time.txt"
   admin_emails:
     - admin@institution.edu

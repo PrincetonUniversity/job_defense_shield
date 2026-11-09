@@ -51,7 +51,7 @@ The available settings are listed below:
 
 - `show_all_users`: (Optional) Flag to show all of the top users in the report. Default: False
 
-- `num_jobs_display`: (Optional) Maximum number of jobs to display in the email message to users. Default: 5
+- `num_jobs_display`: (Optional) Maximum number of jobs to display in the email message to users. Default: 4
 
 - `max_num_jobid_admin`: (Optional) Maximum number of JobID's to show in the report to administrators. If the number of
 jobs per user is greater than this value then a "+" character is appended to the end of the list. Default: 2

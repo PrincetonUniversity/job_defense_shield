@@ -1,5 +1,7 @@
 # Project Instructions: Job Defense Shield
 
+Extensibility, maintainability, and readability are more important than performance.
+
 ## 1. Code Style and Conventions
 - Strictly follow the existing formatting of the Python source code.
 

@@ -25,7 +25,7 @@ class ExcessiveTimeLimits(Alert):
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 10
         if not hasattr(self, "num_jobs_display"):
-            self.num_jobs_display = 10
+            self.num_jobs_display = 4
         if not hasattr(self, "mean_ratio_threshold"):
             self.mean_ratio_threshold = 1.0
         if not hasattr(self, "median_ratio_threshold"):

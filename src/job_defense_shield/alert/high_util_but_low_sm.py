@@ -31,7 +31,7 @@ class HighUtilButLowSM(Alert):
         if not hasattr(self, "gpu_hours_thres_admin"):
             self.gpu_hours_thres_admin = 0
         if not hasattr(self, "num_jobs_display"):
-            self.num_jobs_display = 5
+            self.num_jobs_display = 4
 
     def _filter_and_add_new_fields(self) -> None:
         self.df = self.df[(self.df["cluster"] == self.cluster) &

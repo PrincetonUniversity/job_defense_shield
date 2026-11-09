@@ -131,7 +131,7 @@ excessive-time-cpu-1:
   absolute_thres_hours: 100000  # unused cpu-hours
   overall_ratio_threshold: 0.2  # [0.0, 1.0]
   num_top_users:            10  # count
-  num_jobs_display:         10  # count
+  num_jobs_display:          4  # count
   email_file: "excessive_time.txt"
   admin_emails:
     - admin@institution.edu

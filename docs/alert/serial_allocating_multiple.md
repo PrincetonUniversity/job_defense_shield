@@ -38,6 +38,7 @@ The parameters are explained below:
 
 - `num_top_users`: (Optional) Only consider up to this number of users after sorting by "wasted CPU-hours".
 
+- `num_jobs_display`: (Optional) Maximum number of jobs to display in the email message to users. Default: 4
 
 - `ignore_job_arrays`: (Optional) Ignore jobs in a job array. Default: False
 

@@ -24,7 +24,7 @@ class ExcessCPUMemory(Alert):
         if not hasattr(self, "num_top_users"):
             self.num_top_users = 15
         if not hasattr(self, "num_jobs_display"):
-            self.num_jobs_display = 10
+            self.num_jobs_display = 4
 
     def _filter_and_add_new_fields(self):
         # exclude gpu jobs?

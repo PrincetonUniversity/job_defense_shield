@@ -6,7 +6,7 @@ Tensor Core utilization is the percentage of time that the Tensor Cores are acti
 
 When a workload can take advantage of mixed-precision or matrix operations (such as FP16, BF16, TF32, or FP8), utilizing Tensor Cores can provide a substantial speedup compared to standard CUDA cores.
 
-This alert is useful for clusters or partitions that are devoted to AI codes which should almost always use the Tensor Codes.
+This alert is useful for clusters or partitions that are devoted to AI codes which should almost always use the Tensor Cores.
 
 Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert.
 

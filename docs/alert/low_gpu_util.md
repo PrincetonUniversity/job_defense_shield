@@ -85,7 +85,7 @@ Partitions: gpu
 
 ## Email Message to Users
 
-Below is an example email (see `email/low_gpu_efficiencies.txt`):
+Below is an example email (see `email/low_gpu_efficiency.txt`):
 
 ```
 Hello Alan (u12345),
@@ -112,7 +112,7 @@ The following placeholders can be used in the email file:
 - `<PARTITIONS>`: A comma-separated list of the partitions used by the user.
 - `<EFFICIENCY>`: The mean GPU efficiency of the user.
 - `<RANK>`: The GPU-rank of the user as determined by number of allocated GPU-hours.
-- `<GPU-MEM-PCT>`: The value of `gpu_mem_eff_pct` from the alert settings.
+- `<GPU-MEM-PCT>`: The value of `gpu_mem_eff_pct` from the alert settings (only available when `gpu_mem_eff_pct` is specified in `config.yaml`).
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<TARGET>`: The value of `eff_target_pct` from the alert settings.
 - `<TABLE>`: A table of showing mean efficiency and other values for the user.

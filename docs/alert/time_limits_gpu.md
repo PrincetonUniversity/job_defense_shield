@@ -36,9 +36,9 @@ The available settings are listed below:
 
 - `email_file`: The text file to be used for the email message to users.
 
-- `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used GPU-hours to allocated GPU-hours.
+- `mean_ratio_threshold`: (Optional) Mean of the per job ratio of used GPU-hours to allocated GPU-hours. Default: 1
 
-- `median_ratio_threshold`: (Optional) Same as above but for the median instead of the mean.
+- `median_ratio_threshold`: (Optional) Same as above but for the median instead of the mean. Default: 1
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 

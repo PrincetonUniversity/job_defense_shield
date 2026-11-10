@@ -94,13 +94,14 @@ class SerialAllocatingMultipleCores(Alert):
             def jobid_list(series):
                 ellipsis = "+" if len(series) > self.max_num_jobid_admin else ""
                 return ",".join(series[:self.max_num_jobid_admin]) + ellipsis
-            d = {"CPU-Hours-Wasted":"sum",
-                 "User":"size",
-                 "CPU-Cores":"mean",
-                 "JobID":jobid_list}
+            d = {"CPU-Hours-Wasted": "sum",
+                 "User": "size",
+                 "CPU-Cores": "mean",
+                 "JobID": jobid_list}
             self.gp = self.df.groupby("User").agg(d).rename(columns={"User":"Jobs"})
             self.gp.reset_index(drop=False, inplace=True)
             self.gp = self.gp[self.gp["CPU-Hours-Wasted"] > self.cpu_hours_threshold]
+            self.gp = self.gp.sort_values(by="CPU-Hours-Wasted", ascending=False)
             self.gp = self.gp.head(self.num_top_users)
 
     def create_emails(self, method):

@@ -129,7 +129,7 @@ class ExcessiveTimeLimits(Alert):
                 tags["<MODE-UPPER>"] = self.mode.upper()
                 tags["<AVERAGE>"] = str(round(100 * usr["mean-ratio"].values[0]))
                 tags["<NUM-JOBS>"] = str(total_jobs)
-                tags["<NUM-JOBS-DISPLAY>"] = str(total_jobs)
+                tags["<NUM-JOBS-DISPLAY>"] = str(self.num_jobs_display)
                 tags["<TABLE>"] = "\n".join([indent + row for row in table])
                 tags["<UNUSED-HOURS>"] = str(round(usr[f"{xpu.upper()}-Hours-Unused"].values[0]))
                 translator = EmailTranslator(self.email_files_path,

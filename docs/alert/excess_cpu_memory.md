@@ -51,7 +51,9 @@ and 1.
 
 - `mem_per_node`: (Optional) CPU memory per node in units of GB.
 
-- `cores_fraction`: (Optional) Fraction of the cores per node that will cause the job to be ignored. For instance, with `cores_fraction: 0.8` if a node has 32 cores and the job allocates 30 of them then the job will be ignored since 30/32 > 0.8. Default: 1
+- `cores_fraction`: (Optional) Fraction of the cores per node that will cause the job to be ignored (requires `cores_per_node` to also be set). For instance, with `cores_fraction: 0.8` if a node has 32 cores and the job allocates 30 of them then the job will be ignored since 30/32 > 0.8. Default: 1
+
+- `combine_partitions`: (Optional) If `True` then combine all specified partitions before grouping by user. Default: `False`
 
 - `num_top_users`: (Optional) Only consider the number of users equal to this value after sorting by "unused TB-hours". Default: 15
 
@@ -137,14 +139,14 @@ The following placeholders can be used in the email file:
 - `<CLUSTER>`: The cluster specified for the alert (i.e., `cluster`).
 - `<PARTITIONS>`: A comma-separated list of the partitions used by the user.
 - `<DAYS>`: Time window of the alert in days (7 is default).
-- `<CASE>`: The rank of the user (see email file).
+- `<CASE>`: Helper text relating to the number of jobs.
 - `<NUM-JOBS>`: Number of jobs that are over-allocating memory.
 - `<UNUSED>`: Memory-hours that were unused.
 - `<PERCENT>`: Mean memory efficiency or average ratio of used CPU memory to allocated.
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: The `jobstats` command for the first job of the user.
 
-When `mem_per_node` and `cores_per_node` are used then one more placeholder is available:
+When `mem_per_node` is used then one more placeholder is available:
 
 - `<NUM-WASTED-NODES>`: The number of wasted nodes due to the wasted CPU memory. This is equal to
 the number of unused TB-hours divided by the product of the CPU memory per node in TB and the number of hours in the time window (default is 168 hours or 7 days).

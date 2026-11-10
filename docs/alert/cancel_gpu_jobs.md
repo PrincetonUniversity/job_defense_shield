@@ -117,14 +117,13 @@ Jobs with GPUs that are idle for the first 2 hours (120 minutes) will be cancell
 
 ```yaml
 cancel-zero-gpu-jobs-1:
-  cluster:
-    - della
+  cluster: della
   partitions:
     - gpu
     - llm
   sampling_period_minutes: 15  # minutes
   first_warning_minutes:   60  # minutes
-  scond_warning_minutes:  105  # minutes
+  second_warning_minutes: 105  # minutes
   cancel_minutes:         120  # minutes
   email_file_first_warning:  "cancel_gpu_jobs_warning_1.txt"
   email_file_second_warning: "cancel_gpu_jobs_warning_2.txt"
@@ -140,8 +139,7 @@ The example below is the same as that above except only one warning email will b
 
 ```yaml
 cancel-zero-gpu-jobs-1:
-  cluster:
-    - della
+  cluster: della
   partitions:
     - gpu
     - llm
@@ -159,8 +157,7 @@ Cancel jobs that are found to have 0% GPU utilization over any time period of 5 
 
 ```yaml
 cancel-zero-gpu-jobs-1:
-  cluster:
-    - della
+  cluster: della
   partitions:
     - gpu
     - llm
@@ -332,7 +329,7 @@ The following placeholders can be used in the email file:
 
 ## Warning Email (Sliding Window Over Last N Minutes)
 
-Below is an example email for the warning (see `email/cancel_gpu_sliding_warning.txt`):
+Below is an example email for the warning (see `email/cancel_gpu_jobs_sliding_warning.txt`):
 
 ```
 Hi Alan (aturing),

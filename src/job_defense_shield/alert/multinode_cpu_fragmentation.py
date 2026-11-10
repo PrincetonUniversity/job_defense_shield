@@ -23,7 +23,7 @@ class MultinodeCpuFragmentation(Alert):
             self.email_subject = "Multinode CPU Jobs with Fragmentation"
         if not hasattr(self, "report_title"):
             self.report_title = "Multinode CPU Jobs with Fragmentation"
-        if not hasattr(self, "min_nodes"):
+        if not hasattr(self, "min_nodes_thres"):
             self.min_nodes_thres = 2
 
     def is_fragmented(self, cores_per_node, mem_per_node_used) -> bool:

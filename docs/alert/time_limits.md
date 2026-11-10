@@ -128,6 +128,7 @@ The following placeholders can be used in the email file:
 - `<PARTITIONS>`: A comma-separated list of partitions used by the user.
 - `<DAYS>`: Number of days in the time window (default is 7).
 - `<MODE-UPPER>`: Equal to "CPU".
+- `<CASE>`: Helper text relating to the number of jobs.
 - `<AVERAGE>`: Mean of the per-job CPU-hours used divided by CPU-hours allocated.
 - `<NUM-JOBS>`: Total number of jobs.
 - `<NUM-JOBS-DISPLAY>`: Number of jobs to list in the table.

@@ -131,5 +131,5 @@ $ job_defense_shield --zero-cpu-utilization --check
 Below is an example `crontab` entry:
 
 ```
-0 9 * * 1-5 /path/to/job_defense_shield --zero-cpu-utilization --email -M della -r gpu,llm > /path/to/log/zero_cpu_utilization.log 2>&1
+0 9 * * 1-5 /path/to/job_defense_shield --zero-cpu-utilization --email -M della -r cpu > /path/to/log/zero_cpu_utilization.log 2>&1
 ```

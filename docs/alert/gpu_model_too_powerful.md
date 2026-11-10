@@ -12,8 +12,8 @@ number of allocated CPU-cores.
 Here is an example entry for `config.yaml`:
 
 ```yaml
-gpu-model-too-powerful:
-  clusters: della
+gpu-model-too-powerful-1:
+  cluster: della
   partitions:
     - gpu
   min_run_time:          61  # minutes
@@ -50,7 +50,7 @@ The available settings are listed below:
 
 - `gpu_hours_threshold`: (Optional) Minimum number of GPU-hours (summed over the jobs) for the user to be included. This setting makes it possible to ignore users that are not consuming many resources. Default: 0
 
-- `gpu_util_target`: (Optional) The minimum acceptable GPU utilization. This must be specified for the `<TARGET>` placeholder to be available. Default: 50
+- `gpu_util_target`: (Optional) The minimum acceptable GPU utilization. Default: 50
 
 - `min_run_time`: (Optional) The minimum run time of a job for it to be considered. Jobs that did not run longer
 than this limit will be ignored. Default: 0

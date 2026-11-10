@@ -171,13 +171,13 @@ gpu-model-too-powerful-1:
   cluster: stellar
   partitions:
     - gpu
-  min_run_time:        61  # minutes
-  gpu_hours_threshold: 24  # gpu-hours
-  num_cores_threshold:  2  # count
-  gpu_util_threshold:  15  # percent
-  gpu_mem_threshold:   10  # GB
-  cpu_mem_threshold:   32  # GB
-  gpu_util_target:     50  # percent
+  min_run_time:          61  # minutes
+  gpu_hours_threshold:   24  # gpu-hours
+  num_cores_per_gpu:      2  # count
+  gpu_util_threshold:    15  # percent
+  gpu_mem_usage_max:     10  # GB
+  cpu_mem_usage_per_gpu: 32  # GB
+  gpu_util_target:       50  # percent
   email_file: "gpu_model_too_powerful.txt"
   admin_emails:
     - admin@institution.edu

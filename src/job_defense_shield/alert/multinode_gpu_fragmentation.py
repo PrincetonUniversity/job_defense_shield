@@ -52,6 +52,7 @@ class MultinodeGpuFragmentation(Alert):
             # drop jobs with non-zero error code
             self.df = self.df[self.df["error-code"] == 0]
             self.df["GPU-Eff"] = self.df["GPU-Eff-tpl"].apply(lambda tpl: tpl[0])
+            self.df = self.df[self.df["GPU-Eff"] > 0]
             self.df = self.df.drop(columns=["GPU-Eff-tpl", "error-code"])
 
             self.df["GPUs-per-Node"] = self.df.gpus / self.df.nodes

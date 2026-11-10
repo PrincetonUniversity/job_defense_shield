@@ -19,7 +19,7 @@ zero-util-gpu-hours-1:
   min_run_time:              0  # minutes
   gpu_hours_threshold_user: 24  # hours
   gpu_hours_threshold_admin: 0  # hours
-  max_num_jobid:             4  # count
+  max_num_jobid_admin:       4  # count
   email_file: "zero_util_gpu_hours.txt"
   admin_emails:
     - admin@institution.edu
@@ -40,12 +40,10 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time in minutes for a job to be included in the calculation. For example, if `min_run_time: 30` is used then jobs that ran for less than 30 minutes are ignored. Default: 0
 
-- `max_num_jobid`: (Optional) Maximum number of JobID's to show for a given user. If the number of
+- `max_num_jobid_admin`: (Optional) Maximum number of JobID's to show in the report to administrators for a given user. If the number of
 jobs per user is greater than this value then a "+" character is appended to the end of the list. Default: 4
 
 - `include_running_jobs`: (Optional) If `True` then jobs in a state of `RUNNING` will be included in the calculation. The Prometheus server must be queried for each running job, which can be an expensive operation. Default: `False`
-
-- `max_num_jobid_admin`: (Optional) Maximum number of JobID's to list in the report to administrators. Default: 4
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -72,14 +70,14 @@ For this alert, a GPU is said to have 0% utilization if all of the measurements 
 Below is second example entry for `config.yaml`:
 
 ```yaml
-zero-util-gpu-hours:
+zero-util-gpu-hours-1:
   cluster: stellar
   partitions:
     - gpu
   min_run_time:              30  # minutes
   gpu_hours_threshold_user:  24  # hours
   gpu_hours_threshold_admin: 12  # hours
-  max_num_jobid:              3  # count
+  max_num_jobid_admin:        3  # count
   email_file: "zero_util_gpu_hours.txt"
   admin_emails:
     - admin@institution.edu
@@ -131,7 +129,7 @@ Hello Alan (u12345),
 You have consumed 120 GPU-hours at 0% GPU utilization in the past 7 days
 on the pli-c partition(s) of della:
 
-     JobID     GPUs  GPUs-Unused GPU-Unused-Util  Zero-Util-GPU-Hours
+     JobID     GPUs  GPUs-Unused GPU-Unused-Util  GPU-Hours-At-0%
     62399648    8          8           0%                 36  
     62399649    8          8           0%                 36  
     62400616    8          8           0%                 36  

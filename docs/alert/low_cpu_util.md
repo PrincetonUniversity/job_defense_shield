@@ -27,7 +27,7 @@ per alert.
 
 - `partitions`: Specify one or more Slurm partitions. Use `"*"` to include all partitions (i.e., `partitions: ["*"]`).
 
-- `eff_thres_pct`: Efficiency threshold percentage. Users with a `eff_thres_pct` os less than or equal to this value will receive an email. plus more
+- `eff_thres_pct`: Efficiency threshold percentage. Users with a mean CPU efficiency of less than or equal to this value will be considered to receive an email.
 
 - `absolute_thres_hours`: A user must have used more than this number of CPU-hours to be considered to receive an email.
 
@@ -41,7 +41,7 @@ per alert.
 
 - `min_run_time`: (Optional) Minimum run time of a job in units of minutes. If `min_run_time: 61` then jobs that ran for an hour or less are ignored. Default: 0
 
-- `proportion_thres_pct`: (Optional) Proportional threshold percentage. A user must being using at least this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will excluded all users that are using less than 2% of the total CPU-hours. Default: 0
+- `proportion_thres_pct`: (Optional) Proportional threshold percentage. A user must be using at least this proportion of the total CPU-hours (as a percentage) in order to be sent an email. For example, setting this to 2 will exclude all users that are using less than 2% of the total CPU-hours. Default: 0
 
 - `nodelist`: (Optional) Only apply this alert to jobs that ran on the specified nodes. See [example](../nodelist.md).
 
@@ -113,6 +113,7 @@ The following placeholders can be used in the email file:
 - `<CLUSTER>`: The name of the cluster.
 - `<PARTITIONS>`: A comma-separated list of partitions used by the user.
 - `<DAYS>`: Number of days in the time window (default is 7 days).
+- `<RANK>`: The CPU-rank of the user as determined by number of allocated CPU-hours.
 - `<EFFICIENCY>`: Mean CPU efficiency of the user (e.g., 23%).
 - `<TARGET>`: Target value for the mean CPU efficiency.
 - `<TABLE>`: A table of jobs for the user.

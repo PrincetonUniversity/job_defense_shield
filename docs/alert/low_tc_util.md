@@ -4,7 +4,7 @@ This alert identifies users whose jobs exhibit low Tensor Core utilization.
 
 Tensor Cores are specialized execution units designed to accelerate matrix operations, which are fundamental to deep learning and scientific computing workloads. Tensor Core utilization is the percentage of time that the Tensor Cores are active. When a workload can take advantage of mixed-precision or matrix operations (such as FP16, BF16, TF32, or FP8), utilizing Tensor Cores can provide a substantial speedup compared to standard CUDA cores.
 
-This alert is useful for clusters or partitions that are devoted to AI codes which should almost always use the Tensor Cores.
+This alert is useful for clusters or partitions that are intended for AI workloads, which should almost always use the Tensor Cores.
 
 !!! note
 

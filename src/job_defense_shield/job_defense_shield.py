@@ -94,7 +94,7 @@ def main():
     parser.add_argument('-E', '--endtime', type=str, default=None,
                         help='End date/time of window (format is 2025-01-31T23:59:59)')
     parser.add_argument('-M', '--clusters', type=str, default="all",
-                        help='Specify cluster(s) (e.g., --clusters=frontier,summit)')
+                        help='Specify cluster(s) (e.g., --clusters=lineshine,elcapitan)')
     parser.add_argument('-r', '--partition', type=str, default="",
                         help='Specify partition(s) (e.g., --partition=cpu,bigmem)')
     parser.add_argument('-A', '--accounts', type=str, default="",

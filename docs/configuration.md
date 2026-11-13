@@ -5,7 +5,7 @@ Job Defense Shield is configured using a YAML file, which specifies global setti
 Below is a minimal configuration file (`config.yaml`) with one alert:
 
 ```yaml
-%YAML 1.1
+%YAML 1.2
 ---
 #####################
 ## GLOBAL SETTINGS ##

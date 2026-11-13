@@ -2,13 +2,13 @@
 
 This alert identifies users whose jobs exhibit low Tensor Core utilization.
 
-Tensor Core utilization is the percentage of time that the Tensor Cores are active. Tensor Cores are specialized execution units designed to accelerate matrix multiply-accumulate operations, which are fundamental to deep learning and scientific computing workloads.
-
-When a workload can take advantage of mixed-precision or matrix operations (such as FP16, BF16, TF32, or FP8), utilizing Tensor Cores can provide a substantial speedup compared to standard CUDA cores.
+Tensor Cores are specialized execution units designed to accelerate matrix operations, which are fundamental to deep learning and scientific computing workloads. Tensor Core utilization is the percentage of time that the Tensor Cores are active. When a workload can take advantage of mixed-precision or matrix operations (such as FP16, BF16, TF32, or FP8), utilizing Tensor Cores can provide a substantial speedup compared to standard CUDA cores.
 
 This alert is useful for clusters or partitions that are devoted to AI codes which should almost always use the Tensor Cores.
 
-Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert.
+!!! note
+
+    Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert. The alert expects to find `any_tensor_util_percent_avg`.
 
 ## Configuration File
 

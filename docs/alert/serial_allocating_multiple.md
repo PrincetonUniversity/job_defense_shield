@@ -126,7 +126,7 @@ The following placeholders can be used in the email file:
 - `<PARTITIONS>`: A comma-separated list of the partitions used by the user.
 - `<CASE>`: Helper text relating to the number of jobs.
 - `<DAYS>`: Number of days in the time window (default is 7).
-- `<CPU-HOURS>`: Total number of CPU-hours wasted if the jobs were in fact running serial codes. This quantity is the elapsed time of the job multiplied by the number of allocated core minus one (summed over all jobs).
+- `<CPU-HOURS>`: Total number of CPU-hours wasted if the jobs were in fact running serial codes. This quantity is the elapsed time of the job multiplied by the number of allocated cores minus one (summed over all jobs).
 - `<NUM-JOBS>`: Total number of serial jobs allocating multiple CPU-cores.
 - `<TABLE>`: Table of job data.
 - `<JOBSTATS>`: The `jobstats` command for the first job of the user.

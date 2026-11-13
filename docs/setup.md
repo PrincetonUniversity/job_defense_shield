@@ -46,7 +46,7 @@ Next, try running a simple informational alert. To do this, make a trivial confi
 $ cat config.yaml
 ```
 ```yaml
-%YAML 1.1
+%YAML 1.2
 ---
 #####################
 ## GLOBAL SETTINGS ##

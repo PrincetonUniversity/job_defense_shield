@@ -10,7 +10,9 @@ For reference, an NVIDIA B200 GPU has 148 active SMs, each containing 128 FP32 C
 
 Jobs with high GPU utilization but low SM utilization are good candidates to run on less powerful GPUs.
 
-Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert.
+!!! note
+
+    Jobstats 1.1.0+ with [detailed GPU metrics](https://princetonuniversity.github.io/jobstats/setup/detailed_gpu_metrics/) enabled is required for this alert. The alert expects to find `sm_util_percent_avg`.
 
 ## Configuration File
 
